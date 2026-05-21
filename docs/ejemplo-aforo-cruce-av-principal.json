@@ -1,0 +1,56 @@
+{
+  "name": "Cruce Av. Principal x Calle 5 — Aforo AM 30/04/2026",
+  "peak_hour_factor": 0.95,
+  "latitude": 7.780639,
+  "longitude": -72.221870,
+  "approaches": [
+    {
+      "id": "N",
+      "name": "Norte",
+      "lane_groups": [
+        { "id": "N-T", "movement": "through", "lanes": 2, "saturation_flow_per_lane": 1900, "shared_with_through": false },
+        { "id": "N-L", "movement": "left", "lanes": 1, "saturation_flow_per_lane": 1900, "shared_with_through": false }
+      ]
+    },
+    {
+      "id": "S",
+      "name": "Sur",
+      "lane_groups": [
+        { "id": "S-T", "movement": "through", "lanes": 2, "saturation_flow_per_lane": 1900, "shared_with_through": false },
+        { "id": "S-L", "movement": "left", "lanes": 1, "saturation_flow_per_lane": 1900, "shared_with_through": false }
+      ]
+    },
+    {
+      "id": "E",
+      "name": "Este",
+      "lane_groups": [
+        { "id": "E-T", "movement": "through", "lanes": 2, "saturation_flow_per_lane": 1900, "shared_with_through": false },
+        { "id": "E-L", "movement": "left", "lanes": 1, "saturation_flow_per_lane": 1900, "shared_with_through": false }
+      ]
+    },
+    {
+      "id": "W",
+      "name": "Oeste",
+      "lane_groups": [
+        { "id": "W-T", "movement": "through", "lanes": 2, "saturation_flow_per_lane": 1900, "shared_with_through": false },
+        { "id": "W-L", "movement": "left", "lanes": 1, "saturation_flow_per_lane": 1900, "shared_with_through": false }
+      ]
+    }
+  ],
+  "phases": [
+    { "id": "P1", "name": "N-S directo", "lane_group_ids": ["N-T", "S-T"], "min_green": 7, "max_green": 60, "yellow": 3, "all_red": 1 },
+    { "id": "P2", "name": "N-S izquierda", "lane_group_ids": ["N-L", "S-L"], "min_green": 7, "max_green": 25, "yellow": 3, "all_red": 1 },
+    { "id": "P3", "name": "E-W directo", "lane_group_ids": ["E-T", "W-T"], "min_green": 7, "max_green": 60, "yellow": 3, "all_red": 1 },
+    { "id": "P4", "name": "E-W izquierda", "lane_group_ids": ["E-L", "W-L"], "min_green": 7, "max_green": 25, "yellow": 3, "all_red": 1 }
+  ],
+  "demand": [
+    { "lane_group_id": "N-T", "volume": 735, "pcu_factor": 1.06 },
+    { "lane_group_id": "N-L", "volume": 173, "pcu_factor": 1.03 },
+    { "lane_group_id": "S-T", "volume": 694, "pcu_factor": 1.06 },
+    { "lane_group_id": "S-L", "volume": 154, "pcu_factor": 1.03 },
+    { "lane_group_id": "E-T", "volume": 1125, "pcu_factor": 1.12 },
+    { "lane_group_id": "E-L", "volume": 248, "pcu_factor": 1.08 },
+    { "lane_group_id": "W-T", "volume": 1066, "pcu_factor": 1.11 },
+    { "lane_group_id": "W-L", "volume": 222, "pcu_factor": 1.07 }
+  ]
+}

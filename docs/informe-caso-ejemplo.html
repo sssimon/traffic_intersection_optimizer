@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Informe — Cruce Av. Principal x Calle 5</title>
+<style>
+@page { size: A4; margin: 16mm 16mm 16mm 16mm; }
+* { box-sizing: border-box; }
+body { font-family:'Inter Tight','Helvetica Neue','Segoe UI',Arial,sans-serif;
+       font-size:10.5pt; line-height:1.5; color:#0a0a0a; margin:0; }
+h1 { font-size:15.5pt; font-weight:700; margin:22px 0 8px;
+     border-bottom:1px solid #0a0a0a; padding-bottom:3px; page-break-after:avoid; }
+h2 { font-size:11.5pt; font-weight:600; color:#8a0f1c; margin:14px 0 6px;
+     page-break-after:avoid; }
+p { margin:6px 0; text-align:justify; }
+strong { font-weight:700; }
+small { color:#7a7a7a; }
+table { border-collapse:collapse; width:100%; margin:8px 0; font-size:9pt;
+        page-break-inside:avoid; }
+th { background:#0a0a0a; color:#fff; text-align:left; padding:5px 7px;
+     font-size:8pt; text-transform:uppercase; letter-spacing:0.4px; }
+td { border:1px solid #d0d0d0; padding:4px 7px; }
+td.r, th.r { text-align:right; }
+td.c, th.c { text-align:center; }
+tbody tr:nth-child(even) td { background:#f6f6f6; }
+code { font-family:'JetBrains Mono',Consolas,monospace; font-size:9pt;
+       background:#f0f0f0; padding:1px 4px; }
+pre { background:#f4f4f4; border-left:3px solid #8a0f1c; padding:9px 12px;
+      font-size:9pt; page-break-inside:avoid; }
+ul,ol { margin:6px 0; padding-left:22px; }
+li { margin:3px 0; }
+img { max-width:88%; height:auto; display:block; margin:10px auto 4px;
+      page-break-inside:avoid; }
+.caption { text-align:center; font-size:8.5pt; color:#7a7a7a; margin:0 0 12px;
+           text-transform:uppercase; letter-spacing:1px; }
+.cover { page-break-after:always; padding-top:46mm; }
+.cover .kicker { font-size:10pt; letter-spacing:3px; text-transform:uppercase;
+                 color:#8a0f1c; font-weight:600; }
+.cover h1.title { font-size:30pt; font-weight:700; border:none; margin:8px 0 4px;
+                  letter-spacing:-1px; line-height:1.1; }
+.cover .sub { font-size:14pt; color:#0a0a0a; font-weight:400; margin:0 0 22px; }
+.cover .rule { height:4px; background:#8a0f1c; width:120px; margin:18px 0 26px; }
+.meta { width:100%; font-size:10pt; }
+.meta td { border:none; border-bottom:1px solid #e0e0e0; padding:7px 4px; }
+.meta td:first-child { color:#7a7a7a; text-transform:uppercase; font-size:8.5pt;
+                       letter-spacing:1px; width:42%; }
+.meta td:last-child { font-weight:600; }
+.badge { display:inline-block; min-width:22px; padding:1px 6px; text-align:center;
+         color:#fff; font-weight:700; font-size:9pt; }
+.A{background:#2e7d32}.B{background:#689f38}.C{background:#f9a825}
+.D{background:#ef6c00}.E{background:#c62828}.F{background:#4a0000}
+.kpis { display:flex; gap:10px; margin:12px 0; }
+.kpi { flex:1; border:1px solid #0a0a0a; padding:9px 11px; }
+.kpi .l { font-size:7.5pt; text-transform:uppercase; letter-spacing:1px;
+          color:#7a7a7a; }
+.kpi .v { font-size:19pt; font-weight:700; line-height:1.1; }
+.kpi .u { font-size:8pt; color:#7a7a7a; }
+.box { border-left:3px solid #8a0f1c; background:#faf2f2; padding:8px 12px;
+       margin:10px 0; font-size:10pt; page-break-inside:avoid; }
+.foot { margin-top:26px; padding-top:8px; border-top:1px solid #d0d0d0;
+        font-size:8pt; color:#9a9a9a; }
+</style>
+</head>
+<body>
+
+<!-- ============ PORTADA ============ -->
+<div class="cover">
+  <div class="kicker">Vialidad y Transporte · Informe técnico</div>
+  <h1 class="title">Análisis y optimización<br>semafórica de intersección</h1>
+  <p class="sub">Cruce Av. Principal × Calle 5 — periodo pico matutino</p>
+  <div class="rule"></div>
+  <table class="meta">
+    <tr><td>Intersección</td><td>Av. Principal × Calle 5 (4 accesos semaforizados)</td></tr>
+    <tr><td>Coordenadas</td><td>7.780639, −72.221870</td></tr>
+    <tr><td>Tipo de estudio</td><td>Aforo direccional de movimientos de giro</td></tr>
+    <tr><td>Fecha del aforo</td><td>Jueves 30 de abril de 2026</td></tr>
+    <tr><td>Periodo observado</td><td>07:00 – 09:00 h · intervalos de 15 min</td></tr>
+    <tr><td>Hora pico identificada</td><td>07:30 – 08:30 h</td></tr>
+    <tr><td>Métodos aplicados</td><td>Webster (1958) · HCM 2010 cap. 18 · microsimulación</td></tr>
+    <tr><td>Herramienta</td><td>Traffic Intersection Optimizer v0.1</td></tr>
+    <tr><td>Fecha del informe</td><td>20 de mayo de 2026</td></tr>
+  </table>
+  <div class="foot">Documento generado a partir del caso de ejemplo cargado en el sistema
+  (archivo <code>ejemplo-aforo-cruce-av-principal.json</code>). Cifras calculadas por el
+  motor de análisis; reproducibles importando dicho archivo.</div>
+</div>
+
+<!-- ============ 1. RESUMEN EJECUTIVO ============ -->
+<h1>1. Resumen ejecutivo</h1>
+<p>La intersección Av. Principal × Calle 5 opera en hora pico matutina con un
+<strong>nivel de servicio global E</strong> (operación deficiente) y una
+saturación máxima de <strong>v/c = 0,94</strong>. Aun con el plan de tiempos
+optimizado por el método de Webster, la demora media alcanza
+<strong>57,9 s/veh</strong> y los cuatro movimientos de giro a la izquierda
+operan en el límite o por encima de su capacidad.</p>
+
+<div class="kpis">
+  <div class="kpi"><div class="l">Demora media</div><div class="v">57,9</div><div class="u">s / veh</div></div>
+  <div class="kpi"><div class="l">LOS global</div><div class="v"><span class="badge E">E</span></div><div class="u">deficiente</div></div>
+  <div class="kpi"><div class="l">Saturación v/c</div><div class="v">0,94</div><div class="u">máximo</div></div>
+  <div class="kpi"><div class="l">Ciclo óptimo</div><div class="v">120</div><div class="u">segundos</div></div>
+</div>
+
+<p>El eje <strong>Este–Oeste</strong> concentra el tránsito (2&nbsp;661 veh/h entrantes
+frente a 1&nbsp;756 veh/h del eje Norte–Sur) y constituye el movimiento crítico.
+Los <strong>giros a la izquierda son el cuello de botella</strong>: tres de ellos
+(N-L, S-L, E-L) operan en nivel de servicio F. El análisis de escenarios indica que
+un incremento de apenas <strong>+10 % de demanda sobresatura la intersección</strong>
+(v/c = 1,03). En consecuencia, la optimización de tiempos por sí sola es insuficiente
+en el horizonte de proyecto y debe acompañarse de medidas de capacidad y de gestión
+de demanda (ver sección 12).</p>
+
+<!-- ============ 2. DESCRIPCIÓN ============ -->
+<h1>2. Descripción de la intersección</h1>
+<p>Intersección en cruz de cuatro accesos semaforizados (Norte, Sur, Este, Oeste).
+Cada acceso dispone de un grupo de carriles directo (2 carriles) y un grupo
+exclusivo de giro a la izquierda (1 carril). Los giros a la derecha son libres
+(no semaforizados) y no se incluyen en el análisis de tiempos.</p>
+
+<img src="figura-4-ubicacion.png" alt="Plano de ubicación de la intersección">
+<p class="caption">Plano de ubicación — coordenadas 7.780639, −72.221870
+(© OpenStreetMap · © CARTO)</p>
+
+<table>
+  <thead><tr><th>Acceso</th><th>Grupo</th><th>Movimiento</th><th class="r">Carriles</th>
+  <th class="r">Sat. base (veh/h/carril)</th></tr></thead>
+  <tbody>
+    <tr><td>Norte</td><td><code>N-T</code></td><td>Directo</td><td class="r">2</td><td class="r">1 900</td></tr>
+    <tr><td>Norte</td><td><code>N-L</code></td><td>Giro izquierda</td><td class="r">1</td><td class="r">1 900</td></tr>
+    <tr><td>Sur</td><td><code>S-T</code></td><td>Directo</td><td class="r">2</td><td class="r">1 900</td></tr>
+    <tr><td>Sur</td><td><code>S-L</code></td><td>Giro izquierda</td><td class="r">1</td><td class="r">1 900</td></tr>
+    <tr><td>Este</td><td><code>E-T</code></td><td>Directo</td><td class="r">2</td><td class="r">1 900</td></tr>
+    <tr><td>Este</td><td><code>E-L</code></td><td>Giro izquierda</td><td class="r">1</td><td class="r">1 900</td></tr>
+    <tr><td>Oeste</td><td><code>W-T</code></td><td>Directo</td><td class="r">2</td><td class="r">1 900</td></tr>
+    <tr><td>Oeste</td><td><code>W-L</code></td><td>Giro izquierda</td><td class="r">1</td><td class="r">1 900</td></tr>
+  </tbody>
+</table>
+
+<h2>Esquema de fases</h2>
+<table>
+  <thead><tr><th>Fase</th><th>Nombre</th><th>Grupos con verde</th>
+  <th class="r">Verde mín.</th><th class="r">Verde máx.</th><th class="r">Amarillo</th><th class="r">Todo-rojo</th></tr></thead>
+  <tbody>
+    <tr><td><code>P1</code></td><td>N-S directo</td><td><code>N-T</code>, <code>S-T</code></td><td class="r">7 s</td><td class="r">60 s</td><td class="r">3 s</td><td class="r">1 s</td></tr>
+    <tr><td><code>P2</code></td><td>N-S izquierda</td><td><code>N-L</code>, <code>S-L</code></td><td class="r">7 s</td><td class="r">25 s</td><td class="r">3 s</td><td class="r">1 s</td></tr>
+    <tr><td><code>P3</code></td><td>E-W directo</td><td><code>E-T</code>, <code>W-T</code></td><td class="r">7 s</td><td class="r">60 s</td><td class="r">3 s</td><td class="r">1 s</td></tr>
+    <tr><td><code>P4</code></td><td>E-W izquierda</td><td><code>E-L</code>, <code>W-L</code></td><td class="r">7 s</td><td class="r">25 s</td><td class="r">3 s</td><td class="r">1 s</td></tr>
+  </tbody>
+</table>
+
+<!-- ============ 3. METODOLOGÍA ============ -->
+<h1>3. Metodología</h1>
+<ul>
+  <li><strong>Aforo direccional.</strong> Conteo manual de vehículos por movimiento
+  de giro, en intervalos de 15 minutos, durante el periodo pico matutino.</li>
+  <li><strong>Reducción de datos.</strong> Identificación de la hora pico mediante
+  ventana móvil de cuatro intervalos y cálculo del factor de hora pico (PHF).</li>
+  <li><strong>Optimización Webster (1958).</strong> Cálculo del ciclo óptimo y del
+  reparto de verde a partir de los flujos críticos de cada fase.</li>
+  <li><strong>Análisis HCM 2010 (capítulo 18).</strong> Demora media por movimiento
+  <code>d = d1·PF + d2</code>, capacidad, grado de saturación v/c, cola al
+  95-percentil y nivel de servicio (LOS A–F).</li>
+  <li><strong>Microsimulación.</strong> Modelo discreto de tiempo con llegadas de
+  Poisson y descarga a flujo de saturación, para observar la evolución de colas.</li>
+</ul>
+<div class="box">El factor de equivalencia de vehículos pesados se aplicó como
+<code>PCU = 1 + %pesados</code> (equivalencia camión = 2,0). La demanda de diseño
+que utiliza el modelo es <code>demanda = conteo × PCU ÷ PHF</code>.</div>
+
+<!-- ============ 4. DATOS DE CAMPO ============ -->
+<h1>4. Datos de campo (aforo)</h1>
+<p>Vehículos contados por movimiento, en intervalos de 15 minutos.
+<code>L</code> = giro a la izquierda; <code>T</code> = movimiento directo.</p>
+
+<h2>Movimientos Norte–Sur</h2>
+<table>
+  <thead><tr><th>Intervalo</th><th class="r">N-L</th><th class="r">N-T</th><th class="r">S-L</th><th class="r">S-T</th></tr></thead>
+  <tbody>
+    <tr><td>07:00 – 07:15</td><td class="r">35</td><td class="r">150</td><td class="r">30</td><td class="r">140</td></tr>
+    <tr><td>07:15 – 07:30</td><td class="r">40</td><td class="r">165</td><td class="r">34</td><td class="r">152</td></tr>
+    <tr><td>07:30 – 07:45</td><td class="r">42</td><td class="r">180</td><td class="r">38</td><td class="r">170</td></tr>
+    <tr><td>07:45 – 08:00</td><td class="r">46</td><td class="r">195</td><td class="r">41</td><td class="r">182</td></tr>
+    <tr><td>08:00 – 08:15</td><td class="r">44</td><td class="r">185</td><td class="r">39</td><td class="r">176</td></tr>
+    <tr><td>08:15 – 08:30</td><td class="r">41</td><td class="r">175</td><td class="r">36</td><td class="r">166</td></tr>
+    <tr><td>08:30 – 08:45</td><td class="r">36</td><td class="r">155</td><td class="r">32</td><td class="r">148</td></tr>
+    <tr><td>08:45 – 09:00</td><td class="r">32</td><td class="r">140</td><td class="r">28</td><td class="r">132</td></tr>
+  </tbody>
+</table>
+
+<h2>Movimientos Este–Oeste</h2>
+<table>
+  <thead><tr><th>Intervalo</th><th class="r">E-L</th><th class="r">E-T</th><th class="r">W-L</th><th class="r">W-T</th></tr></thead>
+  <tbody>
+    <tr><td>07:00 – 07:15</td><td class="r">48</td><td class="r">210</td><td class="r">42</td><td class="r">200</td></tr>
+    <tr><td>07:15 – 07:30</td><td class="r">55</td><td class="r">245</td><td class="r">49</td><td class="r">232</td></tr>
+    <tr><td>07:30 – 07:45</td><td class="r">60</td><td class="r">270</td><td class="r">54</td><td class="r">258</td></tr>
+    <tr><td>07:45 – 08:00</td><td class="r">66</td><td class="r">295</td><td class="r">59</td><td class="r">278</td></tr>
+    <tr><td>08:00 – 08:15</td><td class="r">63</td><td class="r">285</td><td class="r">56</td><td class="r">270</td></tr>
+    <tr><td>08:15 – 08:30</td><td class="r">59</td><td class="r">275</td><td class="r">53</td><td class="r">260</td></tr>
+    <tr><td>08:30 – 08:45</td><td class="r">52</td><td class="r">240</td><td class="r">46</td><td class="r">228</td></tr>
+    <tr><td>08:45 – 09:00</td><td class="r">46</td><td class="r">210</td><td class="r">40</td><td class="r">198</td></tr>
+  </tbody>
+</table>
+<p><small>Vehículos pesados (buses/camiones, contados aparte): N-T 6 % · N-L 3 % ·
+S-T 6 % · S-L 3 % · E-T 12 % · E-L 8 % · W-T 11 % · W-L 7 %.</small></p>
+
+<!-- ============ 5. REDUCCIÓN ============ -->
+<h1>5. Reducción de datos</h1>
+<h2>Identificación de la hora pico</h2>
+<p>Sumando los ocho movimientos por intervalo y aplicando una ventana móvil de
+cuatro intervalos, la hora de máxima demanda resulta <strong>07:30 – 08:30</strong>,
+con un volumen total de <strong>4&nbsp;417 veh/h</strong>.</p>
+<table>
+  <thead><tr><th>Ventana (1 hora)</th><th class="r">Volumen total (veh/h)</th></tr></thead>
+  <tbody>
+    <tr><td>07:00 – 08:00</td><td class="r">4 061</td></tr>
+    <tr><td>07:15 – 08:15</td><td class="r">4 324</td></tr>
+    <tr><td><strong>07:30 – 08:30</strong></td><td class="r"><strong>4 417 — máxima</strong></td></tr>
+    <tr><td>07:45 – 08:45</td><td class="r">4 282</td></tr>
+  </tbody>
+</table>
+
+<h2>Factor de hora pico (PHF)</h2>
+<pre>PHF = V / (4 × volumen del intervalo de 15 min más alto)
+PHF = 4 417 / (4 × 1 162) = 4 417 / 4 648 = 0,95</pre>
+
+<h2>Demanda de diseño por movimiento</h2>
+<p>Demanda de la hora pico (suma de los cuatro intervalos 07:30–08:30) y factor PCU
+por contenido de vehículos pesados:</p>
+<table>
+  <thead><tr><th>Grupo</th><th class="r">Conteo hora pico (veh/h)</th><th class="r">PCU</th>
+  <th>Grupo</th><th class="r">Conteo hora pico (veh/h)</th><th class="r">PCU</th></tr></thead>
+  <tbody>
+    <tr><td><code>N-T</code></td><td class="r">735</td><td class="r">1,06</td>
+        <td><code>E-T</code></td><td class="r">1 125</td><td class="r">1,12</td></tr>
+    <tr><td><code>N-L</code></td><td class="r">173</td><td class="r">1,03</td>
+        <td><code>E-L</code></td><td class="r">248</td><td class="r">1,08</td></tr>
+    <tr><td><code>S-T</code></td><td class="r">694</td><td class="r">1,06</td>
+        <td><code>W-T</code></td><td class="r">1 066</td><td class="r">1,11</td></tr>
+    <tr><td><code>S-L</code></td><td class="r">154</td><td class="r">1,03</td>
+        <td><code>W-L</code></td><td class="r">222</td><td class="r">1,07</td></tr>
+  </tbody>
+</table>
+
+<!-- ============ 6. FIGURA FLUJOS ============ -->
+<h1>6. Flujos de demanda</h1>
+<img src="figura-1-flujos.svg" alt="Figura 1 - Flujos de demanda">
+<p class="caption">Figura 1 — Flujos de demanda de la hora pico (veh/h)</p>
+<p>La representación confirma que el eje Este–Oeste soporta la mayor carga
+(E-T 1&nbsp;125 y W-T 1&nbsp;066 veh/h en los movimientos directos), casi un 50 % por
+encima de los directos del eje Norte–Sur.</p>
+
+<!-- ============ 7. PLAN SEMAFÓRICO ============ -->
+<h1>7. Plan semafórico óptimo (Webster)</h1>
+<p>Aplicando el método de Webster a la demanda de diseño se obtiene un ciclo de
+<strong>120 segundos</strong> (valor máximo admisible: la intersección se encuentra
+próxima a la saturación) con un tiempo perdido total de 16 s por ciclo.</p>
+<table>
+  <thead><tr><th>Fase</th><th>Movimientos</th><th class="r">Verde efectivo</th>
+  <th class="r">Amarillo</th><th class="r">Todo-rojo</th></tr></thead>
+  <tbody>
+    <tr><td><code>P1</code> N-S directo</td><td>N-T, S-T</td><td class="r">27,6 s</td><td class="r">3 s</td><td class="r">1 s</td></tr>
+    <tr><td><code>P2</code> N-S izquierda</td><td>N-L, S-L</td><td class="r">12,6 s</td><td class="r">3 s</td><td class="r">1 s</td></tr>
+    <tr><td><code>P3</code> E-W directo</td><td>E-T, W-T</td><td class="r">44,7 s</td><td class="r">3 s</td><td class="r">1 s</td></tr>
+    <tr><td><code>P4</code> E-W izquierda</td><td>E-L, W-L</td><td class="r">19,0 s</td><td class="r">3 s</td><td class="r">1 s</td></tr>
+  </tbody>
+</table>
+<p>El reparto asigna el verde más largo a la fase E-W directo (P3), coherente con
+la mayor demanda de ese eje. Las fases de giro a la izquierda (P2 y P4) alcanzan
+el límite de su asignación.</p>
+
+<!-- ============ 8. ANÁLISIS HCM ============ -->
+<h1>8. Análisis de capacidad y nivel de servicio (HCM 2010)</h1>
+<table>
+  <thead><tr><th>Grupo</th><th>Fase</th><th class="r">Demanda dis.</th>
+  <th class="r">Capacidad</th><th class="r">v/c</th><th class="r">Demora (s)</th>
+  <th class="r">Cola 95 % (veh)</th><th class="c">LOS</th></tr></thead>
+  <tbody>
+    <tr><td><code>N-T</code></td><td>P1</td><td class="r">820</td><td class="r">874</td><td class="r">0,94</td><td class="r">64</td><td class="r">53,7</td><td class="c"><span class="badge E">E</span></td></tr>
+    <tr><td><code>N-L</code></td><td>P2</td><td class="r">188</td><td class="r">200</td><td class="r">0,94</td><td class="r">103</td><td class="r">12,4</td><td class="c"><span class="badge F">F</span></td></tr>
+    <tr><td><code>S-T</code></td><td>P1</td><td class="r">774</td><td class="r">874</td><td class="r">0,89</td><td class="r">58</td><td class="r">49,9</td><td class="c"><span class="badge E">E</span></td></tr>
+    <tr><td><code>S-L</code></td><td>P2</td><td class="r">167</td><td class="r">200</td><td class="r">0,84</td><td class="r">85</td><td class="r">10,9</td><td class="c"><span class="badge F">F</span></td></tr>
+    <tr><td><code>E-T</code></td><td>P3</td><td class="r">1 326</td><td class="r">1 416</td><td class="r">0,94</td><td class="r">49</td><td class="r">85,2</td><td class="c"><span class="badge D">D</span></td></tr>
+    <tr><td><code>E-L</code></td><td>P4</td><td class="r">282</td><td class="r">301</td><td class="r">0,94</td><td class="r">88</td><td class="r">18,6</td><td class="c"><span class="badge F">F</span></td></tr>
+    <tr><td><code>W-T</code></td><td>P3</td><td class="r">1 246</td><td class="r">1 416</td><td class="r">0,88</td><td class="r">43</td><td class="r">77,5</td><td class="c"><span class="badge D">D</span></td></tr>
+    <tr><td><code>W-L</code></td><td>P4</td><td class="r">250</td><td class="r">301</td><td class="r">0,83</td><td class="r">72</td><td class="r">16,2</td><td class="c"><span class="badge E">E</span></td></tr>
+  </tbody>
+</table>
+<p><strong>Resultado global:</strong> demora media de 57,9 s/veh, nivel de servicio
+<span class="badge E">E</span> y saturación máxima v/c = 0,94. La columna
+«Demanda dis.» corresponde a la demanda de diseño <code>conteo × PCU ÷ PHF</code>.</p>
+<div class="box">Los tres movimientos en nivel de servicio <strong>F</strong> (N-L, S-L y
+E-L) son giros a la izquierda con demoras de 85 a 103 s/veh. Constituyen el cuello
+de botella operativo de la intersección.</div>
+
+<!-- ============ 9. FIGURA RESULTADOS ============ -->
+<h1>9. Resultados del análisis</h1>
+<img src="figura-2-resultados.svg" alt="Figura 2 - Resultados del análisis">
+<p class="caption">Figura 2 — Nivel de servicio por movimiento y plan semafórico</p>
+
+<!-- ============ 10. SIMULACIÓN ============ -->
+<h1>10. Microsimulación</h1>
+<p>Simulación de 900 s (15 min) con llegadas de Poisson y semilla 42. De
+1&nbsp;235 vehículos generados se sirvieron 1&nbsp;208 (97,8 %); las colas son
+extensas pero todavía se disipan dentro del periodo analizado.</p>
+<div class="kpis">
+  <div class="kpi"><div class="l">Vehículos llegados</div><div class="v">1 235</div><div class="u">en 15 min</div></div>
+  <div class="kpi"><div class="l">Servidos</div><div class="v">97,8 %</div><div class="u">1 208 veh</div></div>
+  <div class="kpi"><div class="l">Espera media</div><div class="v">31,8</div><div class="u">s / veh</div></div>
+  <div class="kpi"><div class="l">Cola máxima</div><div class="v">35</div><div class="u">vehículos</div></div>
+</div>
+<table>
+  <thead><tr><th>Grupo</th><th class="r">Llegados</th><th class="r">Servidos</th>
+  <th class="r">Espera media (s)</th><th class="r">Cola máxima (veh)</th></tr></thead>
+  <tbody>
+    <tr><td><code>E-T</code></td><td class="r">322</td><td class="r">322</td><td class="r">26,5</td><td class="r">35</td></tr>
+    <tr><td><code>W-T</code></td><td class="r">301</td><td class="r">301</td><td class="r">25,2</td><td class="r">30</td></tr>
+    <tr><td><code>S-T</code></td><td class="r">196</td><td class="r">188</td><td class="r">31,1</td><td class="r">25</td></tr>
+    <tr><td><code>N-T</code></td><td class="r">206</td><td class="r">199</td><td class="r">34,1</td><td class="r">24</td></tr>
+    <tr><td><code>E-L</code></td><td class="r">64</td><td class="r">61</td><td class="r">48,5</td><td class="r">10</td></tr>
+    <tr><td><code>W-L</code></td><td class="r">59</td><td class="r">53</td><td class="r">40,5</td><td class="r">9</td></tr>
+    <tr><td><code>N-L</code></td><td class="r">47</td><td class="r">46</td><td class="r">55,7</td><td class="r">8</td></tr>
+    <tr><td><code>S-L</code></td><td class="r">40</td><td class="r">38</td><td class="r">51,1</td><td class="r">8</td></tr>
+  </tbody>
+</table>
+<img src="figura-3-simulacion.svg" alt="Figura 3 - Evolución de las colas">
+<p class="caption">Figura 3 — Evolución de la cola en los movimientos directos durante la simulación</p>
+<p>El patrón en diente de sierra refleja el ciclo del semáforo: la cola crece
+durante el rojo y se descarga durante el verde. En los movimientos directos del
+eje Este–Oeste las colas alcanzan de 30 a 35 vehículos antes de cada descarga;
+las del eje Norte–Sur se mantienen entre 24 y 25. Los giros a la izquierda (no
+graficados) no superan los 10 vehículos, pero con esperas unitarias más altas
+(50–56 s), confirmando el diagnóstico del análisis HCM: la mayor demora la
+sufren los giros, mientras que las colas más largas se forman en los directos.</p>
+
+<!-- ============ 11. ESCENARIOS ============ -->
+<h1>11. Escenarios y proyección de demanda</h1>
+<p>Se reoptimizó el plan de tiempos para distintos niveles de demanda, a fin de
+evaluar la sensibilidad de la intersección al crecimiento del tránsito.</p>
+<table>
+  <thead><tr><th>Escenario</th><th class="r">Factor</th><th class="r">Ciclo</th>
+  <th class="r">Demora media</th><th class="r">v/c máx</th><th class="c">LOS</th></tr></thead>
+  <tbody>
+    <tr><td>Valle (mediodía)</td><td class="r">0,65×</td><td class="r">61 s</td><td class="r">28 s</td><td class="r">0,74</td><td class="c"><span class="badge C">C</span></td></tr>
+    <tr><td>Hora pico AM (aforo actual)</td><td class="r">1,00×</td><td class="r">120 s</td><td class="r">58 s</td><td class="r">0,94</td><td class="c"><span class="badge E">E</span></td></tr>
+    <tr><td>Proyección +10 % (3 años)</td><td class="r">1,10×</td><td class="r">120 s</td><td class="r">75 s</td><td class="r">1,03</td><td class="c"><span class="badge E">E</span></td></tr>
+    <tr><td>Proyección +25 % (horizonte)</td><td class="r">1,25×</td><td class="r">120 s</td><td class="r">119 s</td><td class="r">1,18</td><td class="c"><span class="badge F">F</span></td></tr>
+  </tbody>
+</table>
+<p>Con un crecimiento de tan solo <strong>+10 %</strong> la intersección
+sobrepasa su capacidad (v/c = 1,03) y comienza a acumular colas residuales que no
+se disipan ciclo a ciclo. En el horizonte de proyecto (+25 %) la operación colapsa
+a nivel de servicio F con demoras de casi dos minutos por vehículo.</p>
+
+<!-- ============ 12. CONCLUSIONES ============ -->
+<h1>12. Conclusiones y recomendaciones</h1>
+<h2>Conclusiones</h2>
+<ul>
+  <li>La intersección <strong>ya opera al límite</strong> en la hora pico
+  matutina (LOS E, v/c = 0,94), lo que es consistente con la congestión y las
+  colas observadas en campo.</li>
+  <li>Los <strong>cuatro giros a la izquierda</strong> son el componente crítico;
+  tres de ellos operan en nivel de servicio F pese al plan optimizado.</li>
+  <li>El eje <strong>Este–Oeste</strong> es el de mayor demanda y ya recibe la
+  asignación de verde más larga posible.</li>
+  <li>La intersección <strong>carece de margen</strong>: +10 % de demanda la
+  sobresatura. La optimización de tiempos no resuelve el problema de fondo.</li>
+</ul>
+
+<h2>Estrategia recomendada</h2>
+<div class="box"><strong>Gestión de demanda + control adaptativo en red.</strong></div>
+<ol>
+  <li><strong>Corto plazo.</strong> Implantar control semafórico actuado
+  (vehicle-actuated) que responda a las fluctuaciones de demanda, y revisar la
+  asignación de las fases de giro a la izquierda (esquema lead/lag).</li>
+  <li><strong>Mediano plazo.</strong> Evaluar la ampliación de capacidad
+  geométrica en los accesos críticos: carril exclusivo adicional de giro a la
+  izquierda donde el espacio lo permita; coordinación de corredor (onda verde)
+  con las intersecciones contiguas.</li>
+  <li><strong>Largo plazo / horizonte de proyecto.</strong> Ante el escenario
+  +25 % (LOS F), considerar gestión activa de demanda (restricción horaria,
+  redistribución de flujos en la red) y, de confirmarse las proyecciones,
+  estudiar una solución de mayor capacidad (paso a desnivel o rediseño
+  geométrico mayor).</li>
+</ol>
+
+<div class="foot">Traffic Intersection Optimizer v0.1 — Webster (1958) · HCM 2010 cap. 18 ·
+microsimulación de tiempo discreto. Las cifras de este informe son reproducibles
+importando el archivo <code>ejemplo-aforo-cruce-av-principal.json</code> en la
+aplicación y ejecutando «Optimizar y analizar».</div>
+
+</body>
+</html>

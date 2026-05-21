@@ -1,0 +1,194 @@
+<svg viewBox="0 0 800 1010" xmlns="http://www.w3.org/2000/svg" font-family="'Inter Tight','Helvetica Neue',Arial,sans-serif">
+  <defs>
+    <marker id="r-D" viewBox="0 0 12 12" refX="9" refY="6" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M1,1 L11,6 L1,11 Z" fill="#ef6c00"/>
+    </marker>
+    <marker id="r-E" viewBox="0 0 12 12" refX="9" refY="6" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M1,1 L11,6 L1,11 Z" fill="#c62828"/>
+    </marker>
+    <marker id="r-F" viewBox="0 0 12 12" refX="9" refY="6" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M1,1 L11,6 L1,11 Z" fill="#4a0000"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="800" height="1010" fill="#fafafa"/>
+
+  <!-- title -->
+  <text x="400" y="44" text-anchor="middle" font-size="23" font-weight="700" fill="#0a0a0a">Figura 2 — Resultados del análisis</text>
+  <text x="400" y="70" text-anchor="middle" font-size="12" fill="#7a7a7a" letter-spacing="2">OPTIMIZACIÓN WEBSTER + ANÁLISIS HCM 2010 · NIVEL DE SERVICIO POR MOVIMIENTO</text>
+  <line x1="300" y1="84" x2="500" y2="84" stroke="#8a0f1c" stroke-width="2"/>
+
+  <!-- roads -->
+  <rect x="320" y="124" width="160" height="716" fill="#ececec"/>
+  <rect x="40" y="400" width="720" height="160" fill="#ececec"/>
+
+  <!-- centerlines -->
+  <g stroke="#b9b9b9" stroke-width="2" stroke-dasharray="11 9">
+    <line x1="400" y1="124" x2="400" y2="400"/>
+    <line x1="400" y1="560" x2="400" y2="840"/>
+    <line x1="40" y1="480" x2="320" y2="480"/>
+    <line x1="480" y1="480" x2="760" y2="480"/>
+  </g>
+
+  <!-- intersection box -->
+  <rect x="320" y="400" width="160" height="160" fill="#ffffff" stroke="#0a0a0a" stroke-width="2"/>
+  <g stroke="#0a0a0a" stroke-width="5">
+    <line x1="320" y1="400" x2="400" y2="400"/>
+    <line x1="400" y1="560" x2="480" y2="560"/>
+    <line x1="480" y1="400" x2="480" y2="480"/>
+    <line x1="320" y1="480" x2="320" y2="560"/>
+  </g>
+
+  <!-- approach names -->
+  <g text-anchor="middle" fill="#0a0a0a" font-size="15" font-weight="700">
+    <text x="400" y="858">SUR</text>
+    <text x="400" y="116">NORTE</text>
+  </g>
+  <g text-anchor="middle" fill="#0a0a0a" font-size="15" font-weight="700">
+    <text x="600" y="392">ESTE</text>
+    <text x="200" y="592">OESTE</text>
+  </g>
+
+  <!-- result arrows: colored by LOS -->
+  <g fill="none" stroke-width="6" stroke-linecap="butt" stroke-linejoin="round">
+    <path d="M350,170 L350,396"             stroke="#c62828" marker-end="url(#r-E)"/>
+    <path d="M383,170 L383,434 L450,434"    stroke="#4a0000" marker-end="url(#r-F)"/>
+    <path d="M450,810 L450,564"             stroke="#c62828" marker-end="url(#r-E)"/>
+    <path d="M417,810 L417,526 L350,526"    stroke="#4a0000" marker-end="url(#r-F)"/>
+    <path d="M730,430 L484,430"             stroke="#ef6c00" marker-end="url(#r-D)"/>
+    <path d="M730,463 L454,463 L454,528"    stroke="#4a0000" marker-end="url(#r-F)"/>
+    <path d="M70,530 L316,530"              stroke="#ef6c00" marker-end="url(#r-D)"/>
+    <path d="M70,497 L346,497 L346,432"     stroke="#c62828" marker-end="url(#r-E)"/>
+  </g>
+
+  <!-- RESULTADO GLOBAL panel (top-left quadrant) -->
+  <g transform="translate(60,150)">
+    <rect x="0" y="0" width="234" height="150" fill="#ffffff" stroke="#0a0a0a" stroke-width="1.5"/>
+    <rect x="0" y="0" width="234" height="28" fill="#0a0a0a"/>
+    <text x="12" y="19" font-size="12" font-weight="700" letter-spacing="1.5" fill="#ffffff">RESULTADO GLOBAL</text>
+    <rect x="16" y="44" width="56" height="56" fill="#c62828"/>
+    <text x="44" y="84" text-anchor="middle" font-size="34" font-weight="700" fill="#ffffff">E</text>
+    <text x="86" y="62" font-size="13" font-weight="600" fill="#0a0a0a">Nivel de servicio E</text>
+    <text x="86" y="80" font-size="12" fill="#7a7a7a">operación deficiente</text>
+    <line x1="16" y1="112" x2="218" y2="112" stroke="#e0e0e0"/>
+    <text x="16" y="130" font-size="12" fill="#0a0a0a">Demora media</text>
+    <text x="218" y="130" text-anchor="end" font-size="13" font-weight="700" fill="#0a0a0a">57,9 s/veh</text>
+    <text x="16" y="146" font-size="12" fill="#0a0a0a">Saturación máx (v/c)</text>
+    <text x="218" y="146" text-anchor="end" font-size="13" font-weight="700" fill="#8a0f1c">0.94</text>
+  </g>
+
+  <!-- PLAN SEMAFORICO panel (top-right quadrant) -->
+  <g transform="translate(506,150)">
+    <rect x="0" y="0" width="234" height="178" fill="#ffffff" stroke="#0a0a0a" stroke-width="1.5"/>
+    <rect x="0" y="0" width="234" height="28" fill="#0a0a0a"/>
+    <text x="12" y="19" font-size="12" font-weight="700" letter-spacing="1.5" fill="#ffffff">PLAN SEMAFÓRICO</text>
+    <text x="16" y="48" font-size="13" fill="#0a0a0a">Ciclo</text>
+    <text x="218" y="48" text-anchor="end" font-size="15" font-weight="700" fill="#0a0a0a">120 s</text>
+    <text x="16" y="66" font-size="11" fill="#7a7a7a">Tiempo perdido 16 s · método de Webster</text>
+    <g font-size="11" fill="#0a0a0a">
+      <text x="16" y="92">P1 N-S directo</text>
+      <rect x="118" y="83" width="44" height="10" fill="#0a0a0a"/>
+      <text x="218" y="92" text-anchor="end" font-weight="700">28 s</text>
+      <text x="16" y="114">P2 N-S izquierda</text>
+      <rect x="118" y="105" width="20" height="10" fill="#8a0f1c"/>
+      <text x="218" y="114" text-anchor="end" font-weight="700">13 s</text>
+      <text x="16" y="136">P3 E-W directo</text>
+      <rect x="118" y="127" width="70" height="10" fill="#0a0a0a"/>
+      <text x="218" y="136" text-anchor="end" font-weight="700">45 s</text>
+      <text x="16" y="158">P4 E-W izquierda</text>
+      <rect x="118" y="149" width="30" height="10" fill="#8a0f1c"/>
+      <text x="218" y="158" text-anchor="end" font-weight="700">19 s</text>
+    </g>
+  </g>
+
+  <!-- result chips: id + LOS badge + v/c + delay -->
+  <g font-family="'Inter Tight',Arial,sans-serif">
+    <!-- N-T  E -->
+    <g transform="translate(400,212)">
+      <rect x="-52" y="-29" width="104" height="58" rx="3" fill="#ffffff" stroke="#0a0a0a"/>
+      <text x="-44" y="-11" font-size="13" font-weight="700" fill="#0a0a0a">N-T</text>
+      <rect x="22" y="-25" width="22" height="20" fill="#c62828"/>
+      <text x="33" y="-10" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">E</text>
+      <text x="0" y="8" text-anchor="middle" font-size="11" fill="#0a0a0a">v/c 0.94</text>
+      <text x="0" y="23" text-anchor="middle" font-size="10" fill="#7a7a7a">demora 64 s</text>
+    </g>
+    <!-- N-L  F -->
+    <g transform="translate(400,300)">
+      <rect x="-52" y="-29" width="104" height="58" rx="3" fill="#ffffff" stroke="#4a0000"/>
+      <text x="-44" y="-11" font-size="13" font-weight="700" fill="#0a0a0a">N-L</text>
+      <rect x="22" y="-25" width="22" height="20" fill="#4a0000"/>
+      <text x="33" y="-10" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">F</text>
+      <text x="0" y="8" text-anchor="middle" font-size="11" fill="#0a0a0a">v/c 0.94</text>
+      <text x="0" y="23" text-anchor="middle" font-size="10" fill="#7a7a7a">demora 103 s</text>
+    </g>
+    <!-- S-T  E -->
+    <g transform="translate(400,668)">
+      <rect x="-52" y="-29" width="104" height="58" rx="3" fill="#ffffff" stroke="#0a0a0a"/>
+      <text x="-44" y="-11" font-size="13" font-weight="700" fill="#0a0a0a">S-T</text>
+      <rect x="22" y="-25" width="22" height="20" fill="#c62828"/>
+      <text x="33" y="-10" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">E</text>
+      <text x="0" y="8" text-anchor="middle" font-size="11" fill="#0a0a0a">v/c 0.89</text>
+      <text x="0" y="23" text-anchor="middle" font-size="10" fill="#7a7a7a">demora 58 s</text>
+    </g>
+    <!-- S-L  F -->
+    <g transform="translate(400,754)">
+      <rect x="-52" y="-29" width="104" height="58" rx="3" fill="#ffffff" stroke="#4a0000"/>
+      <text x="-44" y="-11" font-size="13" font-weight="700" fill="#0a0a0a">S-L</text>
+      <rect x="22" y="-25" width="22" height="20" fill="#4a0000"/>
+      <text x="33" y="-10" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">F</text>
+      <text x="0" y="8" text-anchor="middle" font-size="11" fill="#0a0a0a">v/c 0.84</text>
+      <text x="0" y="23" text-anchor="middle" font-size="10" fill="#7a7a7a">demora 85 s</text>
+    </g>
+    <!-- E-T  D -->
+    <g transform="translate(610,438)">
+      <rect x="-52" y="-29" width="104" height="58" rx="3" fill="#ffffff" stroke="#0a0a0a"/>
+      <text x="-44" y="-11" font-size="13" font-weight="700" fill="#0a0a0a">E-T</text>
+      <rect x="22" y="-25" width="22" height="20" fill="#ef6c00"/>
+      <text x="33" y="-10" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">D</text>
+      <text x="0" y="8" text-anchor="middle" font-size="11" fill="#0a0a0a">v/c 0.94</text>
+      <text x="0" y="23" text-anchor="middle" font-size="10" fill="#7a7a7a">demora 49 s</text>
+    </g>
+    <!-- E-L  F -->
+    <g transform="translate(610,520)">
+      <rect x="-52" y="-29" width="104" height="58" rx="3" fill="#ffffff" stroke="#4a0000"/>
+      <text x="-44" y="-11" font-size="13" font-weight="700" fill="#0a0a0a">E-L</text>
+      <rect x="22" y="-25" width="22" height="20" fill="#4a0000"/>
+      <text x="33" y="-10" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">F</text>
+      <text x="0" y="8" text-anchor="middle" font-size="11" fill="#0a0a0a">v/c 0.94</text>
+      <text x="0" y="23" text-anchor="middle" font-size="10" fill="#7a7a7a">demora 88 s</text>
+    </g>
+    <!-- W-T  D -->
+    <g transform="translate(190,520)">
+      <rect x="-52" y="-29" width="104" height="58" rx="3" fill="#ffffff" stroke="#0a0a0a"/>
+      <text x="-44" y="-11" font-size="13" font-weight="700" fill="#0a0a0a">W-T</text>
+      <rect x="22" y="-25" width="22" height="20" fill="#ef6c00"/>
+      <text x="33" y="-10" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">D</text>
+      <text x="0" y="8" text-anchor="middle" font-size="11" fill="#0a0a0a">v/c 0.88</text>
+      <text x="0" y="23" text-anchor="middle" font-size="10" fill="#7a7a7a">demora 43 s</text>
+    </g>
+    <!-- W-L  E -->
+    <g transform="translate(190,438)">
+      <rect x="-52" y="-29" width="104" height="58" rx="3" fill="#ffffff" stroke="#0a0a0a"/>
+      <text x="-44" y="-11" font-size="13" font-weight="700" fill="#0a0a0a">W-L</text>
+      <rect x="22" y="-25" width="22" height="20" fill="#c62828"/>
+      <text x="33" y="-10" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">E</text>
+      <text x="0" y="8" text-anchor="middle" font-size="11" fill="#0a0a0a">v/c 0.83</text>
+      <text x="0" y="23" text-anchor="middle" font-size="10" fill="#7a7a7a">demora 72 s</text>
+    </g>
+  </g>
+
+  <!-- LOS legend -->
+  <g transform="translate(0,892)">
+    <line x1="40" y1="0" x2="760" y2="0" stroke="#d4d4d4" stroke-width="1"/>
+    <text x="40" y="28" font-size="12" font-weight="700" letter-spacing="1.5" fill="#0a0a0a">NIVEL DE SERVICIO (LOS) — DEMORA POR VEHÍCULO</text>
+    <g font-size="10.5" fill="#0a0a0a">
+      <rect x="40"  y="42" width="20" height="20" fill="#2e7d32"/><text x="66" y="56">A · ≤10 s</text>
+      <rect x="160" y="42" width="20" height="20" fill="#689f38"/><text x="186" y="56">B · ≤20 s</text>
+      <rect x="280" y="42" width="20" height="20" fill="#f9a825"/><text x="306" y="56">C · ≤35 s</text>
+      <rect x="400" y="42" width="20" height="20" fill="#ef6c00"/><text x="426" y="56">D · ≤55 s</text>
+      <rect x="520" y="42" width="20" height="20" fill="#c62828"/><text x="546" y="56">E · ≤80 s</text>
+      <rect x="640" y="42" width="20" height="20" fill="#4a0000"/><text x="666" y="56">F · &gt;80 s</text>
+    </g>
+    <text x="40" y="86" font-size="12" fill="#7a7a7a">Las flechas se colorean según el LOS del movimiento. Los giros a la izquierda (LOS F) son el cuello de botella.</text>
+  </g>
+</svg>

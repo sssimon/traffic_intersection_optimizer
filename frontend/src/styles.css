@@ -1,0 +1,433 @@
+/* Swiss-aesthetic local styles. The library handles Button/Card/Input via
+   data-theme="swiss"; here we style the elements the library doesn't cover
+   (layout, tabs, tables, badges, KPIs, chart, custom checkboxes/selects). */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+
+:root {
+  --ink: #0a0a0a;
+  --paper: #fafafa;
+  --surface: #ffffff;
+  --surface-alt: #f0f0f0;
+  --muted: #7a7a7a;
+  --hairline: #0a0a0a;
+  --oxblood: #8a0f1c;
+  --los-a: #2e7d32;
+  --los-b: #689f38;
+  --los-c: #f9a825;
+  --los-d: #ef6c00;
+  --los-e: #c62828;
+  --los-f: #4a0000;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Inter Tight", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "ss01" 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.app {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  min-height: 100vh;
+  max-width: 1400px;
+  margin: 0 auto;
+  border-left: 1px solid var(--hairline);
+  border-right: 1px solid var(--hairline);
+  background: var(--paper);
+}
+
+/* ---------- Top bar ---------- */
+.topbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 32px 16px;
+  border-bottom: 1px solid var(--hairline);
+  background: var(--surface);
+}
+.topbar h1 {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.topbar h1::before {
+  content: "— ";
+  color: var(--oxblood);
+}
+.topbar .sub {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.topbar-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ---------- Tabs ---------- */
+.tabs {
+  display: flex;
+  padding: 0 32px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--hairline);
+  overflow-x: auto;
+}
+.tabs button {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  padding: 14px 20px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  cursor: pointer;
+  position: relative;
+  font-variant-numeric: tabular-nums;
+}
+.tabs button.active {
+  color: var(--ink);
+}
+.tabs button.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--oxblood);
+}
+.tabs button:hover:not(.active) {
+  color: var(--ink);
+}
+
+/* ---------- Content ---------- */
+.content {
+  padding: 32px;
+  display: grid;
+  gap: 24px;
+  overflow: auto;
+}
+
+/* ---------- Section grids ---------- */
+.row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+@media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+/* ---------- Tables (Swiss data display) ---------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+table th {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--hairline);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--ink);
+}
+table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e6e6e6;
+  vertical-align: middle;
+}
+table tr:hover td { background: var(--surface-alt); }
+table td.right, table th.right { text-align: right; }
+
+/* ---------- Native form controls (not covered by lib) ---------- */
+select {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--hairline);
+  border-radius: 0;
+  padding: 6px 10px;
+  font-family: inherit;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+select:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--oxblood);
+  border-color: var(--oxblood);
+}
+
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--hairline);
+  background: var(--surface);
+  cursor: pointer;
+  position: relative;
+  margin: 0;
+}
+input[type="checkbox"]:checked {
+  background: var(--oxblood);
+  border-color: var(--oxblood);
+}
+input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 0px;
+  width: 5px;
+  height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+input[type="file"] { display: none; }
+
+/* Standalone label tags (without library Input) */
+label.field {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--ink);
+}
+label.field::before {
+  content: "— ";
+  color: var(--oxblood);
+}
+label.inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+/* ---------- KPIs ---------- */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0;
+  border: 1px solid var(--hairline);
+}
+.kpi {
+  padding: 14px 16px;
+  border-right: 1px solid var(--hairline);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.kpi:last-child { border-right: none; }
+.kpi .label {
+  color: var(--ink);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 600;
+}
+.kpi .label::before {
+  content: "— ";
+  color: var(--oxblood);
+}
+.kpi .value {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.kpi .unit {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+/* ---------- LOS badges ---------- */
+.los-badge {
+  display: inline-block;
+  width: 26px;
+  height: 26px;
+  line-height: 26px;
+  text-align: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  font-family: "Inter Tight", sans-serif;
+}
+.los-A { background: var(--los-a); }
+.los-B { background: var(--los-b); }
+.los-C { background: var(--los-c); }
+.los-D { background: var(--los-d); }
+.los-E { background: var(--los-e); }
+.los-F { background: var(--los-f); }
+
+/* ---------- Cycle bar ---------- */
+.bar {
+  display: flex;
+  height: 40px;
+  width: 100%;
+  border: 1px solid var(--hairline);
+  background: var(--surface);
+}
+.bar > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+  white-space: nowrap;
+}
+.bar > div:last-child { border-right: none; }
+.legend {
+  display: flex;
+  gap: 16px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+  margin-top: 10px;
+}
+.legend .swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+/* ---------- Notes / warnings / errors ---------- */
+.warning, .note, .error {
+  padding: 10px 14px;
+  margin: 8px 0;
+  font-size: 13px;
+  border: 1px solid var(--hairline);
+  background: var(--surface);
+}
+.warning { border-left: 4px solid #f9a825; }
+.note    { border-left: 4px solid var(--oxblood); }
+.error   { border-left: 4px solid var(--oxblood); color: var(--oxblood); }
+
+/* ---------- Chart ---------- */
+.chart {
+  width: 100%;
+  height: 300px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+}
+
+/* ---------- Code/identifier styling ---------- */
+.code {
+  background: var(--surface-alt);
+  padding: 2px 6px;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--ink);
+  border: 1px solid var(--hairline);
+}
+
+/* ---------- Section header bar ---------- */
+.section-rule {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0 8px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-weight: 600;
+  color: var(--muted);
+}
+.section-rule::before {
+  content: "—";
+  color: var(--oxblood);
+}
+.section-rule::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--hairline);
+}
+
+/* ---------- Lists ---------- */
+ul.compact { margin: 4px 0; padding-left: 20px; font-size: 13px; }
+ul.compact li { margin: 4px 0; }
+
+.loading { color: var(--muted); font-style: italic; }
+
+/* ---------- Mapa de ubicación (Leaflet) ---------- */
+.map-container {
+  height: 380px;
+  width: 100%;
+  border: 1px solid var(--hairline);
+}
+.map-placeholder {
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 24px;
+  border: 1px dashed var(--hairline);
+  background: var(--surface-alt);
+  color: var(--muted);
+  font-size: 13px;
+}
+.leaflet-container {
+  font-family: inherit;
+  background: var(--surface-alt);
+}
+.leaflet-bar {
+  border: 1px solid var(--hairline);
+  box-shadow: none;
+}
+.leaflet-bar a,
+.leaflet-bar a:hover {
+  border-radius: 0 !important;
+  color: var(--ink);
+}
+.leaflet-control-attribution {
+  font-size: 10px;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/* ---------- Library overrides for tighter integration ---------- */
+.nbc-card { background: var(--surface); }
+.nbc-card__content { padding: 20px 24px 24px; }
+
+/* Force NBC button uppercase swiss style (already set by theme but ensure inheritance) */
+.topbar-actions .nbc-button { font-size: 11px; padding: 8px 14px; letter-spacing: 0.18em; }
