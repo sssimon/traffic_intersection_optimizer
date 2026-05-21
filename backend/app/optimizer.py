@@ -67,29 +67,34 @@ def optimize(cfg: IntersectionConfig) -> SignalPlan:
     green_per_phase: dict[str, float] = {}
     yellow: dict[str, float] = {}
     all_red: dict[str, float] = {}
+    clamped: List[str] = []
 
-    if Y > 0:
-        for ph, yi in zip(cfg.phases, y_per_phase):
-            g = effective_green_total * (yi / Y) if Y > 0 else effective_green_total / len(cfg.phases)
-            g = max(ph.min_green, min(ph.max_green, g))
-            green_per_phase[ph.id] = round(g, 1)
-            yellow[ph.id] = ph.yellow
-            all_red[ph.id] = ph.all_red
-    else:
-        equal = effective_green_total / max(1, len(cfg.phases))
-        for ph in cfg.phases:
-            green_per_phase[ph.id] = round(max(ph.min_green, equal), 1)
-            yellow[ph.id] = ph.yellow
-            all_red[ph.id] = ph.all_red
+    n_phases = len(cfg.phases)
+    for i, ph in enumerate(cfg.phases):
+        if Y > 0:
+            target = effective_green_total * (y_per_phase[i] / Y)
+        else:
+            target = effective_green_total / n_phases
+        # El verde se acota a [min_green, max_green]: los límites de la fase
+        # (seguridad, diseño del semáforo) mandan sobre el reparto proporcional.
+        # No se reescala después: escalar un verde ya acotado fue el origen
+        # del bug que podía devolver verdes fuera de rango.
+        g = max(ph.min_green, min(ph.max_green, target))
+        if abs(g - target) > 0.1:
+            clamped.append(ph.id)
+        green_per_phase[ph.id] = round(g, 1)
+        yellow[ph.id] = ph.yellow
+        all_red[ph.id] = ph.all_red
+
+    if Y <= 0:
         notes.append("No hay demanda registrada; verde distribuido equitativamente.")
-
-    # Reescalar para que la suma de tiempos coincida con el ciclo.
-    total = sum(green_per_phase.values()) + sum(yellow.values()) + sum(all_red.values())
-    if abs(total - cycle) > 0.5 and total > 0:
-        scale = (cycle - sum(yellow.values()) - sum(all_red.values())) / sum(green_per_phase.values())
-        if scale > 0:
-            for k in green_per_phase:
-                green_per_phase[k] = round(green_per_phase[k] * scale, 1)
+    if clamped:
+        notes.append(
+            "El verde de la(s) fase(s) " + ", ".join(clamped)
+            + " se acotó a [min_green, max_green]; con demanda muy "
+            "desbalanceada la suma de tiempos puede no igualar el ciclo. "
+            "Revise el número de fases o la geometría de la intersección."
+        )
 
     return SignalPlan(
         cycle_length=round(cycle, 1),

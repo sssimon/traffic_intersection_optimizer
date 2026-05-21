@@ -39,6 +39,10 @@ def _build_phase_schedule(cfg: IntersectionConfig, plan: SignalPlan) -> List[tup
     """Devuelve secuencia [(phase_id, state, dur_s)] para un ciclo.
 
     state ∈ {'green', 'yellow', 'all_red'}
+
+    `plan.phase_green` es verde efectivo; bajo el supuesto del modelo
+    (arranque perdido ≈ extensión del verde) se reproduce directamente como
+    el intervalo de verde visualizado, sin conversión adicional.
     """
     sched: List[tuple[str, str, float]] = []
     for ph in cfg.phases:

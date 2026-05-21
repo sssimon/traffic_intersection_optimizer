@@ -38,3 +38,15 @@ def test_cycle_clamped_to_minimum(make_two_phase):
     # Y = 2 * (90 / 1800) = 0.10 -> Co = 17 / 0.90 = 18.9 s -> acotado a 40 s
     plan = optimize(make_two_phase(90.0))
     assert plan.cycle_length == 40.0
+
+
+def test_green_respects_bounds_when_demand_is_unbalanced(make_two_phase):
+    # Regresión del bug #7: demanda muy desbalanceada -> el verde objetivo de
+    # P1 es ~109 s y el de P2 ~3 s. Antes del arreglo, el reescalado empujaba
+    # el verde de P1 por encima de max_green (60 s). Ahora cada verde se acota.
+    plan = optimize(make_two_phase(1700.0, 50.0))
+    for phase_id, green in plan.phase_green.items():
+        assert 7.0 <= green <= 60.0, f"verde de {phase_id} fuera de rango"
+    assert plan.phase_green["P1"] == 60.0   # topa contra max_green
+    assert plan.phase_green["P2"] == 7.0    # topa contra min_green
+    assert any("se acotó" in note for note in plan.notes)

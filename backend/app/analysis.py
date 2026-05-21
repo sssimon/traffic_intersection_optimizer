@@ -30,6 +30,11 @@ K_FACTOR = 0.5   # k: controlador pretimed
 I_FACTOR = 1.0   # I: intersección aislada
 PF_FACTOR = 1.0  # PF: factor por progresión (1.0 = llegadas aleatorias)
 
+# Demora de referencia para un movimiento sin capacidad (g=0 o C=0): no puede
+# servir demanda, su demora real no está acotada. Se usa un valor finito grande
+# que cae claramente en LOS F (>80 s) sin propagar infinitos al promedio.
+ZERO_CAPACITY_DELAY = 300.0
+
 
 def _los_from_delay(d: float) -> LOSGrade:
     if d <= 10:
@@ -91,7 +96,7 @@ def analyze(cfg: IntersectionConfig, plan: SignalPlan) -> IntersectionAnalysis:
                 inside = (X - 1.0) ** 2 + (8.0 * K_FACTOR * I_FACTOR * X) / (capacity * T_HOURS)
                 d2 = 900.0 * T_HOURS * ((X - 1.0) + math.sqrt(max(0.0, inside)))
             else:
-                d2 = 300.0  # demora oversaturada de referencia
+                d2 = ZERO_CAPACITY_DELAY
 
             d = d1 * PF_FACTOR + d2
 

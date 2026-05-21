@@ -89,7 +89,7 @@ def post_analyze_twsc(req: TWSCRequest) -> TWSCAnalysis:
 
 @app.post("/api/analyze-roundabout", response_model=RoundaboutAnalysis)
 def post_analyze_roundabout(req: RoundaboutRequest) -> RoundaboutAnalysis:
-    """Análisis de glorieta / rotonda (HCM cap. 22)."""
+    """Análisis de glorieta / rotonda (HCM 2010 cap. 21)."""
     return analyze_roundabout(
         req.config, req.approach_order, req.circulating_lanes, req.entry_lanes
     )

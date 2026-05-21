@@ -27,7 +27,10 @@ def make_two_phase():
     para probar los regímenes de Webster (normal, sobre-saturado, mínimo).
     """
 
-    def _make(volume: float, saturation: float = 1800.0) -> IntersectionConfig:
+    def _make(volume: float, volume2: float | None = None,
+              saturation: float = 1800.0) -> IntersectionConfig:
+        # volume2 permite demanda distinta por fase (escenarios desbalanceados).
+        v2 = volume if volume2 is None else volume2
         return IntersectionConfig(
             name="test-2fases",
             approaches=[
@@ -44,7 +47,7 @@ def make_two_phase():
             ],
             demand=[
                 Demand(lane_group_id="N-T", volume=volume),
-                Demand(lane_group_id="E-T", volume=volume),
+                Demand(lane_group_id="E-T", volume=v2),
             ],
             peak_hour_factor=1.0,
         )

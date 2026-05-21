@@ -75,10 +75,14 @@ class Phase(BaseModel):
 
     @property
     def lost_time(self) -> float:
-        """Tiempo perdido por fase: arranque + despeje. Asumimos 2s + (Y+AR) - 2s útiles."""
-        # Tiempo perdido típico = 2s arranque + (amarillo + todo-rojo) - extensión efectiva
-        # HCM usa L = arranque + despeje - extensión ≈ 4s por fase
-        return 2.0 + self.yellow + self.all_red - 2.0
+        """Tiempo perdido por fase (s): amarillo + todo-rojo.
+
+        El arranque perdido al inicio del verde se asume compensado por la
+        extensión del verde efectivo sobre el amarillo (supuesto estándar
+        l1 ≈ extensión). Para un modelo más fino habría que separar el
+        arranque perdido como un parámetro propio de la fase.
+        """
+        return self.yellow + self.all_red
 
 
 class Demand(BaseModel):
@@ -135,7 +139,12 @@ class SignalPlan(BaseModel):
     """Plan de tiempos resultante de la optimización."""
     cycle_length: float = Field(..., description="Duración del ciclo (s).")
     phase_green: dict[str, float] = Field(
-        ..., description="Verde efectivo por fase (s)."
+        ...,
+        description=(
+            "Verde por fase (s). Es verde efectivo; bajo el supuesto del "
+            "modelo (arranque perdido ≈ extensión del verde) se usa también "
+            "como el verde visualizado en la simulación."
+        ),
     )
     phase_yellow: dict[str, float]
     phase_all_red: dict[str, float]
@@ -242,7 +251,7 @@ class TWSCRequest(BaseModel):
 
 
 class RoundaboutRequest(BaseModel):
-    """Glorieta / rotonda (HCM cap. 22)."""
+    """Glorieta / rotonda (HCM 2010 cap. 21)."""
     config: IntersectionConfig
     approach_order: List[str] = Field(
         default_factory=list,

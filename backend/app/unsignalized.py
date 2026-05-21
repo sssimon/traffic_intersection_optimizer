@@ -3,11 +3,11 @@
 Dos métodos del Highway Capacity Manual 2010:
 
 - TWSC (cap. 19) — calle secundaria con PARE; la principal circula libre.
-- Glorieta / rotonda (cap. 22) — capacidad de entrada por aceptación de brechas.
+- Glorieta / rotonda (cap. 21) — capacidad de entrada por aceptación de brechas.
 
 Ambos se basan en teoría de aceptación de brechas (gap-acceptance). El nivel de
 servicio para intersecciones no semaforizadas usa umbrales distintos a los del
-semáforo (HCM Exhibit 19-1 / 22-3):
+semáforo (HCM 2010, capítulos 19 y 21):
 
     A ≤ 10   B ≤ 15   C ≤ 25   D ≤ 35   E ≤ 50   F > 50   (s/veh)
 
@@ -249,7 +249,7 @@ def analyze_roundabout(
     circulating_lanes: int,
     entry_lanes: Dict[str, int],
 ) -> RoundaboutAnalysis:
-    """Análisis de glorieta — capacidad de entrada (HCM cap. 22)."""
+    """Análisis de glorieta — capacidad de entrada (HCM 2010 cap. 21)."""
     warnings: List[str] = []
     order = approach_order or [a.id for a in cfg.approaches]
     n = len(order)

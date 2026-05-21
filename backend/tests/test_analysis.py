@@ -48,3 +48,19 @@ def test_los_thresholds():
     assert _los_from_delay(55.0) == LOSGrade.D
     assert _los_from_delay(80.0) == LOSGrade.E
     assert _los_from_delay(80.1) == LOSGrade.F
+
+
+def test_zero_capacity_movement_is_los_f(single_movement_config):
+    # Una fase sin verde -> capacidad 0 -> demora de referencia
+    # (ZERO_CAPACITY_DELAY) -> el movimiento cae en LOS F.
+    plan = SignalPlan(
+        cycle_length=60.0,
+        phase_green={"P1": 0.0},
+        phase_yellow={"P1": 3.0},
+        phase_all_red={"P1": 1.0},
+        total_lost_time=4.0,
+    )
+    result = analyze(single_movement_config, plan)
+    mv = result.movements[0]
+    assert mv.capacity == 0.0
+    assert mv.los == LOSGrade.F
