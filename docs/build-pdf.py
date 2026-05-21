@@ -4,6 +4,7 @@
 Produce:
   INSTRUCTIVO-CARGA-DE-DATOS.pdf  <-  INSTRUCTIVO-CARGA-DE-DATOS.md
   INFORME-CRUCE-AV-PRINCIPAL.pdf  <-  informe-caso-ejemplo.html
+  INVESTIGACION-COMPARATIVA.pdf   <-  investigacion-comparativa.md
 
 Requisitos:
   - Python 3
@@ -11,9 +12,10 @@ Requisitos:
   - Microsoft Edge o Google Chrome instalado
 
 Uso:
-  python build-pdf.py            (genera ambos)
-  python build-pdf.py informe    (solo el informe)
+  python build-pdf.py              (genera todos)
+  python build-pdf.py informe      (solo el informe)
   python build-pdf.py instructivo
+  python build-pdf.py investigacion
 """
 from __future__ import annotations
 
@@ -64,8 +66,13 @@ hr { border:none; border-top:1px solid #d0d0d0; margin:16px 0; }
 
 TARGETS = {
     "instructivo": ("INSTRUCTIVO-CARGA-DE-DATOS.md", "INSTRUCTIVO-CARGA-DE-DATOS.pdf"),
+    "investigacion": ("investigacion-comparativa.md", "INVESTIGACION-COMPARATIVA.pdf"),
     "informe": ("informe-caso-ejemplo.html", "INFORME-CRUCE-AV-PRINCIPAL.pdf"),
 }
+
+# Claves cuya fuente es Markdown (se convierte a HTML antes de imprimir).
+# El resto de TARGETS ya son HTML y se imprimen directamente.
+MARKDOWN_KEYS = ("instructivo", "investigacion")
 
 
 def find_browser() -> str | None:
@@ -108,7 +115,8 @@ def html_to_pdf(browser: str, html_path: Path, pdf_path: Path) -> bool:
     return pdf_path.exists()
 
 
-def build_instructivo(browser: str) -> bool:
+def build_markdown(browser: str, key: str) -> bool:
+    """Convierte un documento Markdown a PDF (MD -> HTML con estilo swiss -> PDF)."""
     try:
         import markdown
     except ImportError:
@@ -116,7 +124,7 @@ def build_instructivo(browser: str) -> bool:
         print("         Instálalo con:  pip install --user markdown")
         return False
 
-    src = DOCS / TARGETS["instructivo"][0]
+    src = DOCS / TARGETS[key][0]
     if not src.exists():
         print(f"  ERROR: no se encuentra {src.name}")
         return False
@@ -127,13 +135,13 @@ def build_instructivo(browser: str) -> bool:
     )
     doc = (
         "<!doctype html><html lang='es'><head><meta charset='utf-8'>"
-        f"<title>Instructivo</title><style>{CSS}</style></head>"
+        f"<title>{src.stem}</title><style>{CSS}</style></head>"
         f"<body>{body}</body></html>"
     )
     tmp = DOCS / "_build_tmp.html"
     tmp.write_text(doc, encoding="utf-8")
     try:
-        return html_to_pdf(browser, tmp, DOCS / TARGETS["instructivo"][1])
+        return html_to_pdf(browser, tmp, DOCS / TARGETS[key][1])
     finally:
         tmp.unlink(missing_ok=True)
 
@@ -147,10 +155,11 @@ def build_informe(browser: str) -> bool:
 
 
 def main() -> int:
+    valid = ("all",) + tuple(TARGETS)
     which = sys.argv[1].lower() if len(sys.argv) > 1 else "all"
-    if which not in ("all", "instructivo", "informe"):
+    if which not in valid:
         print(f"Argumento no reconocido: {which}")
-        print("Uso: python build-pdf.py [all|instructivo|informe]")
+        print(f"Uso: python build-pdf.py [{'|'.join(valid)}]")
         return 2
 
     browser = find_browser()
@@ -160,20 +169,12 @@ def main() -> int:
     print(f"Navegador: {browser}\n")
 
     ok = True
-    if which in ("all", "instructivo"):
-        print("Generando INSTRUCTIVO-CARGA-DE-DATOS.pdf ...")
-        res = build_instructivo(browser)
-        pdf = DOCS / TARGETS["instructivo"][1]
-        if res:
-            print(f"  OK  ({pdf.stat().st_size / 1024:.0f} KB)")
-        else:
-            print("  FALLO")
-        ok = ok and res
-
-    if which in ("all", "informe"):
-        print("Generando INFORME-CRUCE-AV-PRINCIPAL.pdf ...")
-        res = build_informe(browser)
-        pdf = DOCS / TARGETS["informe"][1]
+    for key in TARGETS:
+        if which not in ("all", key):
+            continue
+        pdf = DOCS / TARGETS[key][1]
+        print(f"Generando {pdf.name} ...")
+        res = build_markdown(browser, key) if key in MARKDOWN_KEYS else build_informe(browser)
         if res:
             print(f"  OK  ({pdf.stat().st_size / 1024:.0f} KB)")
         else:
