@@ -252,7 +252,7 @@ class ScenarioComparison(BaseModel):
     rationale: List[str]
 
 
-# ---------- Análisis no semaforizado (HCM cap. 19 y 22) ----------
+# ---------- Análisis no semaforizado (HCM cap. 19) ----------
 
 class TWSCRequest(BaseModel):
     """Intersección con PARE en la calle secundaria (Two-Way Stop Control)."""
@@ -261,20 +261,6 @@ class TWSCRequest(BaseModel):
         ...,
         description="IDs de los accesos de la calle principal (sin PARE, flujo libre).",
         min_length=1,
-    )
-
-
-class RoundaboutRequest(BaseModel):
-    """Glorieta / rotonda (HCM 2010 cap. 21)."""
-    config: IntersectionConfig
-    approach_order: List[str] = Field(
-        default_factory=list,
-        description="IDs de accesos en orden de circulación. Vacío = orden del config.",
-    )
-    circulating_lanes: int = Field(1, ge=1, le=2)
-    entry_lanes: dict[str, int] = Field(
-        default_factory=dict,
-        description="Carriles de entrada por acceso (id -> nº). Por defecto 1.",
     )
 
 
@@ -301,21 +287,3 @@ class TWSCAnalysis(BaseModel):
     warnings: List[str] = Field(default_factory=list)
 
 
-class RoundaboutApproachResult(BaseModel):
-    approach_id: str
-    approach_name: str
-    entry_demand: float
-    circulating_flow: float
-    capacity: float
-    v_c_ratio: float
-    avg_delay_s: float
-    los: LOSGrade
-
-
-class RoundaboutAnalysis(BaseModel):
-    config_name: str
-    circulating_lanes: int
-    approaches: List[RoundaboutApproachResult]
-    avg_delay_s: float
-    overall_los: LOSGrade
-    warnings: List[str] = Field(default_factory=list)

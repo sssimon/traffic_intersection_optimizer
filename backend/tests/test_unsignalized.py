@@ -1,8 +1,8 @@
-"""Pruebas de regresión — análisis no semaforizado HCM cap. 19/22 (app/unsignalized.py).
+"""Pruebas de regresión — análisis no semaforizado TWSC, HCM cap. 19
+(app/unsignalized.py).
 
 Valores esperados derivados a mano de las fórmulas de aceptación de brechas.
-Si se altera el intercepto de capacidad de glorieta (A = 1130) o las fórmulas
-de capacidad/demora, estas pruebas lo detectan.
+Si se alteran las fórmulas de capacidad/demora, estas pruebas lo detectan.
 """
 import pytest
 
@@ -10,7 +10,6 @@ from app.models import LOSGrade, MovementType
 from app.unsignalized import (
     _gap_delay,
     _potential_capacity,
-    analyze_roundabout,
     analyze_twsc,
     los_unsignalized,
 )
@@ -42,16 +41,6 @@ def test_gap_delay_formula():
 def test_gap_delay_zero_capacity_is_capped():
     # Capacidad nula -> demora topada en DELAY_CAP (999 s)
     assert _gap_delay(100.0, 0.0) == 999.0
-
-
-def test_roundabout_intercept_capacity(right_turn_roundabout):
-    # Solo giros a la derecha -> flujo circulante 0 en cada acceso
-    # -> capacidad de entrada = A * exp(-B*0) * 1 = 1130 veh/h
-    result = analyze_roundabout(right_turn_roundabout, [], 1, {})
-    assert len(result.approaches) == 4
-    for approach in result.approaches:
-        assert approach.circulating_flow == 0.0
-        assert approach.capacity == 1130.0
 
 
 def test_twsc_major_through_is_free(twsc_config):

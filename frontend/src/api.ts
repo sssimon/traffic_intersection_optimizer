@@ -1,7 +1,6 @@
 import type {
   IntersectionAnalysis,
   IntersectionConfig,
-  RoundaboutAnalysis,
   ScenarioComparison,
   SignalPlan,
   SimulationResult,
@@ -59,15 +58,4 @@ export const analyzeTwsc = (cfg: IntersectionConfig, majorApproachIds: string[])
   post<TWSCAnalysis>("/analyze-twsc", {
     config: cfg,
     major_approach_ids: majorApproachIds,
-  });
-
-export const analyzeRoundabout = (
-  cfg: IntersectionConfig,
-  opts: { order: string[]; circulatingLanes: number; entryLanes: Record<string, number> },
-) =>
-  post<RoundaboutAnalysis>("/analyze-roundabout", {
-    config: cfg,
-    approach_order: opts.order,
-    circulating_lanes: opts.circulatingLanes,
-    entry_lanes: opts.entryLanes,
   });

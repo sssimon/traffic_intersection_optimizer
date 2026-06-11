@@ -16,8 +16,8 @@ semaforizada — incluso sin datos históricos.
    queue, HCM 2000 ap. G), LOS A–F.
 4. **Simulación de colas**: llegadas aleatorias + descarga a saturación, traza de colas en el tiempo.
 5. **Escenarios**: compara crecimiento, hora pico, eventos — recomienda estrategia.
-6. **Análisis sin semáforo**: PARE en calle secundaria (HCM cap. 19) y glorieta
-   (HCM cap. 21) por aceptación de brechas; compara semáforo vs PARE vs glorieta.
+6. **Análisis sin semáforo**: PARE en calle secundaria (HCM cap. 19) por
+   aceptación de brechas; compara semáforo vs PARE.
 
 ## Quick start
 
@@ -93,8 +93,8 @@ de hora pico) puede usarse como volumen horario equivalente.
 - **Simulación de colas de tiempo discreto** — paso fijo (1 s por defecto),
   llegadas Poisson (muestreo exacto por paso), salidas a flujo de saturación
   durante el verde. Ver `backend/app/simulator.py`.
-- **Aceptación de brechas** — HCM 2010 cap. 19 (PARE) y cap. 21 (glorieta) para
-  intersecciones no semaforizadas. Ver `backend/app/unsignalized.py`.
+- **Aceptación de brechas** — HCM 2010 cap. 19 (PARE en la calle secundaria)
+  para intersecciones no semaforizadas. Ver `backend/app/unsignalized.py`.
 
 ## API
 
@@ -107,7 +107,6 @@ de hora pico) puede usarse como volumen horario equivalente.
 | POST   | `/api/simulate`          | Simulación de colas (tiempo discreto)        |
 | POST   | `/api/scenarios`         | Comparación multi-escenario + recomendación  |
 | POST   | `/api/analyze-twsc`      | Análisis no semaforizado con PARE (HCM 19)   |
-| POST   | `/api/analyze-roundabout`| Análisis de glorieta / rotonda (HCM 21)      |
 
 ## Estructura
 
@@ -120,7 +119,7 @@ Traffic-Intersection-Optimizer/
 │   │   ├── analysis.py     # HCM 2010
 │   │   ├── simulator.py    # Microsim
 │   │   ├── scenarios.py    # Comparación
-│   │   ├── unsignalized.py # TWSC + glorieta (HCM 19/22)
+│   │   ├── unsignalized.py # TWSC — PARE en secundaria (HCM 19)
 │   │   ├── data.py         # Sample
 │   │   └── main.py         # FastAPI
 │   ├── requirements.txt

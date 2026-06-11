@@ -78,29 +78,6 @@ def single_movement_config():
 
 
 @pytest.fixture
-def right_turn_roundabout():
-    """Glorieta de 4 ramas con solo giros a la derecha.
-
-    Los giros a la derecha no aportan al flujo circulante, así que el flujo
-    circulante de cada acceso es 0 y la capacidad de entrada queda en el
-    intercepto puro: c = A * exp(0) * 1 = A.
-    """
-    quad = [("N", "Norte"), ("E", "Este"), ("S", "Sur"), ("W", "Oeste")]
-    return IntersectionConfig(
-        name="test-glorieta",
-        approaches=[
-            Approach(id=i, name=n, lane_groups=[
-                LaneGroup(id=f"{i}-R", movement=MovementType.RIGHT, lanes=1,
-                          saturation_flow_per_lane=1800.0)])
-            for i, n in quad
-        ],
-        phases=[],
-        demand=[Demand(lane_group_id=f"{i}-R", volume=300.0) for i, _ in quad],
-        peak_hour_factor=1.0,
-    )
-
-
-@pytest.fixture
 def twsc_config():
     """Intersección con PARE: E y W son la calle principal; N y S la secundaria."""
     return IntersectionConfig(

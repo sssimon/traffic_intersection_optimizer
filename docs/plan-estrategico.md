@@ -15,7 +15,7 @@ Fecha: 2026-06-11 · Parte del estado auditado en `investigacion-comparativa.md`
 | Activo | Estado |
 |--------|--------|
 | Motor analítico: Webster + demora HCM (d1/d2) + LOS | Correcto, testeado (25 tests, 0.05 s) |
-| TWSC (PARE) + glorieta por aceptación de brechas | Funcional, supuestos declarados |
+| TWSC (PARE) por aceptación de brechas | Funcional, supuestos declarados. (La glorieta se retiró el 2026-06-11 por decisión de alcance: simplificar la aplicación.) |
 | Simulador de colas estocástico | Funcional, etiquetas ya sinceradas |
 | Comparación de escenarios + recomendación | Funcional pero básica (multiplicador uniforme) |
 | Frontend React 19, 5 pestañas, mapa Leaflet, import/export JSON | Funcional |
@@ -62,10 +62,10 @@ car-following, 3D). Se compite en un eje que ellos estructuralmente no cubren:
 
 1. **Prescriptivo, no solo descriptivo.** Dado un aforo, el sistema explora y
    rankea *alternativas de diseño*: semáforo (2/3/4 fases, izquierda protegida
-   o permitida), PARE, glorieta de 1 o 2 carriles — todas con la misma demanda,
-   en segundos. Ningún software del mercado responde "¿qué tipo de control
-   merece esta intersección?" de forma integrada; el usuario de Synchro tiene
-   que modelar cada alternativa a mano.
+   o permitida) y PARE — todas con la misma demanda, en segundos. Ningún
+   software del mercado responde "¿qué tipo de control merece esta
+   intersección?" de forma integrada; el usuario de Synchro tiene que modelar
+   cada alternativa a mano.
 
 2. **Incertidumbre nativa.** Un aforo de 15 minutos no justifica un LOS de
    letra única. Las entradas llevan incertidumbre declarada (±%), se propagan
@@ -120,7 +120,7 @@ Esfuerzos en semanas-persona aproximadas.
 |---|------------------------|----------|------------------------|
 | 1.1 | Llegadas Poisson reales (M2b): `numpy.random.poisson(λ·dt)` por paso | `simulator.py` | Test: varianza/media de llegadas ≈ 1 (índice de dispersión) |
 | 1.2 | Cola percentil-95 del HCM (M2c): término uniforme + incremental con factor de percentil; renombrar el campo y la UI | `analysis.py`, `models.py`, `TimingResults.tsx` | Test contra valor calculado a mano del HCM |
-| 1.3 | HCM 7.ª ed. (M3): glorieta A=1380 y ecuación **por carril** (no multiplicar); revisar coeficientes TWSC | `unsignalized.py` | Tests actualizados; nota de edición en docstring y UI |
+| 1.3 | HCM 7.ª ed. (M3): revisar brechas críticas y coeficientes TWSC contra HCM 7 | `unsignalized.py` | Tests actualizados; nota de edición en docstring y UI |
 | 1.4 | Cadena de factores de saturación HCM (M9): ancho de carril, pendiente, pesados, estacionamiento, buses, tipo de área, utilización, giros, peatones — campos opcionales con default 1.0 | `models.py`, `analysis.py`, `IntersectionForm.tsx` | Caso del manual reproducido; defaults no cambian resultados actuales |
 | 1.5 | Segundo optimizador (M4): minimización directa de la demora HCM agregada — búsqueda sobre ciclo × reparto de verdes (grid + refinamiento local; el motor lo permite por fuerza bruta) | nuevo `optimizer_delay.py`, `main.py` (`/api/optimize?method=`) | En el caso de ejemplo congestionado produce ciclo ≤ Webster y demora ≤ Webster; UI compara ambos |
 | 1.6 | Réplicas estocásticas (M6): N semillas, percentiles 5/50/95, banda en la gráfica de colas | `simulator.py`, `models.py`, `QueueChart.tsx` | Banda visible; punto único eliminado |
@@ -131,7 +131,7 @@ Esfuerzos en semanas-persona aproximadas.
 
 | # | Tarea | Archivos | Criterio de aceptación |
 |---|-------|----------|------------------------|
-| 2.1 | **Explorador de alternativas**: `/api/compare-controls` corre con la misma demanda semáforo (esquemas de fase alternativos), TWSC y glorieta 1×/2×; tabla ranking por demora/LOS/cola con advertencias de aplicabilidad (volúmenes mínimos tipo warrant) | nuevo `alternatives.py`, `main.py`, nueva pestaña UI | Para el caso de ejemplo: ranking completo en < 2 s |
+| 2.1 | **Explorador de alternativas**: `/api/compare-controls` corre con la misma demanda semáforo (esquemas de fase alternativos) y TWSC; tabla ranking por demora/LOS/cola con advertencias de aplicabilidad (volúmenes mínimos tipo warrant) | nuevo `alternatives.py`, `main.py`, nueva pestaña UI | Para el caso de ejemplo: ranking completo en < 2 s |
 | 2.2 | Generador de esquemas de fases: enumerar esquemas válidos (NEMA-like: 2 fases, izquierdas protegidas, lead/lag) a partir de los lane groups y optimizar cada uno | `alternatives.py` | ≥ 4 esquemas evaluados automáticamente para una 4×4 |
 | 2.3 | **Incertidumbre Monte Carlo**: ±CV% por volumen (defaults según duración del aforo), 1 000+ muestras vectorizadas, salida: distribución de demora, P(cada LOS), tornado de sensibilidad | nuevo `uncertainty.py`, `models.py`, UI | 1 000 muestras < 2 s; UI muestra P(LOS) y banda |
 | 2.4 | **Modo auditoría**: traza de cálculo por movimiento (d1, d2, cada factor, fórmula y edición citada) en la respuesta y como tabla colapsable + anexo del informe | `analysis.py`, `TimingResults.tsx` | Un revisor puede verificar cualquier número contra el manual sin leer código |

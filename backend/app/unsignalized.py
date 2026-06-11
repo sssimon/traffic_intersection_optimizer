@@ -1,13 +1,8 @@
 """Análisis de intersecciones NO semaforizadas.
 
-Dos métodos del Highway Capacity Manual 2010:
-
-- TWSC (cap. 19) — calle secundaria con PARE; la principal circula libre.
-- Glorieta / rotonda (cap. 21) — capacidad de entrada por aceptación de brechas.
-
-Ambos se basan en teoría de aceptación de brechas (gap-acceptance). El nivel de
-servicio para intersecciones no semaforizadas usa umbrales distintos a los del
-semáforo (HCM 2010, capítulos 19 y 21):
+TWSC (HCM 2010, cap. 19) — calle secundaria con PARE; la principal circula
+libre. Se basa en teoría de aceptación de brechas (gap-acceptance). El nivel
+de servicio no semaforizado usa umbrales distintos a los del semáforo:
 
     A ≤ 10   B ≤ 15   C ≤ 25   D ≤ 35   E ≤ 50   F > 50   (s/veh)
 
@@ -16,8 +11,6 @@ Supuestos del módulo (declarados para que sean auditables):
   mediana). Brechas críticas y tiempos de seguimiento: valores base HCM.
 - El flujo conflictivo del giro a la derecha desde la calle secundaria se
   aproxima como el promedio de ambos sentidos de la principal.
-- Glorieta validada para 4 ramas; capacidad de entrada multiplicada por el
-  número de carriles de entrada (simplificación).
 """
 from __future__ import annotations
 
@@ -28,8 +21,6 @@ from .models import (
     IntersectionConfig,
     LOSGrade,
     MovementType,
-    RoundaboutAnalysis,
-    RoundaboutApproachResult,
     TWSCAnalysis,
     UnsignalizedMovement,
 )
@@ -239,95 +230,5 @@ def analyze_twsc(cfg: IntersectionConfig, major_ids: List[str]) -> TWSCAnalysis:
         avg_delay_s=round(avg, 1),
         overall_los=overall,
         worst_movement=worst_id,
-        warnings=warnings,
-    )
-
-
-def analyze_roundabout(
-    cfg: IntersectionConfig,
-    approach_order: List[str],
-    circulating_lanes: int,
-    entry_lanes: Dict[str, int],
-) -> RoundaboutAnalysis:
-    """Análisis de glorieta — capacidad de entrada (HCM 2010 cap. 21)."""
-    warnings: List[str] = []
-    order = approach_order or [a.id for a in cfg.approaches]
-    n = len(order)
-    by_id = {a.id: a for a in cfg.approaches}
-
-    if n < 3:
-        warnings.append("Una glorieta requiere al menos 3 ramas.")
-    if n != 4:
-        warnings.append(
-            "Modelo validado para glorietas de 4 ramas; "
-            "el flujo circulante en otras geometrías es aproximado."
-        )
-
-    # Flujo circulante: cada movimiento aporta a las entradas que atraviesa.
-    # Regla (4 ramas, circulación estándar): un movimiento directo pasa frente
-    # a 1 entrada; un giro a la izquierda, frente a 2; el giro a la derecha, 0.
-    circulating: Dict[str, float] = {aid: 0.0 for aid in order}
-    for i, aid in enumerate(order):
-        ap = by_id.get(aid)
-        if ap is None:
-            continue
-        vT = _mvt_volume(cfg, ap, MovementType.THROUGH)
-        vL = _mvt_volume(cfg, ap, MovementType.LEFT)
-        if n >= 2:
-            circulating[order[(i + 1) % n]] += vT
-        if n >= 3:
-            circulating[order[(i + 1) % n]] += vL
-            circulating[order[(i + 2) % n]] += vL
-
-    # Capacidad de entrada: c = A * exp(-B * vc)  (HCM 2010).
-    A = 1130.0
-    B = 1.0e-3 if circulating_lanes == 1 else 0.7e-3
-
-    results: List[RoundaboutApproachResult] = []
-    num = 0.0
-    den = 0.0
-
-    for aid in order:
-        ap = by_id.get(aid)
-        if ap is None:
-            warnings.append(f"Acceso '{aid}' no existe en la configuración.")
-            continue
-        entry_demand = sum(cfg.demand_for(lg.id) for lg in ap.lane_groups)
-        vc = circulating[aid]
-        n_entry = max(1, entry_lanes.get(aid, 1))
-        capacity = A * math.exp(-B * vc) * n_entry
-        x = entry_demand / capacity if capacity > 0 else 99.0
-        # Demora de glorieta: como gap-delay con término +5*min(x,1).
-        if capacity <= 0:
-            delay = DELAY_CAP
-        else:
-            inside = (x - 1.0) ** 2 + (3600.0 / capacity) * x / (450.0 * T_HOURS)
-            delay = min(DELAY_CAP, 3600.0 / capacity
-                        + 900.0 * T_HOURS * ((x - 1.0) + math.sqrt(max(0.0, inside)))
-                        + 5.0 * min(x, 1.0))
-        los = los_unsignalized(delay)
-        results.append(RoundaboutApproachResult(
-            approach_id=aid, approach_name=ap.name,
-            entry_demand=round(entry_demand, 1),
-            circulating_flow=round(vc, 1),
-            capacity=round(capacity, 1),
-            v_c_ratio=round(min(x, 99.0), 3),
-            avg_delay_s=round(delay, 1),
-            los=los))
-        num += delay * entry_demand
-        den += entry_demand
-        if los == LOSGrade.F:
-            warnings.append(
-                f"Acceso '{ap.name}' en LOS F (demora {delay:.0f} s): "
-                "la glorieta no absorbe esta demanda."
-            )
-
-    avg = num / den if den > 0 else 0.0
-    return RoundaboutAnalysis(
-        config_name=cfg.name,
-        circulating_lanes=circulating_lanes,
-        approaches=results,
-        avg_delay_s=round(avg, 1),
-        overall_los=los_unsignalized(avg),
         warnings=warnings,
     )

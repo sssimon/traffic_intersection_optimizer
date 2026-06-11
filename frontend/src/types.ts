@@ -135,23 +135,3 @@ export interface TWSCAnalysis {
   worst_movement: string | null;
   warnings: string[];
 }
-
-export interface RoundaboutApproachResult {
-  approach_id: string;
-  approach_name: string;
-  entry_demand: number;
-  circulating_flow: number;
-  capacity: number;
-  v_c_ratio: number;
-  avg_delay_s: number;
-  los: LOS;
-}
-
-export interface RoundaboutAnalysis {
-  config_name: string;
-  circulating_lanes: number;
-  approaches: RoundaboutApproachResult[];
-  avg_delay_s: number;
-  overall_los: LOS;
-  warnings: string[];
-}

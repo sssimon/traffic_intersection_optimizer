@@ -9,8 +9,6 @@ from .data import sample_intersection
 from .models import (
     IntersectionAnalysis,
     IntersectionConfig,
-    RoundaboutAnalysis,
-    RoundaboutRequest,
     ScenarioComparison,
     ScenarioRequest,
     SignalPlan,
@@ -22,7 +20,7 @@ from .models import (
 from .optimizer import optimize
 from .scenarios import compare
 from .simulator import simulate
-from .unsignalized import analyze_roundabout, analyze_twsc
+from .unsignalized import analyze_twsc
 
 app = FastAPI(
     title="Traffic Intersection Optimizer",
@@ -85,11 +83,3 @@ def post_scenarios(req: ScenarioRequest) -> ScenarioComparison:
 def post_analyze_twsc(req: TWSCRequest) -> TWSCAnalysis:
     """Análisis no semaforizado con PARE en la calle secundaria (HCM cap. 19)."""
     return analyze_twsc(req.config, req.major_approach_ids)
-
-
-@app.post("/api/analyze-roundabout", response_model=RoundaboutAnalysis)
-def post_analyze_roundabout(req: RoundaboutRequest) -> RoundaboutAnalysis:
-    """Análisis de glorieta / rotonda (HCM 2010 cap. 21)."""
-    return analyze_roundabout(
-        req.config, req.approach_order, req.circulating_lanes, req.entry_lanes
-    )

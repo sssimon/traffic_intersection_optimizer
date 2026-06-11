@@ -251,10 +251,9 @@ Checklist rápido:
 3. Para ver colas en el tiempo → pestaña **03 · Simulación**.
 4. Para comparar escenarios de demanda → pestaña **04 · Escenarios**.
 5. Para evaluar la intersección **sin semáforo** → pestaña **05 · Sin
-   semáforo**: marca qué accesos son la calle principal (sin PARE), elige los
-   carriles de la glorieta y pulsa **Analizar y comparar**. Obtienes una
-   comparación entre semáforo, PARE en la calle secundaria y glorieta (HCM
-   cap. 19 y 22).
+   semáforo**: marca qué accesos son la calle principal (sin PARE) y pulsa
+   **Analizar y comparar**. Obtienes una comparación entre semáforo y PARE
+   en la calle secundaria (HCM cap. 19).
 
 > Si cambias cualquier dato en Configuración, vuelve a pulsar **Optimizar y
 > analizar** para refrescar los resultados.
