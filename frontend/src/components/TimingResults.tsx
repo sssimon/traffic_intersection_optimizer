@@ -109,7 +109,7 @@ export function TimingResults({ analysis, config }: Props) {
         <Card.Header>
           <Card.Title>Análisis HCM por movimiento</Card.Title>
           <Card.Description>
-            Demora · capacidad · cola 95-percentil · LOS
+            Demora · capacidad · cola estimada · LOS
           </Card.Description>
         </Card.Header>
         <Card.Content>
@@ -122,7 +122,7 @@ export function TimingResults({ analysis, config }: Props) {
                 <th className="right">Capacidad</th>
                 <th className="right">v/c</th>
                 <th className="right">Demora (s)</th>
-                <th className="right">Cola 95% (veh)</th>
+                <th className="right">Cola est. (veh)</th>
                 <th>LOS</th>
               </tr>
             </thead>
@@ -145,7 +145,7 @@ export function TimingResults({ analysis, config }: Props) {
                     {m.v_c_ratio.toFixed(2)}
                   </td>
                   <td className="right">{m.avg_delay_s.toFixed(0)}</td>
-                  <td className="right">{m.queue_95th_veh.toFixed(1)}</td>
+                  <td className="right">{m.queue_estimate_veh.toFixed(1)}</td>
                   <td>
                     <span className={`los-badge los-${m.los}`}>{m.los}</span>
                   </td>

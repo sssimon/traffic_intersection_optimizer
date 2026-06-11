@@ -9,7 +9,8 @@ Para cada movimiento (grupo de carriles) calcula:
     d  = d1·PF + d2                         demora promedio por vehículo
 
 LOS (HCM):  A ≤10 < B ≤20 < C ≤35 < D ≤55 < E ≤80 < F
-Cola 95-percentil aproximada: Q95 = 2 · Q_promedio  con Q_promedio ≈ v·r·(1-(g/C))
+Cola estimada (gruesa): Q ≈ 2 · Q_promedio. NO es el percentil 95 del HCM,
+que requiere el término incremental del modelo de cola. Ver M2c.
 """
 from __future__ import annotations
 
@@ -103,7 +104,7 @@ def analyze(cfg: IntersectionConfig, plan: SignalPlan) -> IntersectionAnalysis:
             # Cola: vehículos atrapados al final del rojo, ajustada por X
             r = C - g
             q_avg = (v / 3600.0) * r * (1.0 / max(1e-6, 1.0 - min(0.95, X) * g_over_C))
-            q_95 = 2.0 * q_avg
+            q_estimate = 2.0 * q_avg
 
             los = _los_from_delay(d)
             movements.append(
@@ -114,7 +115,7 @@ def analyze(cfg: IntersectionConfig, plan: SignalPlan) -> IntersectionAnalysis:
                     capacity=round(capacity, 1),
                     v_c_ratio=round(X if math.isfinite(X) else 99.0, 3),
                     avg_delay_s=round(d, 1),
-                    queue_95th_veh=round(q_95, 1),
+                    queue_estimate_veh=round(q_estimate, 1),
                     los=los,
                 )
             )

@@ -12,11 +12,11 @@ semaforizada — incluso sin datos históricos.
 1. **Configuración genérica**: cualquier número de accesos, carriles, fases;
    ubicación geográfica en un mapa de la ciudad (Leaflet + OpenStreetMap).
 2. **Optimización Webster**: cicl​o y verdes óptimos a partir de la demanda.
-3. **Análisis HCM 2010**: demora, capacidad, cola 95-percentil, LOS A–F.
-4. **Microsimulación**: Poisson + descarga a saturación, traza de colas en el tiempo.
+3. **Análisis HCM 2010**: demora, capacidad, cola estimada, LOS A–F.
+4. **Simulación de colas**: llegadas aleatorias + descarga a saturación, traza de colas en el tiempo.
 5. **Escenarios**: compara crecimiento, hora pico, eventos — recomienda estrategia.
 6. **Análisis sin semáforo**: PARE en calle secundaria (HCM cap. 19) y glorieta
-   (HCM cap. 22) por aceptación de brechas; compara semáforo vs PARE vs glorieta.
+   (HCM cap. 21) por aceptación de brechas; compara semáforo vs PARE vs glorieta.
 
 ## Quick start
 
@@ -86,10 +86,10 @@ de hora pico) puede usarse como volumen horario equivalente.
 - **Webster (1958)** — fórmula clásica del ciclo óptimo. Ver `backend/app/optimizer.py`.
 - **HCM 2010** capítulo 18 — modelo de demora `d = d1·PF + d2` con sus componentes
   uniforme e incremental. Ver `backend/app/analysis.py`.
-- **Microsimulación de tiempo discreto** — paso fijo (1 s por defecto), Poisson
-  para llegadas, salidas a flujo de saturación durante el verde.
-  Ver `backend/app/simulator.py`.
-- **Aceptación de brechas** — HCM 2010 cap. 19 (PARE) y cap. 22 (glorieta) para
+- **Simulación de colas de tiempo discreto** — paso fijo (1 s por defecto),
+  llegadas aleatorias (aproximación de Bernoulli por paso), salidas a flujo de
+  saturación durante el verde. Ver `backend/app/simulator.py`.
+- **Aceptación de brechas** — HCM 2010 cap. 19 (PARE) y cap. 21 (glorieta) para
   intersecciones no semaforizadas. Ver `backend/app/unsignalized.py`.
 
 ## API
@@ -100,10 +100,10 @@ de hora pico) puede usarse como volumen horario equivalente.
 | GET    | `/api/sample`            | Configuración de ejemplo                     |
 | POST   | `/api/optimize`          | Plan de tiempos (Webster)                    |
 | POST   | `/api/analyze`           | Plan + análisis HCM por movimiento           |
-| POST   | `/api/simulate`          | Microsimulación, traza de colas              |
+| POST   | `/api/simulate`          | Simulación de colas (tiempo discreto)        |
 | POST   | `/api/scenarios`         | Comparación multi-escenario + recomendación  |
 | POST   | `/api/analyze-twsc`      | Análisis no semaforizado con PARE (HCM 19)   |
-| POST   | `/api/analyze-roundabout`| Análisis de glorieta / rotonda (HCM 22)      |
+| POST   | `/api/analyze-roundabout`| Análisis de glorieta / rotonda (HCM 21)      |
 
 ## Estructura
 

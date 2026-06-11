@@ -94,7 +94,7 @@ export default function App() {
       <div className="topbar">
         <div>
           <h1>Traffic Intersection Optimizer</h1>
-          <span className="sub">Webster · HCM 2010 · Microsimulación</span>
+          <span className="sub">Webster · HCM 2010 · Simulación de colas</span>
         </div>
         <div className="topbar-actions">
           <Button variant="ghost" size="sm" onClick={loadSample}>

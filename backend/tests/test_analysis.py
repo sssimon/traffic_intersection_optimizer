@@ -31,8 +31,8 @@ def test_hcm_single_movement_delay(single_movement_config):
     assert mv.v_c_ratio == 0.667
     assert mv.avg_delay_s == 15.1
     assert mv.los == LOSGrade.B
-    # Cola estimada: q_avg = (v/3600)*r / (1 - X*g/C) = 7.5 ; q_95 = 2*q_avg = 15.0
-    assert mv.queue_95th_veh == 15.0
+    # Cola estimada: q_avg = (v/3600)*r / (1 - X*g/C) = 7.5 ; q ≈ 2*q_avg = 15.0
+    assert mv.queue_estimate_veh == 15.0
 
     assert result.avg_delay_s == 15.1
     assert result.overall_los == LOSGrade.B

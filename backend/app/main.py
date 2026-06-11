@@ -28,7 +28,7 @@ app = FastAPI(
     title="Traffic Intersection Optimizer",
     description=(
         "Optimización de tiempos de semáforo (Webster), análisis de capacidad "
-        "(HCM 2010), microsimulación y comparación de escenarios."
+        "(HCM 2010), simulación de colas y comparación de escenarios."
     ),
     version="0.1.0",
 )
@@ -71,7 +71,7 @@ def post_analyze(cfg: IntersectionConfig) -> IntersectionAnalysis:
 
 @app.post("/api/simulate", response_model=SimulationResult)
 def post_simulate(req: SimulationRequest) -> SimulationResult:
-    """Microsimulación discreta con el plan dado (o el optimizado)."""
+    """Simulación de colas (tiempo discreto) con el plan dado (o el optimizado)."""
     return simulate(req)
 
 

@@ -450,7 +450,7 @@ Verdes: P1 = 27,6 s · P2 = 12,6 s · P3 = 44,7 s · P4 = 19,0 s.
 **Análisis HCM por movimiento** (la columna *Demanda* ya viene ajustada:
 `conteo × PCU ÷ PHF`):
 
-| Grupo | Demanda aj. | Capacidad | v/c | Demora (s) | Cola 95 % | LOS |
+| Grupo | Demanda aj. | Capacidad | v/c | Demora (s) | Cola est. | LOS |
 |---|--:|--:|--:|--:|--:|:--:|
 | N-T | 820 | 874 | 0.94 | 64 | 53,7 | **E** |
 | N-L | 188 | 200 | 0.94 | 103 | 12,4 | **F** |

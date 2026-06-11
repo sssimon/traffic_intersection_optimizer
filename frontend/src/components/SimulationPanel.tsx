@@ -57,9 +57,9 @@ export function SimulationPanel({ config }: Props) {
   return (
     <Card>
       <Card.Header>
-        <Card.Title>Microsimulación</Card.Title>
+        <Card.Title>Simulación de colas</Card.Title>
         <Card.Description>
-          Llegadas Poisson · descarga a flujo de saturación durante el verde
+          Llegadas aleatorias · descarga a flujo de saturación durante el verde
         </Card.Description>
       </Card.Header>
       <Card.Content>

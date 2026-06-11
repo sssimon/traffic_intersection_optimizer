@@ -1,7 +1,12 @@
-"""Microsimulación discreta en el tiempo (paso fijo).
+"""Simulación de colas en tiempo discreto (paso fijo).
+
+No es una microsimulación espacial: cada grupo de carriles se modela como una
+cola vertical, sin seguimiento vehicular ni cambio de carril.
 
 Modelo:
-- Llegadas: Poisson con tasa λ = demanda / 3600  (veh/s) por grupo.
+- Llegadas: aleatorias. En cada paso se añade una llegada con probabilidad
+  λ·dt  (λ = demanda / 3600 veh/s). Es una aproximación de Bernoulli, no un
+  proceso de Poisson exacto (no genera más de una llegada por paso). Ver M2b.
 - Cola: lista FIFO con tiempo de llegada de cada vehículo.
 - Salidas: durante el verde del grupo, se libera al ritmo de saturación
   s/3600 (veh/s). Fuera del verde no hay salidas (amarillo + rojo).
@@ -109,9 +114,10 @@ def simulate(req: SimulationRequest) -> SimulationResult:
         active_phase, state = _phase_state_at(t, schedule)
 
         for lg_id, (arr_rate, sat_rate, phase_id) in rates.items():
-            # Llegadas Poisson en el intervalo dt
+            # Llegadas aleatorias en el intervalo dt
             mean = arr_rate * dt
-            # Aproximación rápida: número entero + bernoulli de la parte fraccional
+            # Aproximación de Bernoulli: parte entera + bernoulli de la fracción.
+            # NO es Poisson exacto (no produce más de una llegada por paso). Ver M2b.
             n_arr = int(mean)
             frac = mean - n_arr
             if rng.random() < frac:
