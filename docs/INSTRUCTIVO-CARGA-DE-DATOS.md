@@ -245,7 +245,10 @@ Checklist rápido:
 
 1. Pulsa **Optimizar y analizar** (barra superior, botón oscuro).
 2. La app salta a **02 · Tiempos & análisis** y muestra:
-   - Ciclo óptimo y verde por fase (método de Webster).
+   - Comparación de dos optimizadores — Webster (1958) y minimización
+     directa de la demora HCM — con el de menor demora resaltado (★) y un
+     botón para ver el detalle de cada plan.
+   - Ciclo y verde por fase del plan seleccionado.
    - Demora media, nivel de servicio (LOS A–F) y relación v/c.
    - Tabla HCM por movimiento (capacidad, cola, demora).
 3. Para ver colas en el tiempo → pestaña **03 · Simulación**.
@@ -443,8 +446,13 @@ Tabla de **Demanda**:
 
 ### 15.5 — Resultados (pestaña 02 · Tiempos & análisis)
 
-**Plan de tiempos** — Ciclo **120 s** · tiempo perdido 16 s.
+**Plan de tiempos (Webster)** — Ciclo **120 s** · tiempo perdido 16 s.
 Verdes: P1 = 27,6 s · P2 = 12,6 s · P3 = 44,7 s · P4 = 19,0 s.
+
+> La app también calcula el plan de **mínima demora HCM**: ciclo **96 s**,
+> demora media **55,0 s/veh** (LOS D frente al LOS E de Webster) — en
+> congestión Webster sobrestima el ciclo. Las tablas de esta sección
+> corresponden al plan **Webster** (botón "Ver detalle" en la comparación).
 
 **Análisis HCM por movimiento** (la columna *Demanda* ya viene ajustada:
 `conteo × PCU ÷ PHF`):

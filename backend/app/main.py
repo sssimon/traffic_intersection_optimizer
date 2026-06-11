@@ -1,7 +1,9 @@
 """API REST — Traffic Intersection Optimizer."""
 from __future__ import annotations
 
-from fastapi import FastAPI, HTTPException
+from typing import Literal
+
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from .analysis import analyze
@@ -18,18 +20,26 @@ from .models import (
     TWSCRequest,
 )
 from .optimizer import optimize
+from .optimizer_delay import optimize_delay
 from .scenarios import compare
 from .simulator import simulate
 from .unsignalized import analyze_twsc
 
+OptimizeMethod = Literal["webster", "delay_min"]
+
 app = FastAPI(
     title="Traffic Intersection Optimizer",
     description=(
-        "Optimización de tiempos de semáforo (Webster), análisis de capacidad "
-        "(HCM 2010), simulación de colas y comparación de escenarios."
+        "Optimización de tiempos de semáforo (Webster y minimización directa "
+        "de demora HCM), análisis de capacidad (HCM 2010), simulación de "
+        "colas y comparación de escenarios."
     ),
     version="0.1.0",
 )
+
+
+def _plan_for(cfg: IntersectionConfig, method: OptimizeMethod) -> SignalPlan:
+    return optimize_delay(cfg) if method == "delay_min" else optimize(cfg)
 
 app.add_middleware(
     CORSMiddleware,
@@ -52,19 +62,28 @@ def get_sample() -> IntersectionConfig:
 
 
 @app.post("/api/optimize", response_model=SignalPlan)
-def post_optimize(cfg: IntersectionConfig) -> SignalPlan:
-    """Calcula ciclo y verdes óptimos (Webster) para la configuración dada."""
+def post_optimize(
+    cfg: IntersectionConfig,
+    method: OptimizeMethod = Query(
+        "webster", description="Optimizador: 'webster' o 'delay_min'."
+    ),
+) -> SignalPlan:
+    """Plan de tiempos: Webster (1958) o minimización directa de demora HCM."""
     try:
-        return optimize(cfg)
+        return _plan_for(cfg, method)
     except Exception as exc:  # pragma: no cover
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 @app.post("/api/analyze", response_model=IntersectionAnalysis)
-def post_analyze(cfg: IntersectionConfig) -> IntersectionAnalysis:
-    """Optimiza + analiza con HCM (demora, cola, LOS)."""
-    plan = optimize(cfg)
-    return analyze(cfg, plan)
+def post_analyze(
+    cfg: IntersectionConfig,
+    method: OptimizeMethod = Query(
+        "webster", description="Optimizador: 'webster' o 'delay_min'."
+    ),
+) -> IntersectionAnalysis:
+    """Optimiza (según método) + analiza con HCM (demora, cola, LOS)."""
+    return analyze(cfg, _plan_for(cfg, method))
 
 
 @app.post("/api/simulate", response_model=SimulationResult)

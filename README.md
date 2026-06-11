@@ -11,7 +11,9 @@ semaforizada — incluso sin datos históricos.
 
 1. **Configuración genérica**: cualquier número de accesos, carriles, fases;
    ubicación geográfica en un mapa de la ciudad (Leaflet + OpenStreetMap).
-2. **Optimización Webster**: cicl​o y verdes óptimos a partir de la demanda.
+2. **Optimización de tiempos (dos métodos)**: Webster (1958) y minimización
+   directa de la demora HCM — la app calcula ambos planes y resalta el de
+   menor demora. Cicl​o y verdes óptimos a partir de la demanda.
 3. **Análisis HCM 2010**: demora, capacidad, cola al percentil 95 (back of
    queue, HCM 2000 ap. G), LOS A–F.
 4. **Simulación de colas**: llegadas aleatorias + descarga a saturación, traza de colas en el tiempo.
@@ -85,6 +87,10 @@ de hora pico) puede usarse como volumen horario equivalente.
 ## Teoría aplicada
 
 - **Webster (1958)** — fórmula clásica del ciclo óptimo. Ver `backend/app/optimizer.py`.
+- **Minimización directa de demora** — búsqueda de ciclo y reparto de verdes
+  que minimiza la demora media del modelo HCM (descenso coordinado); en
+  congestión produce ciclos más cortos que Webster. Ver
+  `backend/app/optimizer_delay.py`.
 - **HCM 2010** capítulo 18 — modelo de demora `d = d1·PF + d2` con sus componentes
   uniforme e incremental. Ver `backend/app/analysis.py`.
 - **Back of queue (HCM 2000 cap. 16, ap. G)** — cola media `Q1 + Q2` por carril
@@ -102,8 +108,8 @@ de hora pico) puede usarse como volumen horario equivalente.
 |--------|--------------------------|----------------------------------------------|
 | GET    | `/api/health`            | Health check                                 |
 | GET    | `/api/sample`            | Configuración de ejemplo                     |
-| POST   | `/api/optimize`          | Plan de tiempos (Webster)                    |
-| POST   | `/api/analyze`           | Plan + análisis HCM por movimiento           |
+| POST   | `/api/optimize`          | Plan de tiempos (`?method=webster\|delay_min`) |
+| POST   | `/api/analyze`           | Optimiza (`?method=`) + análisis HCM         |
 | POST   | `/api/simulate`          | Simulación de colas (tiempo discreto)        |
 | POST   | `/api/scenarios`         | Comparación multi-escenario + recomendación  |
 | POST   | `/api/analyze-twsc`      | Análisis no semaforizado con PARE (HCM 19)   |
@@ -116,6 +122,7 @@ Traffic-Intersection-Optimizer/
 │   ├── app/
 │   │   ├── models.py       # Pydantic
 │   │   ├── optimizer.py    # Webster
+│   │   ├── optimizer_delay.py # Mínima demora HCM
 │   │   ├── analysis.py     # HCM 2010
 │   │   ├── simulator.py    # Microsim
 │   │   ├── scenarios.py    # Comparación

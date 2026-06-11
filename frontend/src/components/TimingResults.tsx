@@ -1,26 +1,107 @@
-import { Card } from "neobrutalistcomponents";
+import { useEffect, useState } from "react";
+import { Button, Card } from "neobrutalistcomponents";
 import type { IntersectionAnalysis, IntersectionConfig } from "../types";
 
+type Method = "webster" | "delay_min";
+
+const METHOD_LABEL: Record<Method, string> = {
+  webster: "Webster (1958)",
+  delay_min: "Mínima demora HCM",
+};
+
 interface Props {
-  analysis: IntersectionAnalysis;
+  webster: IntersectionAnalysis;
+  delayMin: IntersectionAnalysis;
   config: IntersectionConfig;
 }
 
 // Swiss palette: ink + oxblood + three neutrals
 const PHASE_COLORS = ["#0a0a0a", "#8a0f1c", "#444444", "#888888", "#2a2a2a", "#6b6b6b"];
 
-export function TimingResults({ analysis, config }: Props) {
+export function TimingResults({ webster, delayMin, config }: Props) {
+  const recommended: Method =
+    delayMin.avg_delay_s <= webster.avg_delay_s ? "delay_min" : "webster";
+  const [method, setMethod] = useState<Method>(recommended);
+  useEffect(() => {
+    setMethod(recommended);
+  }, [recommended, webster, delayMin]);
+
+  const analysis = method === "webster" ? webster : delayMin;
   const plan = analysis.signal_plan;
   const phases = config.phases;
   const cycle = plan.cycle_length;
 
   return (
     <>
+      <Card variant="elevated">
+        <Card.Header>
+          <Card.Title>Comparación de optimizadores</Card.Title>
+          <Card.Description>
+            Mismo modelo de demora HCM · dos formas de calcular el plan
+          </Card.Description>
+        </Card.Header>
+        <Card.Content>
+          <table>
+            <thead>
+              <tr>
+                <th>Optimizador</th>
+                <th className="right">Ciclo (s)</th>
+                <th className="right">Demora media (s/veh)</th>
+                <th className="right">v/c máx</th>
+                <th>LOS</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {(["webster", "delay_min"] as Method[]).map((m) => {
+                const a = m === "webster" ? webster : delayMin;
+                return (
+                  <tr
+                    key={m}
+                    style={m === method ? { fontWeight: 600 } : undefined}
+                  >
+                    <td>
+                      {METHOD_LABEL[m]}
+                      {m === recommended ? " ★" : ""}
+                    </td>
+                    <td className="right">
+                      {a.signal_plan.cycle_length.toFixed(0)}
+                    </td>
+                    <td className="right">{a.avg_delay_s.toFixed(1)}</td>
+                    <td className="right">{a.overall_v_c.toFixed(2)}</td>
+                    <td>
+                      <span className={`los-badge los-${a.overall_los}`}>
+                        {a.overall_los}
+                      </span>
+                    </td>
+                    <td>
+                      <Button
+                        variant={m === method ? "primary" : "ghost"}
+                        size="sm"
+                        onClick={() => setMethod(m)}
+                      >
+                        {m === method ? "Mostrando" : "Ver detalle"}
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          <p className="desc" style={{ marginBottom: 0, marginTop: 8 }}>
+            ★ recomendado: menor demora media bajo el mismo modelo HCM. Webster
+            (fórmula cerrada de 1958) tiende a sobrestimar el ciclo en
+            congestión; la minimización directa busca ciclo y verdes sobre el
+            propio modelo de demora.
+          </p>
+        </Card.Content>
+      </Card>
+
       <Card>
         <Card.Header>
-          <Card.Title>Plan de tiempos (Webster)</Card.Title>
+          <Card.Title>Plan de tiempos — {METHOD_LABEL[method]}</Card.Title>
           <Card.Description>
-            Ciclo óptimo y distribución por fase
+            Ciclo y distribución por fase
           </Card.Description>
         </Card.Header>
         <Card.Content>
@@ -109,7 +190,8 @@ export function TimingResults({ analysis, config }: Props) {
         <Card.Header>
           <Card.Title>Análisis HCM por movimiento</Card.Title>
           <Card.Description>
-            Demora · capacidad · cola 95 % por carril (HCM ap. G) · LOS
+            Plan {METHOD_LABEL[method]} · demora · capacidad · cola 95 % por
+            carril (HCM ap. G) · LOS
           </Card.Description>
         </Card.Header>
         <Card.Content>

@@ -25,11 +25,13 @@ export async function fetchSample(): Promise<IntersectionConfig> {
   return r.json();
 }
 
-export const optimize = (cfg: IntersectionConfig) =>
-  post<SignalPlan>("/optimize", cfg);
+export type OptimizeMethod = "webster" | "delay_min";
 
-export const analyze = (cfg: IntersectionConfig) =>
-  post<IntersectionAnalysis>("/analyze", cfg);
+export const optimize = (cfg: IntersectionConfig, method: OptimizeMethod = "webster") =>
+  post<SignalPlan>(`/optimize?method=${method}`, cfg);
+
+export const analyze = (cfg: IntersectionConfig, method: OptimizeMethod = "webster") =>
+  post<IntersectionAnalysis>(`/analyze?method=${method}`, cfg);
 
 export const simulate = (cfg: IntersectionConfig, opts: {
   signal_plan?: SignalPlan;

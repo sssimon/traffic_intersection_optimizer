@@ -68,7 +68,7 @@ export function UnsignalizedPanel({ config }: Props) {
     setError(null);
     try {
       const [signal, twsc] = await Promise.all([
-        analyze(config),
+        analyze(config, "delay_min"),
         analyzeTwsc(config, majorIds),
       ]);
       setResult({ signal, twsc });
@@ -167,7 +167,7 @@ export function UnsignalizedPanel({ config }: Props) {
                 </thead>
                 <tbody>
                   <tr>
-                    <td>Semáforo (plan optimizado)</td>
+                    <td>Semáforo (plan de mínima demora)</td>
                     <td className="right">
                       {result.signal.avg_delay_s.toFixed(0)} s
                     </td>

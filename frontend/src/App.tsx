@@ -28,10 +28,15 @@ const EMPTY: IntersectionConfig = {
   peak_hour_factor: 0.92,
 };
 
+interface Analyses {
+  webster: IntersectionAnalysis;
+  delayMin: IntersectionAnalysis;
+}
+
 export default function App() {
   const [tab, setTab] = useState<Tab>("config");
   const [config, setConfig] = useState<IntersectionConfig>(EMPTY);
-  const [analysis, setAnalysis] = useState<IntersectionAnalysis | null>(null);
+  const [analyses, setAnalyses] = useState<Analyses | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,7 +44,7 @@ export default function App() {
     try {
       const s = await fetchSample();
       setConfig(s);
-      setAnalysis(null);
+      setAnalyses(null);
     } catch (e) {
       setError(String(e));
     }
@@ -53,8 +58,11 @@ export default function App() {
     setLoading(true);
     setError(null);
     try {
-      const a = await analyze(config);
-      setAnalysis(a);
+      const [webster, delayMin] = await Promise.all([
+        analyze(config, "webster"),
+        analyze(config, "delay_min"),
+      ]);
+      setAnalyses({ webster, delayMin });
       setTab("timing");
     } catch (e) {
       setError(String(e));
@@ -81,7 +89,7 @@ export default function App() {
       try {
         const parsed = JSON.parse(String(reader.result));
         setConfig(parsed);
-        setAnalysis(null);
+        setAnalyses(null);
       } catch {
         setError("JSON inválido");
       }
@@ -158,8 +166,12 @@ export default function App() {
         )}
 
         {tab === "timing" &&
-          (analysis ? (
-            <TimingResults analysis={analysis} config={config} />
+          (analyses ? (
+            <TimingResults
+              webster={analyses.webster}
+              delayMin={analyses.delayMin}
+              config={config}
+            />
           ) : (
             <div className="loading">
               Sin análisis aún — haz clic en "Optimizar y analizar" en la barra

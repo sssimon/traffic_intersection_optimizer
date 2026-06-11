@@ -94,6 +94,38 @@ def _back_of_queue_per_lane(
     return q_avg, f_b95 * q_avg
 
 
+def movement_performance(v: float, s: float, g: float, C: float) -> tuple[float, float, float]:
+    """Demora de control HCM, capacidad y grado de saturación de un movimiento.
+
+    Devuelve (d, capacidad, X) con d = d1·PF + d2. Es el núcleo compartido
+    entre el análisis (`analyze`) y el optimizador por minimización de demora
+    (`optimizer_delay`): una sola transcripción de las fórmulas.
+    """
+    if C <= 0 or g <= 0:
+        capacity = 0.0
+        X = float("inf") if v > 0 else 0.0
+    else:
+        capacity = s * (g / C)
+        X = v / capacity if capacity > 0 else float("inf")
+
+    g_over_C = (g / C) if C > 0 else 0.0
+    X_capped = min(1.0, X) if math.isfinite(X) else 1.0
+
+    denom = 1.0 - X_capped * g_over_C
+    if denom <= 1e-6:
+        d1 = 0.5 * C * (1.0 - g_over_C) ** 2 / 1e-6
+    else:
+        d1 = 0.5 * C * (1.0 - g_over_C) ** 2 / denom
+
+    if capacity > 0 and math.isfinite(X):
+        inside = (X - 1.0) ** 2 + (8.0 * K_FACTOR * I_FACTOR * X) / (capacity * T_HOURS)
+        d2 = 900.0 * T_HOURS * ((X - 1.0) + math.sqrt(max(0.0, inside)))
+    else:
+        d2 = ZERO_CAPACITY_DELAY
+
+    return d1 * PF_FACTOR + d2, capacity, X
+
+
 def _los_from_delay(d: float) -> LOSGrade:
     if d <= 10:
         return LOSGrade.A
@@ -134,29 +166,7 @@ def analyze(cfg: IntersectionConfig, plan: SignalPlan) -> IntersectionAnalysis:
             s = lg.saturation_flow
             v = cfg.demand_for(lg.id)
 
-            if C <= 0 or g <= 0:
-                capacity = 0.0
-                X = float("inf") if v > 0 else 0.0
-            else:
-                capacity = s * (g / C)
-                X = v / capacity if capacity > 0 else float("inf")
-
-            g_over_C = (g / C) if C > 0 else 0.0
-            X_capped = min(1.0, X) if math.isfinite(X) else 1.0
-
-            denom = 1.0 - X_capped * g_over_C
-            if denom <= 1e-6:
-                d1 = 0.5 * C * (1.0 - g_over_C) ** 2 / 1e-6
-            else:
-                d1 = 0.5 * C * (1.0 - g_over_C) ** 2 / denom
-
-            if capacity > 0 and math.isfinite(X):
-                inside = (X - 1.0) ** 2 + (8.0 * K_FACTOR * I_FACTOR * X) / (capacity * T_HOURS)
-                d2 = 900.0 * T_HOURS * ((X - 1.0) + math.sqrt(max(0.0, inside)))
-            else:
-                d2 = ZERO_CAPACITY_DELAY
-
-            d = d1 * PF_FACTOR + d2
+            d, capacity, X = movement_performance(v, s, g, C)
 
             # Cola: back of queue por carril (HCM 2000 ap. G; ver helper)
             q_avg, q_95 = _back_of_queue_per_lane(
