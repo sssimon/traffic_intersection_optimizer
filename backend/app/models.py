@@ -170,11 +170,19 @@ class MovementAnalysis(BaseModel):
     capacity: float
     v_c_ratio: float = Field(..., description="Grado de saturación X = v/c.")
     avg_delay_s: float
-    queue_estimate_veh: float = Field(
+    back_of_queue_avg_veh: float = Field(
         ...,
         description=(
-            "Cola estimada (≈ 2× la cola promedio). Aproximación gruesa; "
-            "no es el percentil 95 del modelo de cola del HCM."
+            "Cola media (back of queue) por carril, veh: Q1 + Q2 según "
+            "HCM 2000 cap. 16 ap. G (estructura conservada en HCM 2010 "
+            "cap. 31). Supone utilización igual entre carriles del grupo."
+        ),
+    )
+    queue_95th_veh: float = Field(
+        ...,
+        description=(
+            "Cola al percentil 95 (back of queue) por carril, veh: "
+            "(Q1+Q2)·fB95 con fB95 = 1.6 + e^(-Q/5), controlador pretimed."
         ),
     )
     los: LOSGrade

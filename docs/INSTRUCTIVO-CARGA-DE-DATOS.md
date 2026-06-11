@@ -450,16 +450,20 @@ Verdes: P1 = 27,6 s · P2 = 12,6 s · P3 = 44,7 s · P4 = 19,0 s.
 **Análisis HCM por movimiento** (la columna *Demanda* ya viene ajustada:
 `conteo × PCU ÷ PHF`):
 
-| Grupo | Demanda aj. | Capacidad | v/c | Demora (s) | Cola est. | LOS |
+| Grupo | Demanda aj. | Capacidad | v/c | Demora (s) | Cola 95 % (veh/carril) | LOS |
 |---|--:|--:|--:|--:|--:|:--:|
-| N-T | 820 | 874 | 0.94 | 64 | 53,7 | **E** |
-| N-L | 188 | 200 | 0.94 | 103 | 12,4 | **F** |
-| S-T | 774 | 874 | 0.89 | 58 | 49,9 | **E** |
-| S-L | 167 | 200 | 0.84 | 85 | 10,9 | **F** |
-| E-T | 1 326 | 1 416 | 0.94 | 49 | 85,2 | **D** |
-| E-L | 282 | 301 | 0.94 | 88 | 18,6 | **F** |
-| W-T | 1 246 | 1 416 | 0.88 | 43 | 77,5 | **D** |
-| W-L | 250 | 301 | 0.83 | 72 | 16,2 | **E** |
+| N-T | 820 | 874 | 0.94 | 64 | 29,7 | **E** |
+| N-L | 188 | 200 | 0.94 | 103 | 15,6 | **F** |
+| S-T | 774 | 874 | 0.89 | 58 | 26,7 | **E** |
+| S-L | 167 | 200 | 0.84 | 85 | 13,1 | **F** |
+| E-T | 1 326 | 1 416 | 0.94 | 49 | 45,6 | **D** |
+| E-L | 282 | 301 | 0.94 | 88 | 21,6 | **F** |
+| W-T | 1 246 | 1 416 | 0.88 | 43 | 39,7 | **D** |
+| W-L | 250 | 301 | 0.83 | 72 | 17,8 | **E** |
+
+> La columna de cola es el **back of queue al percentil 95 por carril**
+> (HCM 2000 ap. G): vehículos en cola que el carril debe poder almacenar
+> en el 95 % de los ciclos.
 
 **Resultado global:** demora media **57,9 s/veh** · **LOS E** · v/c máx **0.94**.
 

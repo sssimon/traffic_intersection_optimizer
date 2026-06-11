@@ -12,7 +12,8 @@ semaforizada — incluso sin datos históricos.
 1. **Configuración genérica**: cualquier número de accesos, carriles, fases;
    ubicación geográfica en un mapa de la ciudad (Leaflet + OpenStreetMap).
 2. **Optimización Webster**: cicl​o y verdes óptimos a partir de la demanda.
-3. **Análisis HCM 2010**: demora, capacidad, cola estimada, LOS A–F.
+3. **Análisis HCM 2010**: demora, capacidad, cola al percentil 95 (back of
+   queue, HCM 2000 ap. G), LOS A–F.
 4. **Simulación de colas**: llegadas aleatorias + descarga a saturación, traza de colas en el tiempo.
 5. **Escenarios**: compara crecimiento, hora pico, eventos — recomienda estrategia.
 6. **Análisis sin semáforo**: PARE en calle secundaria (HCM cap. 19) y glorieta
@@ -86,6 +87,9 @@ de hora pico) puede usarse como volumen horario equivalente.
 - **Webster (1958)** — fórmula clásica del ciclo óptimo. Ver `backend/app/optimizer.py`.
 - **HCM 2010** capítulo 18 — modelo de demora `d = d1·PF + d2` con sus componentes
   uniforme e incremental. Ver `backend/app/analysis.py`.
+- **Back of queue (HCM 2000 cap. 16, ap. G)** — cola media `Q1 + Q2` por carril
+  y percentil 95 con factor `fB95 = 1.6 + e^(-Q/5)` (pretimed). Ver
+  `backend/app/analysis.py`.
 - **Simulación de colas de tiempo discreto** — paso fijo (1 s por defecto),
   llegadas Poisson (muestreo exacto por paso), salidas a flujo de saturación
   durante el verde. Ver `backend/app/simulator.py`.

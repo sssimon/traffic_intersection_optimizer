@@ -60,7 +60,8 @@ export interface MovementAnalysis {
   capacity: number;
   v_c_ratio: number;
   avg_delay_s: number;
-  queue_estimate_veh: number;
+  back_of_queue_avg_veh: number;
+  queue_95th_veh: number;
   los: LOS;
 }
 
