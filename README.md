@@ -75,7 +75,7 @@ Toma las coordenadas del JSON del caso, o explícitas:
 
 El sistema funciona con **estimaciones**:
 - Carga el ejemplo y ajusta los volúmenes "a ojo" según observación.
-- La microsimulación genera tráfico Poisson consistente con la demanda configurada.
+- La simulación genera tráfico aleatorio consistente con la demanda configurada.
 - Compara varios escenarios para entender la sensibilidad al volumen.
 
 Para datos reales en el futuro: cualquier conteo manual o aforo (incluso 15 min
