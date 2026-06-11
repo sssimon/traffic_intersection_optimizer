@@ -33,3 +33,35 @@ def test_high_capacity_clears_queue(make_two_phase):
     result = simulate(SimulationRequest(config=cfg, duration_s=600))
     assert result.max_queue_all <= 10
     assert result.total_served >= result.total_arrived * 0.9
+
+
+def test_poisson_arrival_dispersion(single_movement_config):
+    # M2b: el total de llegadas en T segundos debe distribuirse Poisson(λ·T),
+    # cuyo índice de dispersión (varianza/media) es 1. La antigua aproximación
+    # de Bernoulli era sub-dispersa (índice << 1). Con 400 semillas fijas el
+    # estimador tiene desviación ≈ 0.07: los límites [0.75, 1.30] están a más
+    # de 3.5 desviaciones y la prueba es determinista.
+    totals = []
+    for seed in range(400):
+        r = simulate(SimulationRequest(config=single_movement_config,
+                                       duration_s=300, seed=seed))
+        totals.append(r.total_arrived)
+    mean = sum(totals) / len(totals)
+    var = sum((x - mean) ** 2 for x in totals) / (len(totals) - 1)
+    assert mean > 0
+    assert 0.75 <= var / mean <= 1.30
+
+
+def test_poisson_allows_bursts_per_step(make_two_phase):
+    # Con λ·dt = 0.5 un Poisson real produce pasos con 2+ llegadas
+    # (P ≈ 9 % por paso); la aproximación de Bernoulli nunca podía.
+    # Un salto de cola ≥ 2 entre muestras consecutivas implica 2+ llegadas
+    # en ese paso (las salidas solo pueden reducir la diferencia).
+    cfg = make_two_phase(1800.0)
+    r = simulate(SimulationRequest(config=cfg, duration_s=600, seed=7))
+    max_jump = 0
+    for tr in r.movements:
+        q = tr.queue_over_time
+        for i in range(1, len(q)):
+            max_jump = max(max_jump, q[i] - q[i - 1])
+    assert max_jump >= 2

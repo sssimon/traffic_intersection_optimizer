@@ -4,9 +4,11 @@ No es una microsimulación espacial: cada grupo de carriles se modela como una
 cola vertical, sin seguimiento vehicular ni cambio de carril.
 
 Modelo:
-- Llegadas: aleatorias. En cada paso se añade una llegada con probabilidad
-  λ·dt  (λ = demanda / 3600 veh/s). Es una aproximación de Bernoulli, no un
-  proceso de Poisson exacto (no genera más de una llegada por paso). Ver M2b.
+- Llegadas: proceso de Poisson. El número de llegadas de cada paso se muestrea
+  de una distribución Poisson de media λ·dt (λ = demanda / 3600 veh/s), que es
+  la discretización exacta del proceso: reproduce la varianza real de las
+  llegadas, incluidas las ráfagas de 2+ vehículos por paso que forman las
+  colas largas.
 - Cola: lista FIFO con tiempo de llegada de cada vehículo.
 - Salidas: durante el verde del grupo, se libera al ritmo de saturación
   s/3600 (veh/s). Fuera del verde no hay salidas (amarillo + rojo).
@@ -19,9 +21,10 @@ Métricas:
 """
 from __future__ import annotations
 
-import random
 from collections import deque
 from typing import Dict, List
+
+import numpy as np
 
 from .models import (
     IntersectionConfig,
@@ -77,7 +80,7 @@ def _phase_state_at(t: float, schedule: List[tuple[str, str, float]]) -> tuple[s
 
 
 def simulate(req: SimulationRequest) -> SimulationResult:
-    rng = random.Random(req.seed)
+    rng = np.random.default_rng(req.seed)
     cfg = req.config
     plan = req.signal_plan or optimize(cfg)
     schedule = _build_phase_schedule(cfg, plan)
@@ -106,6 +109,12 @@ def simulate(req: SimulationRequest) -> SimulationResult:
             sat_rate = lg.saturation_flow / 3600.0      # veh/s
             rates[lg.id] = (arr_rate, sat_rate, _phase_id_for(cfg, lg.id))
 
+    # Pre-muestreo: llegadas por paso ~ Poisson(λ·dt) para cada grupo.
+    arrival_draws: Dict[str, np.ndarray] = {
+        lg_id: rng.poisson(arr_rate * dt, n_steps)
+        for lg_id, (arr_rate, _, _) in rates.items()
+    }
+
     time_axis: List[float] = []
 
     for step in range(n_steps):
@@ -114,14 +123,8 @@ def simulate(req: SimulationRequest) -> SimulationResult:
         active_phase, state = _phase_state_at(t, schedule)
 
         for lg_id, (arr_rate, sat_rate, phase_id) in rates.items():
-            # Llegadas aleatorias en el intervalo dt
-            mean = arr_rate * dt
-            # Aproximación de Bernoulli: parte entera + bernoulli de la fracción.
-            # NO es Poisson exacto (no produce más de una llegada por paso). Ver M2b.
-            n_arr = int(mean)
-            frac = mean - n_arr
-            if rng.random() < frac:
-                n_arr += 1
+            # Llegadas Poisson en el intervalo dt (pre-muestreadas)
+            n_arr = int(arrival_draws[lg_id][step])
             for _ in range(n_arr):
                 queues[lg_id].append(t)
                 arrivals[lg_id] += 1

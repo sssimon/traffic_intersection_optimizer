@@ -59,7 +59,7 @@ export function SimulationPanel({ config }: Props) {
       <Card.Header>
         <Card.Title>Simulación de colas</Card.Title>
         <Card.Description>
-          Llegadas aleatorias · descarga a flujo de saturación durante el verde
+          Llegadas Poisson · descarga a flujo de saturación durante el verde
         </Card.Description>
       </Card.Header>
       <Card.Content>

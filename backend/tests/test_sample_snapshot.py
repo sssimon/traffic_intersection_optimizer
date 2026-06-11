@@ -35,6 +35,9 @@ def test_sample_analysis_snapshot():
 
 def test_sample_simulation_snapshot():
     # Determinista con la semilla por defecto (42).
+    # Actualizado al implementar M2b (muestreo Poisson real con numpy):
+    # el valor 1320 correspondía a la aproximación de Bernoulli. La media
+    # teórica es Σv/PHF × 900/3600 ≈ 1337; 1328 está dentro de ±1σ (≈37).
     result = simulate(SimulationRequest(config=sample_intersection()))
-    assert result.total_arrived == 1320
+    assert result.total_arrived == 1328
     assert result.total_served <= result.total_arrived

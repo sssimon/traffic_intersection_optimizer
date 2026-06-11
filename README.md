@@ -75,7 +75,7 @@ Toma las coordenadas del JSON del caso, o explícitas:
 
 El sistema funciona con **estimaciones**:
 - Carga el ejemplo y ajusta los volúmenes "a ojo" según observación.
-- La simulación genera tráfico aleatorio consistente con la demanda configurada.
+- La simulación genera tráfico Poisson consistente con la demanda configurada.
 - Compara varios escenarios para entender la sensibilidad al volumen.
 
 Para datos reales en el futuro: cualquier conteo manual o aforo (incluso 15 min
@@ -87,8 +87,8 @@ de hora pico) puede usarse como volumen horario equivalente.
 - **HCM 2010** capítulo 18 — modelo de demora `d = d1·PF + d2` con sus componentes
   uniforme e incremental. Ver `backend/app/analysis.py`.
 - **Simulación de colas de tiempo discreto** — paso fijo (1 s por defecto),
-  llegadas aleatorias (aproximación de Bernoulli por paso), salidas a flujo de
-  saturación durante el verde. Ver `backend/app/simulator.py`.
+  llegadas Poisson (muestreo exacto por paso), salidas a flujo de saturación
+  durante el verde. Ver `backend/app/simulator.py`.
 - **Aceptación de brechas** — HCM 2010 cap. 19 (PARE) y cap. 21 (glorieta) para
   intersecciones no semaforizadas. Ver `backend/app/unsignalized.py`.
 
