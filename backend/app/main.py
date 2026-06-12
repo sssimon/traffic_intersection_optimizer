@@ -8,7 +8,10 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .analysis import analyze
 from .data import sample_intersection
+from .alternatives import compare_controls
 from .models import (
+    CompareControlsRequest,
+    CompareControlsResult,
     IntersectionAnalysis,
     IntersectionConfig,
     ScenarioComparison,
@@ -102,3 +105,10 @@ def post_scenarios(req: ScenarioRequest) -> ScenarioComparison:
 def post_analyze_twsc(req: TWSCRequest) -> TWSCAnalysis:
     """Análisis no semaforizado con PARE en la calle secundaria (HCM cap. 19)."""
     return analyze_twsc(req.config, req.major_approach_ids)
+
+
+@app.post("/api/compare-controls", response_model=CompareControlsResult)
+def post_compare_controls(req: CompareControlsRequest) -> CompareControlsResult:
+    """Explorador de alternativas: rankea semáforo (fases configuradas y por
+    acceso) vs PARE con la misma demanda."""
+    return compare_controls(req)

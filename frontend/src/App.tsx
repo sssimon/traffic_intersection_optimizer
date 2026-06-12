@@ -4,20 +4,20 @@ import { analyze, fetchSample } from "./api";
 import { DemandTable } from "./components/DemandTable";
 import { IntersectionForm, PhaseEditor } from "./components/IntersectionForm";
 import { LocationMap } from "./components/LocationMap";
+import { AlternativesPanel } from "./components/AlternativesPanel";
 import { ScenarioComparison } from "./components/ScenarioComparison";
 import { SimulationPanel } from "./components/SimulationPanel";
 import { TimingResults } from "./components/TimingResults";
-import { UnsignalizedPanel } from "./components/UnsignalizedPanel";
 import type { IntersectionAnalysis, IntersectionConfig } from "./types";
 
-type Tab = "config" | "timing" | "simulation" | "scenarios" | "unsignalized";
+type Tab = "config" | "timing" | "simulation" | "scenarios" | "alternatives";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "config", label: "01 · Configuración" },
   { id: "timing", label: "02 · Tiempos & análisis" },
   { id: "simulation", label: "03 · Simulación" },
   { id: "scenarios", label: "04 · Escenarios" },
-  { id: "unsignalized", label: "05 · Sin semáforo" },
+  { id: "alternatives", label: "05 · Alternativas" },
 ];
 
 const EMPTY: IntersectionConfig = {
@@ -183,7 +183,7 @@ export default function App() {
 
         {tab === "scenarios" && <ScenarioComparison config={config} />}
 
-        {tab === "unsignalized" && <UnsignalizedPanel config={config} />}
+        {tab === "alternatives" && <AlternativesPanel config={config} />}
       </div>
     </div>
   );

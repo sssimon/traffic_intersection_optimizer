@@ -1,4 +1,5 @@
 import type {
+  CompareControlsResult,
   DemandMultiplier,
   IntersectionAnalysis,
   IntersectionConfig,
@@ -63,6 +64,15 @@ export const runScenarios = (
 
 export const analyzeTwsc = (cfg: IntersectionConfig, majorApproachIds: string[]) =>
   post<TWSCAnalysis>("/analyze-twsc", {
+    config: cfg,
+    major_approach_ids: majorApproachIds,
+  });
+
+export const compareControls = (
+  cfg: IntersectionConfig,
+  majorApproachIds: string[],
+) =>
+  post<CompareControlsResult>("/compare-controls", {
     config: cfg,
     major_approach_ids: majorApproachIds,
   });

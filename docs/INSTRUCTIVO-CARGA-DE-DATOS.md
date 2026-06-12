@@ -261,10 +261,12 @@ Checklist rápido:
    5–95 — el rango esperable, no una corrida suelta.
 4. Para comparar escenarios de demanda → pestaña **04 · Escenarios**
    (factor global o ajustes por acceso, para crecimiento direccional).
-5. Para evaluar la intersección **sin semáforo** → pestaña **05 · Sin
-   semáforo**: marca qué accesos son la calle principal (sin PARE) y pulsa
-   **Analizar y comparar**. Obtienes una comparación entre semáforo y PARE
-   en la calle secundaria (HCM cap. 19).
+5. Para decidir **qué control conviene** → pestaña **05 · Alternativas**:
+   marca qué accesos son la calle principal (sin PARE) y pulsa **Comparar
+   alternativas**. El explorador optimiza con la misma demanda el semáforo
+   (fases configuradas y un esquema por acceso auto-generado) y el PARE
+   (HCM cap. 19), y los rankea por demora media con una recomendación (★)
+   y sus criterios.
 
 > Si cambias cualquier dato en Configuración, vuelve a pulsar **Optimizar y
 > analizar** para refrescar los resultados.

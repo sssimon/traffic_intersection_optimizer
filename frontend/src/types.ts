@@ -159,3 +159,26 @@ export interface TWSCAnalysis {
   worst_movement: string | null;
   warnings: string[];
 }
+
+// ---- Explorador de alternativas de control ----
+
+export interface ControlAlternative {
+  id: string;
+  kind: "signal" | "twsc";
+  name: string;
+  avg_delay_s: number;
+  overall_los: LOS;
+  overall_v_c: number;
+  cycle_length: number | null;
+  worst_queue_95th_veh: number | null;
+  notes: string[];
+  signal: IntersectionAnalysis | null;
+  twsc: TWSCAnalysis | null;
+}
+
+export interface CompareControlsResult {
+  alternatives: ControlAlternative[];
+  recommended_id: string;
+  rationale: string[];
+  warnings: string[];
+}

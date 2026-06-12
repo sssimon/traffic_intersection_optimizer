@@ -20,8 +20,10 @@ semaforizada — incluso sin datos históricos.
    réplicas y banda de percentiles 5–95 de la cola en el tiempo.
 5. **Escenarios**: compara crecimiento global o direccional (factores por
    acceso/movimiento) — recomienda estrategia.
-6. **Análisis sin semáforo**: PARE en calle secundaria (HCM cap. 19) por
-   aceptación de brechas; compara semáforo vs PARE.
+6. **Explorador de alternativas de control**: con la misma demanda optimiza
+   y rankea semáforo (fases configuradas y fases por acceso auto-generadas)
+   vs PARE en secundaria (HCM cap. 19) — responde *qué control conviene*,
+   con recomendación y criterios de aplicabilidad.
 
 ## Quick start
 
@@ -125,6 +127,7 @@ de hora pico) puede usarse como volumen horario equivalente.
 | POST   | `/api/simulate`          | Simulación de colas (N réplicas, banda 5–95) |
 | POST   | `/api/scenarios`         | Escenarios (global/direccional) + estrategia |
 | POST   | `/api/analyze-twsc`      | Análisis no semaforizado con PARE (HCM 19)   |
+| POST   | `/api/compare-controls`  | Ranking de alternativas de control           |
 
 ## Estructura
 
@@ -139,6 +142,7 @@ Traffic-Intersection-Optimizer/
 │   │   ├── simulator.py    # Microsim
 │   │   ├── scenarios.py    # Comparación
 │   │   ├── unsignalized.py # TWSC — PARE en secundaria (HCM 19)
+│   │   ├── alternatives.py # Explorador de alternativas de control
 │   │   ├── data.py         # Sample
 │   │   └── main.py         # FastAPI
 │   ├── requirements.txt

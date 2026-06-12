@@ -429,3 +429,42 @@ class TWSCAnalysis(BaseModel):
     warnings: List[str] = Field(default_factory=list)
 
 
+# ---------- Explorador de alternativas de control (tarea 2.1) ----------
+
+class CompareControlsRequest(BaseModel):
+    config: IntersectionConfig
+    major_approach_ids: List[str] = Field(
+        default_factory=list,
+        description=(
+            "Accesos de la calle principal para la alternativa PARE. "
+            "Vacío = los dos de mayor demanda."
+        ),
+    )
+
+
+class ControlAlternative(BaseModel):
+    """Una alternativa de control evaluada con la misma demanda."""
+    id: str
+    kind: Literal["signal", "twsc"]
+    name: str
+    avg_delay_s: float = Field(..., description="Demora media ponderada (s/veh) sobre TODOS los vehículos.")
+    overall_los: LOSGrade = Field(..., description="OJO: umbrales distintos entre semáforo (F>80) y PARE (F>50).")
+    overall_v_c: float = Field(..., description="v/c representativo (máximo entre movimientos).")
+    cycle_length: Optional[float] = Field(None, description="Solo semáforo (s).")
+    worst_queue_95th_veh: Optional[float] = Field(
+        None, description="Solo semáforo: peor cola 95 % por carril (veh)."
+    )
+    notes: List[str] = Field(default_factory=list)
+    signal: Optional[IntersectionAnalysis] = None
+    twsc: Optional[TWSCAnalysis] = None
+
+
+class CompareControlsResult(BaseModel):
+    alternatives: List[ControlAlternative] = Field(
+        ..., description="Ordenadas por demora media ascendente (ranking)."
+    )
+    recommended_id: str
+    rationale: List[str]
+    warnings: List[str] = Field(default_factory=list)
+
+
