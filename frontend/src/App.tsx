@@ -5,6 +5,7 @@ import { DemandTable } from "./components/DemandTable";
 import { IntersectionForm, PhaseEditor } from "./components/IntersectionForm";
 import { LocationMap } from "./components/LocationMap";
 import { AlternativesPanel } from "./components/AlternativesPanel";
+import { RunsPanel } from "./components/RunsPanel";
 import { ScenarioComparison } from "./components/ScenarioComparison";
 import { SimulationPanel } from "./components/SimulationPanel";
 import { TimingResults } from "./components/TimingResults";
@@ -162,6 +163,7 @@ export default function App() {
             <IntersectionForm config={config} onChange={setConfig} />
             <PhaseEditor config={config} onChange={setConfig} />
             <DemandTable config={config} onChange={setConfig} />
+            <RunsPanel config={config} onChange={setConfig} />
           </>
         )}
 

@@ -3,6 +3,8 @@ import type {
   DemandMultiplier,
   IntersectionAnalysis,
   IntersectionConfig,
+  RunDetail,
+  RunSummary,
   ScenarioComparison,
   SignalPlan,
   SimulationResult,
@@ -95,3 +97,26 @@ export const runUncertainty = (
     samples: opts.samples ?? 1000,
     method: opts.method ?? "delay_min",
   });
+
+export const saveRun = (
+  name: string,
+  cfg: IntersectionConfig,
+  method: OptimizeMethod = "delay_min",
+) => post<RunSummary>("/runs", { name, config: cfg, method });
+
+export async function listRuns(): Promise<RunSummary[]> {
+  const r = await fetch(`${BASE}/runs`);
+  if (!r.ok) throw new Error(`runs: ${r.status}`);
+  return r.json();
+}
+
+export async function getRun(id: number): Promise<RunDetail> {
+  const r = await fetch(`${BASE}/runs/${id}`);
+  if (!r.ok) throw new Error(`run ${id}: ${r.status}`);
+  return r.json();
+}
+
+export async function deleteRun(id: number): Promise<void> {
+  const r = await fetch(`${BASE}/runs/${id}`, { method: "DELETE" });
+  if (!r.ok) throw new Error(`delete run ${id}: ${r.status}`);
+}

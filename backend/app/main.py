@@ -15,6 +15,9 @@ from .models import (
     CompareControlsResult,
     IntersectionAnalysis,
     IntersectionConfig,
+    RunDetail,
+    RunSummary,
+    SaveRunRequest,
     ScenarioComparison,
     ScenarioRequest,
     SignalPlan,
@@ -29,6 +32,7 @@ from .optimizer import optimize
 from .optimizer_delay import optimize_delay
 from .scenarios import compare
 from .simulator import simulate
+from .storage import delete_run, get_run, list_runs, save_run
 from .uncertainty import run_uncertainty
 from .unsignalized import analyze_twsc
 
@@ -131,3 +135,32 @@ def post_uncertainty(req: UncertaintyRequest) -> UncertaintyResult:
     """Monte Carlo de incertidumbre del aforo: P(LOS), banda de demora y
     tornado de sensibilidad."""
     return run_uncertainty(req)
+
+
+@app.post("/api/runs", response_model=RunSummary)
+def post_run(req: SaveRunRequest) -> RunSummary:
+    """Guarda la corrida: configuración + resumen del análisis."""
+    return save_run(req)
+
+
+@app.get("/api/runs", response_model=list[RunSummary])
+def get_runs() -> list[RunSummary]:
+    """Corridas guardadas (la más reciente primero) — comparables entre sí."""
+    return list_runs()
+
+
+@app.get("/api/runs/{run_id}", response_model=RunDetail)
+def get_run_detail(run_id: int) -> RunDetail:
+    """Corrida completa (incluye la configuración para recargarla)."""
+    run = get_run(run_id)
+    if run is None:
+        raise HTTPException(status_code=404, detail=f"No existe la corrida {run_id}.")
+    return run
+
+
+@app.delete("/api/runs/{run_id}")
+def remove_run(run_id: int) -> dict:
+    """Elimina una corrida guardada."""
+    if not delete_run(run_id):
+        raise HTTPException(status_code=404, detail=f"No existe la corrida {run_id}.")
+    return {"ok": True}

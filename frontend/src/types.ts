@@ -199,6 +199,24 @@ export interface CompareControlsResult {
   warnings: string[];
 }
 
+// ---- Corridas guardadas ----
+
+export interface RunSummary {
+  id: number;
+  name: string;
+  created_at: string;
+  intersection_name: string;
+  method: string;
+  cycle_length: number;
+  avg_delay_s: number;
+  overall_los: LOS;
+  overall_v_c: number;
+}
+
+export interface RunDetail extends RunSummary {
+  config: IntersectionConfig;
+}
+
 // ---- Incertidumbre Monte Carlo ----
 
 export interface MovementSensitivity {

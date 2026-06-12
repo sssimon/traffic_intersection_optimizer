@@ -284,7 +284,16 @@ Checklist rápido:
 
 ## 13. Guardar y reutilizar la configuración
 
-En la barra superior:
+Dos mecanismos complementarios:
+
+**Corridas guardadas (recomendado)** — al final de la pestaña
+**01 · Configuración**: ponle nombre y pulsa **Guardar corrida actual**. Se
+guarda en el servidor la configuración completa más el resumen del análisis
+(método, ciclo, demora, LOS, v/c) del momento. La tabla del historial
+permite **comparar corridas entre fechas** y recargar cualquiera con
+**Cargar**.
+
+**Archivos JSON** — en la barra superior:
 
 - **Exportar JSON** — descarga un archivo `.json` con toda la configuración.
   Úsalo para guardar tu intersección o compartirla.

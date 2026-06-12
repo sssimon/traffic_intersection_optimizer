@@ -512,6 +512,34 @@ class CompareControlsResult(BaseModel):
     warnings: List[str] = Field(default_factory=list)
 
 
+# ---------- Persistencia de corridas (tarea 2.5) ----------
+
+class SaveRunRequest(BaseModel):
+    name: str = Field(..., min_length=1, max_length=120, description="Nombre de la corrida.")
+    config: IntersectionConfig
+    method: Literal["webster", "delay_min"] = Field(
+        "delay_min", description="Optimizador con el que se calcula el resumen."
+    )
+
+
+class RunSummary(BaseModel):
+    """Resumen guardado de una corrida — la tabla de resúmenes permite
+    comparar corridas entre fechas."""
+    id: int
+    name: str
+    created_at: str = Field(..., description="Fecha-hora ISO (UTC).")
+    intersection_name: str
+    method: str
+    cycle_length: float
+    avg_delay_s: float
+    overall_los: LOSGrade
+    overall_v_c: float
+
+
+class RunDetail(RunSummary):
+    config: IntersectionConfig
+
+
 # ---------- Incertidumbre Monte Carlo (tarea 2.3) ----------
 
 class UncertaintyRequest(BaseModel):

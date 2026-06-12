@@ -32,6 +32,9 @@ semaforizada — incluso sin datos históricos.
    fórmula, sustitución numérica y edición del manual citada
    (`/api/analyze?audit=true`). Un revisor verifica con calculadora, sin
    leer código.
+9. **Corridas guardadas**: historial en SQLite (`data/runs/`) con la
+   configuración completa y el resumen del análisis — comparable entre
+   fechas y recargable con un clic.
 
 ## Quick start
 
@@ -141,6 +144,8 @@ de hora pico) puede usarse como volumen horario equivalente.
 | POST   | `/api/analyze-twsc`      | Análisis no semaforizado con PARE (HCM 19)   |
 | POST   | `/api/compare-controls`  | Ranking de alternativas de control           |
 | POST   | `/api/uncertainty`       | Monte Carlo: P(LOS), banda y tornado         |
+| POST/GET | `/api/runs`            | Guardar / listar corridas (SQLite)           |
+| GET/DELETE | `/api/runs/{id}`     | Cargar / eliminar una corrida                |
 
 ## Estructura
 
@@ -156,6 +161,9 @@ Traffic-Intersection-Optimizer/
 │   │   ├── scenarios.py    # Comparación
 │   │   ├── unsignalized.py # TWSC — PARE en secundaria (HCM 19)
 │   │   ├── alternatives.py # Explorador de alternativas de control
+│   │   ├── uncertainty.py  # Monte Carlo de incertidumbre
+│   │   ├── audit.py        # Traza de cálculo verificable
+│   │   ├── storage.py      # Corridas guardadas (SQLite)
 │   │   ├── data.py         # Sample
 │   │   └── main.py         # FastAPI
 │   ├── requirements.txt
