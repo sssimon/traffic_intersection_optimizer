@@ -143,6 +143,11 @@ grupo y completa las columnas:
 | **Carriles** | Cuántos carriles físicos tiene ese grupo. |
 | **Sat. (veh/h/c)** | Flujo de saturación por carril. Deja **1900** salvo que tengas un valor medido. |
 | **Compartido** | Marca la casilla **solo** si un carril de giro comparte con el directo (reduce capacidad). |
+| **ƒ HCM** | Opcional. Activa la cadena de factores de ajuste del HCM para ese grupo: ancho de carril, pendiente, estacionamiento adyacente, buses que paran, zona céntrica (CBD) y utilización de carriles (fLU). Al activarla, los giros **exclusivos** aplican además el factor de giro protegido (×0.95 izquierda, ×0.85 derecha). Sin activar, el cálculo usa la saturación base tal cual. |
+
+> **Vehículos pesados:** no van en ƒ HCM — se cargan como **PCU** en la tabla
+> de Demanda (equivale al fHV del HCM; ponerlos en ambos lados los contaría
+> doble).
 
 ### Ejemplo de un acceso
 

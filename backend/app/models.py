@@ -22,6 +22,89 @@ class MovementType(str, Enum):
     RIGHT = "right"
 
 
+class SaturationFactors(BaseModel):
+    """Factores de ajuste del flujo de saturación — HCM 2010, cap. 18 (M9).
+
+        s = s_base · N · fw · fg · fp · fbb · fa · fLU · f_giro
+
+    Declarar este objeto activa la cadena. Todos los campos tienen valores
+    neutros (factor 1.0) salvo el ajuste por giro: en un grupo de giro
+    EXCLUSIVO se aplica el factor de giro protegido del HCM (fLT = 0.95
+    izquierda, fRT = 0.85 derecha). En carriles compartidos se mantiene la
+    simplificación 0.85 del grupo y NO se aplica f_giro (evita el doble
+    castigo). Sin este objeto el cálculo es el histórico.
+
+    Vehículos pesados: NO van aquí — se modelan con `pcu_factor` en la
+    demanda, matemáticamente equivalente al fHV del HCM (incluirlos en
+    ambos lados los contaría dos veces). Bloqueo de giros por peatones y
+    ciclistas (fLpb/fRpb): no modelado aún (ver M10).
+    """
+    lane_width_m: Optional[float] = Field(
+        None,
+        ge=2.4,
+        le=5.5,
+        description=(
+            "Ancho promedio de carril (m). fw = 1 + (W − 3.66)/9.14 "
+            "(HCM 2010; 12 y 30 pies). None = sin ajuste."
+        ),
+    )
+    grade_pct: float = Field(
+        0.0,
+        ge=-6.0,
+        le=10.0,
+        description="Pendiente del acceso (%), subida positiva. fg = 1 − G/200.",
+    )
+    parking_maneuvers_per_h: Optional[float] = Field(
+        None,
+        ge=0.0,
+        le=180.0,
+        description=(
+            "Maniobras de estacionamiento adyacente por hora (Nm). "
+            "fp = (N − 0.1 − 18·Nm/3600)/N ≥ 0.05. None = sin estacionamiento."
+        ),
+    )
+    bus_stops_per_h: float = Field(
+        0.0,
+        ge=0.0,
+        le=250.0,
+        description=(
+            "Buses que paran por hora en el acceso (NB). "
+            "fbb = (N − 14.4·NB/3600)/N ≥ 0.05."
+        ),
+    )
+    cbd: bool = Field(False, description="Zona céntrica de negocios: fa = 0.90.")
+    lane_utilization: float = Field(
+        1.0,
+        ge=0.5,
+        le=1.0,
+        description=(
+            "fLU. Valores HCM típicos: 0.952 (2 carriles), 0.908 (3). "
+            "1.0 = reparto parejo o medido."
+        ),
+    )
+
+    def chain(self, lanes: int, movement: MovementType, shared: bool) -> float:
+        """Producto de los factores para un grupo de `lanes` carriles."""
+        n = max(1, lanes)
+        f = 1.0
+        if self.lane_width_m is not None:
+            f *= 1.0 + (self.lane_width_m - 3.66) / 9.14
+        f *= 1.0 - self.grade_pct / 200.0
+        if self.parking_maneuvers_per_h is not None:
+            f *= max(0.050, (n - 0.1 - 18.0 * self.parking_maneuvers_per_h / 3600.0) / n)
+        if self.bus_stops_per_h > 0:
+            f *= max(0.050, (n - 14.4 * self.bus_stops_per_h / 3600.0) / n)
+        if self.cbd:
+            f *= 0.90
+        f *= self.lane_utilization
+        if not shared:
+            if movement == MovementType.LEFT:
+                f *= 0.95
+            elif movement == MovementType.RIGHT:
+                f *= 0.85
+        return f
+
+
 class LaneGroup(BaseModel):
     """Grupo de carriles que comparten línea de detención y movimiento."""
     id: str = Field(..., description="Identificador único, ej: 'N-through'")
@@ -37,12 +120,23 @@ class LaneGroup(BaseModel):
         False,
         description="True si el carril de giro comparte con el directo (afecta capacidad).",
     )
+    factors: Optional[SaturationFactors] = Field(
+        None,
+        description=(
+            "Cadena de factores de saturación HCM; None = sin cadena "
+            "(comportamiento histórico)."
+        ),
+    )
 
     @property
     def saturation_flow(self) -> float:
         """Flujo de saturación total del grupo (veh/h)."""
-        factor = 0.85 if self.shared_with_through else 1.0
-        return self.saturation_flow_per_lane * self.lanes * factor
+        s = self.saturation_flow_per_lane * self.lanes
+        if self.factors is not None:
+            s *= self.factors.chain(self.lanes, self.movement, self.shared_with_through)
+        if self.shared_with_through:
+            s *= 0.85
+        return s
 
 
 class Approach(BaseModel):

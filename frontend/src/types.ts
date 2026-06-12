@@ -2,12 +2,22 @@
 
 export type MovementType = "left" | "through" | "right";
 
+export interface SaturationFactors {
+  lane_width_m?: number | null;
+  grade_pct?: number;
+  parking_maneuvers_per_h?: number | null;
+  bus_stops_per_h?: number;
+  cbd?: boolean;
+  lane_utilization?: number;
+}
+
 export interface LaneGroup {
   id: string;
   movement: MovementType;
   lanes: number;
   saturation_flow_per_lane: number;
   shared_with_through: boolean;
+  factors?: SaturationFactors | null;
 }
 
 export interface Approach {

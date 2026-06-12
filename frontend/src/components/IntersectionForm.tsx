@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { Button, Card, Input } from "neobrutalistcomponents";
 import type {
   Approach,
@@ -6,6 +6,7 @@ import type {
   LaneGroup,
   MovementType,
   Phase,
+  SaturationFactors,
 } from "../types";
 
 interface Props {
@@ -68,6 +69,17 @@ export function IntersectionForm({ config, onChange }: Props) {
     groups[lgIdx] = lg;
     updateApproach(apIdx, { ...ap, lane_groups: groups });
   };
+
+  const patchFactors = (
+    apIdx: number,
+    lgIdx: number,
+    lg: LaneGroup,
+    patch: Partial<SaturationFactors>,
+  ) =>
+    updateLaneGroup(apIdx, lgIdx, {
+      ...lg,
+      factors: { ...(lg.factors ?? {}), ...patch },
+    });
 
   const removeLaneGroup = (apIdx: number, lgIdx: number) => {
     const ap = config.approaches[apIdx];
@@ -184,96 +196,239 @@ export function IntersectionForm({ config, onChange }: Props) {
                         <th>Carriles</th>
                         <th>Sat. (veh/h/c)</th>
                         <th>Compartido</th>
+                        <th>ƒ HCM</th>
                         <th></th>
                       </tr>
                     </thead>
                     <tbody>
                       {ap.lane_groups.map((lg, lgIdx) => (
-                        <tr key={lg.id}>
-                          <td>
-                            <Input
-                              size="sm"
-                              value={lg.id}
-                              onChange={(e) =>
-                                updateLaneGroup(apIdx, lgIdx, {
-                                  ...lg,
-                                  id: e.target.value,
-                                })
-                              }
-                              style={{ width: 100 }}
-                            />
-                          </td>
-                          <td>
-                            <select
-                              value={lg.movement}
-                              onChange={(e) =>
-                                updateLaneGroup(apIdx, lgIdx, {
-                                  ...lg,
-                                  movement: e.target.value as MovementType,
-                                })
-                              }
-                            >
-                              {movementOptions.map((m) => (
-                                <option key={m} value={m}>
-                                  {m}
-                                </option>
-                              ))}
-                            </select>
-                          </td>
-                          <td>
-                            <Input
-                              size="sm"
-                              type="number"
-                              min={1}
-                              max={8}
-                              value={lg.lanes}
-                              onChange={(e) =>
-                                updateLaneGroup(apIdx, lgIdx, {
-                                  ...lg,
-                                  lanes: parseInt(e.target.value) || 1,
-                                })
-                              }
-                              style={{ width: 80 }}
-                            />
-                          </td>
-                          <td>
-                            <Input
-                              size="sm"
-                              type="number"
-                              step={50}
-                              value={lg.saturation_flow_per_lane}
-                              onChange={(e) =>
-                                updateLaneGroup(apIdx, lgIdx, {
-                                  ...lg,
-                                  saturation_flow_per_lane:
-                                    parseFloat(e.target.value) || 1900,
-                                })
-                              }
-                              style={{ width: 110 }}
-                            />
-                          </td>
-                          <td>
-                            <input
-                              type="checkbox"
-                              checked={lg.shared_with_through}
-                              onChange={(e) =>
-                                updateLaneGroup(apIdx, lgIdx, {
-                                  ...lg,
-                                  shared_with_through: e.target.checked,
-                                })
-                              }
-                            />
-                          </td>
-                          <td>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeLaneGroup(apIdx, lgIdx)}
-                            >
-                              ✕
-                            </Button>
-                          </td>
-                        </tr>
+                        <Fragment key={lg.id}>
+                          <tr>
+                            <td>
+                              <Input
+                                size="sm"
+                                value={lg.id}
+                                onChange={(e) =>
+                                  updateLaneGroup(apIdx, lgIdx, {
+                                    ...lg,
+                                    id: e.target.value,
+                                  })
+                                }
+                                style={{ width: 100 }}
+                              />
+                            </td>
+                            <td>
+                              <select
+                                value={lg.movement}
+                                onChange={(e) =>
+                                  updateLaneGroup(apIdx, lgIdx, {
+                                    ...lg,
+                                    movement: e.target.value as MovementType,
+                                  })
+                                }
+                              >
+                                {movementOptions.map((m) => (
+                                  <option key={m} value={m}>
+                                    {m}
+                                  </option>
+                                ))}
+                              </select>
+                            </td>
+                            <td>
+                              <Input
+                                size="sm"
+                                type="number"
+                                min={1}
+                                max={8}
+                                value={lg.lanes}
+                                onChange={(e) =>
+                                  updateLaneGroup(apIdx, lgIdx, {
+                                    ...lg,
+                                    lanes: parseInt(e.target.value) || 1,
+                                  })
+                                }
+                                style={{ width: 80 }}
+                              />
+                            </td>
+                            <td>
+                              <Input
+                                size="sm"
+                                type="number"
+                                step={50}
+                                value={lg.saturation_flow_per_lane}
+                                onChange={(e) =>
+                                  updateLaneGroup(apIdx, lgIdx, {
+                                    ...lg,
+                                    saturation_flow_per_lane:
+                                      parseFloat(e.target.value) || 1900,
+                                  })
+                                }
+                                style={{ width: 110 }}
+                              />
+                            </td>
+                            <td>
+                              <input
+                                type="checkbox"
+                                checked={lg.shared_with_through}
+                                onChange={(e) =>
+                                  updateLaneGroup(apIdx, lgIdx, {
+                                    ...lg,
+                                    shared_with_through: e.target.checked,
+                                  })
+                                }
+                              />
+                            </td>
+                            <td>
+                              <Button
+                                variant={lg.factors != null ? "secondary" : "ghost"}
+                                size="sm"
+                                onClick={() =>
+                                  updateLaneGroup(apIdx, lgIdx, {
+                                    ...lg,
+                                    factors: lg.factors != null ? null : {},
+                                  })
+                                }
+                              >
+                                {lg.factors != null ? "ƒ ✓" : "ƒ"}
+                              </Button>
+                            </td>
+                            <td>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeLaneGroup(apIdx, lgIdx)}
+                              >
+                                ✕
+                              </Button>
+                            </td>
+                          </tr>
+                          {lg.factors != null && (
+                            <tr>
+                              <td colSpan={7} style={{ background: "#fafafa" }}>
+                                <div
+                                  className="row"
+                                  style={{
+                                    flexWrap: "wrap",
+                                    alignItems: "flex-end",
+                                    gap: 10,
+                                  }}
+                                >
+                                  <Input
+                                    label="Ancho carril (m)"
+                                    size="sm"
+                                    type="number"
+                                    step={0.05}
+                                    min={2.4}
+                                    max={5.5}
+                                    placeholder="—"
+                                    value={lg.factors.lane_width_m ?? ""}
+                                    onChange={(e) => {
+                                      const v = parseFloat(e.target.value);
+                                      patchFactors(apIdx, lgIdx, lg, {
+                                        lane_width_m: Number.isNaN(v) ? null : v,
+                                      });
+                                    }}
+                                    style={{ width: 120 }}
+                                  />
+                                  <Input
+                                    label="Pendiente %"
+                                    size="sm"
+                                    type="number"
+                                    step={0.5}
+                                    min={-6}
+                                    max={10}
+                                    value={lg.factors.grade_pct ?? 0}
+                                    onChange={(e) =>
+                                      patchFactors(apIdx, lgIdx, lg, {
+                                        grade_pct:
+                                          parseFloat(e.target.value) || 0,
+                                      })
+                                    }
+                                    style={{ width: 100 }}
+                                  />
+                                  <Input
+                                    label="Estac. man/h"
+                                    size="sm"
+                                    type="number"
+                                    step={1}
+                                    min={0}
+                                    max={180}
+                                    placeholder="—"
+                                    value={
+                                      lg.factors.parking_maneuvers_per_h ?? ""
+                                    }
+                                    onChange={(e) => {
+                                      const v = parseFloat(e.target.value);
+                                      patchFactors(apIdx, lgIdx, lg, {
+                                        parking_maneuvers_per_h: Number.isNaN(v)
+                                          ? null
+                                          : v,
+                                      });
+                                    }}
+                                    style={{ width: 110 }}
+                                  />
+                                  <Input
+                                    label="Buses/h"
+                                    size="sm"
+                                    type="number"
+                                    step={1}
+                                    min={0}
+                                    max={250}
+                                    value={lg.factors.bus_stops_per_h ?? 0}
+                                    onChange={(e) =>
+                                      patchFactors(apIdx, lgIdx, lg, {
+                                        bus_stops_per_h:
+                                          parseFloat(e.target.value) || 0,
+                                      })
+                                    }
+                                    style={{ width: 90 }}
+                                  />
+                                  <label
+                                    className="inline"
+                                    style={{ alignSelf: "center" }}
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={lg.factors.cbd ?? false}
+                                      onChange={(e) =>
+                                        patchFactors(apIdx, lgIdx, lg, {
+                                          cbd: e.target.checked,
+                                        })
+                                      }
+                                    />
+                                    CBD
+                                  </label>
+                                  <Input
+                                    label="fLU"
+                                    size="sm"
+                                    type="number"
+                                    step={0.01}
+                                    min={0.5}
+                                    max={1}
+                                    value={lg.factors.lane_utilization ?? 1}
+                                    onChange={(e) =>
+                                      patchFactors(apIdx, lgIdx, lg, {
+                                        lane_utilization:
+                                          parseFloat(e.target.value) || 1,
+                                      })
+                                    }
+                                    style={{ width: 90 }}
+                                  />
+                                  <span
+                                    style={{
+                                      fontSize: 11,
+                                      color: "var(--muted)",
+                                      maxWidth: 320,
+                                    }}
+                                  >
+                                    Pesados: vía PCU en Demanda (no aquí). Giro
+                                    exclusivo activo: ×0.95 izq / ×0.85 der.
+                                  </span>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </Fragment>
                       ))}
                     </tbody>
                   </table>
@@ -303,6 +458,7 @@ function defaultLaneGroup(id: string, mv: MovementType): LaneGroup {
     lanes: 1,
     saturation_flow_per_lane: 1900,
     shared_with_through: false,
+    factors: null,
   };
 }
 

@@ -98,6 +98,10 @@ de hora pico) puede usarse como volumen horario equivalente.
 - **Back of queue (HCM 2000 cap. 16, ap. G)** — cola media `Q1 + Q2` por carril
   y percentil 95 con factor `fB95 = 1.6 + e^(-Q/5)` (pretimed). Ver
   `backend/app/analysis.py`.
+- **Factores de saturación (HCM 2010 cap. 18)** — cadena opcional por grupo:
+  `fw · fg · fp · fbb · fa · fLU` + giro protegido (0.95 izq / 0.85 der en
+  carril exclusivo). Pesados vía `pcu_factor` en la demanda (≡ fHV). Ver
+  `SaturationFactors` en `backend/app/models.py`.
 - **Simulación de colas de tiempo discreto** — paso fijo (1 s por defecto),
   llegadas Poisson (muestreo exacto por paso), salidas a flujo de saturación
   durante el verde; N réplicas con semillas consecutivas y percentiles
@@ -160,8 +164,9 @@ Traffic-Intersection-Optimizer/
 - No modela coordinación entre intersecciones (cada una se trata como aislada).
 - No incluye control adaptativo en tiempo real — el plan es pretimed con
   posibilidad de re-optimizar al cambiar la demanda.
-- Saturación de flujo base HCM (1900 veh/h/carril); para ajustes finos editar
-  el campo `saturation_flow_per_lane` por grupo.
+- Flujo de saturación: base 1900 veh/h/carril + cadena opcional de factores
+  HCM por grupo (botón ƒ). El bloqueo de giros por peatones/ciclistas
+  (fLpb/fRpb) aún no se modela.
 
 ## Próximos pasos sugeridos
 
