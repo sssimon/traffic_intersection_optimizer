@@ -10,9 +10,12 @@ from .analysis import analyze
 from .data import sample_intersection
 from .alternatives import compare_controls
 from .audit import build_audit
+from .field_count import process_field_count
 from .models import (
     CompareControlsRequest,
     CompareControlsResult,
+    FieldCountRequest,
+    FieldCountResult,
     IntersectionAnalysis,
     IntersectionConfig,
     OsmImportRequest,
@@ -138,6 +141,15 @@ def post_uncertainty(req: UncertaintyRequest) -> UncertaintyResult:
     """Monte Carlo de incertidumbre del aforo: P(LOS), banda de demora y
     tornado de sensibilidad."""
     return run_uncertainty(req)
+
+
+@app.post("/api/field-count", response_model=FieldCountResult)
+def post_field_count(req: FieldCountRequest) -> FieldCountResult:
+    """Procesa el aforo de 15 min: hora pico, PHF y PCU por movimiento."""
+    try:
+        return process_field_count(req)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 @app.post("/api/osm-import", response_model=OsmImportResult)

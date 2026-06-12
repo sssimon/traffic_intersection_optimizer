@@ -206,9 +206,12 @@ class Demand(BaseModel):
     volume: float = Field(..., ge=0.0, description="Demanda en veh/h.")
     pcu_factor: float = Field(
         1.0,
-        ge=1.0,
+        ge=0.3,
         le=3.0,
-        description="Factor de equivalencia vehículo ligero (pesados >1.0).",
+        description=(
+            "Factor de equivalencia a vehículo ligero: pesados > 1.0, "
+            "motos < 1.0 (composición con muchas motos baja el factor)."
+        ),
     )
 
     @property
@@ -509,6 +512,58 @@ class CompareControlsResult(BaseModel):
     )
     recommended_id: str
     rationale: List[str]
+    warnings: List[str] = Field(default_factory=list)
+
+
+# ---------- Aforo de campo de 15 minutos (tarea 3.3) ----------
+
+class MovementCounts(BaseModel):
+    """Conteos de un grupo por intervalo de 15 min y clase vehicular.
+
+    Cada lista trae un valor por intervalo (o va vacía = ceros)."""
+    auto: List[float] = Field(default_factory=list)
+    moto: List[float] = Field(default_factory=list)
+    bus: List[float] = Field(default_factory=list)
+    camion: List[float] = Field(default_factory=list)
+
+
+class PcuEquivalences(BaseModel):
+    """Equivalencias PCU por clase — declaradas y editables."""
+    auto: float = Field(1.0, ge=0.1, le=5.0)
+    moto: float = Field(0.5, ge=0.1, le=5.0)
+    bus: float = Field(2.0, ge=0.1, le=5.0)
+    camion: float = Field(2.0, ge=0.1, le=5.0)
+
+
+class FieldCountRequest(BaseModel):
+    interval_labels: List[str] = Field(
+        ...,
+        min_length=1,
+        max_length=16,
+        description="Etiquetas de los intervalos de 15 min (ej. hora de inicio).",
+    )
+    counts: dict[str, MovementCounts] = Field(
+        ..., description="Conteos por lane_group_id."
+    )
+    pcu: PcuEquivalences = Field(default_factory=PcuEquivalences)
+
+
+class FieldCountResult(BaseModel):
+    peak_hour_label: str
+    expanded: bool = Field(
+        ..., description="True si hubo menos de 4 intervalos (expansión ×4/n)."
+    )
+    phf: Optional[float] = Field(
+        None,
+        description="PHF = V_hora/(4·V15máx) sobre el total; None si no es calculable.",
+    )
+    volumes: dict[str, float] = Field(
+        ..., description="Volumen horario mixto (veh/h) por grupo en la hora pico."
+    )
+    pcu_factors: dict[str, float] = Field(
+        ..., description="PCU por grupo desde la composición de la hora pico."
+    )
+    totals_per_interval: List[float]
     warnings: List[str] = Field(default_factory=list)
 
 

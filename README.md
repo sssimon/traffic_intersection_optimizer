@@ -37,6 +37,10 @@ semaforizada — incluso sin datos históricos.
 9. **Corridas guardadas**: historial en SQLite (`data/runs/`) con la
    configuración completa y el resumen del análisis — comparable entre
    fechas y recargable con un clic.
+10. **Aforo de campo (15 min)**: hoja imprimible + captura por intervalo y
+    clase (auto/moto/bus/camión); la app detecta la hora pico (ventana
+    móvil), calcula el PHF y el PCU por movimiento (motos < 1.0) y los
+    aplica a la demanda — sin Excel.
 
 ## Quick start
 
@@ -100,8 +104,9 @@ El sistema funciona con **estimaciones**:
 - La simulación genera tráfico Poisson consistente con la demanda configurada.
 - Compara varios escenarios para entender la sensibilidad al volumen.
 
-Para datos reales en el futuro: cualquier conteo manual o aforo (incluso 15 min
-de hora pico) puede usarse como volumen horario equivalente.
+Para datos reales: la tarjeta **Aforo de campo (15 min)** de la pestaña 01
+procesa conteos manuales (incluso de un solo intervalo, con expansión y
+advertencia) y aplica volúmenes, PHF y PCU sin pasar por Excel.
 
 ## Teoría aplicada
 
@@ -146,6 +151,7 @@ de hora pico) puede usarse como volumen horario equivalente.
 | POST   | `/api/analyze-twsc`      | Análisis no semaforizado con PARE (HCM 19)   |
 | POST   | `/api/compare-controls`  | Ranking de alternativas de control           |
 | POST   | `/api/uncertainty`       | Monte Carlo: P(LOS), banda y tornado         |
+| POST   | `/api/field-count`       | Aforo 15 min: hora pico, PHF y PCU           |
 | POST   | `/api/osm-import`        | Geometría del cruce desde OSM (Overpass)     |
 | POST/GET | `/api/runs`            | Guardar / listar corridas (SQLite)           |
 | GET/DELETE | `/api/runs/{id}`     | Cargar / eliminar una corrida                |

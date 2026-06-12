@@ -1,8 +1,10 @@
 import type {
   CompareControlsResult,
   DemandMultiplier,
+  FieldCountResult,
   IntersectionAnalysis,
   IntersectionConfig,
+  MovementCounts,
   OsmImportResult,
   RunDetail,
   RunSummary,
@@ -97,6 +99,15 @@ export const runUncertainty = (
     volume_cv: opts.volumeCv,
     samples: opts.samples ?? 1000,
     method: opts.method ?? "delay_min",
+  });
+
+export const processFieldCount = (
+  intervalLabels: string[],
+  counts: Record<string, MovementCounts>,
+) =>
+  post<FieldCountResult>("/field-count", {
+    interval_labels: intervalLabels,
+    counts,
   });
 
 export const importOsm = (latitude: number, longitude: number, radiusM = 60) =>

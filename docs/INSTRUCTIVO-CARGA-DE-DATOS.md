@@ -231,13 +231,33 @@ que creaste (se generan solas). Completa:
 | Columna | Qué poner |
 |---|---|
 | **Demanda (veh/h)** | Vehículos por hora que usan ese grupo en la hora analizada. |
-| **PCU** | 1.0 para tráfico de autos. Súbelo si hay muchos camiones/buses. |
+| **PCU** | 1.0 para tráfico de autos. Súbelo con camiones/buses; **bájalo** (< 1.0) si dominan las motos. |
 
 Las columnas Acceso / Grupo / Mov. / Carriles son solo informativas (no se
 editan; vienen de la geometría).
 
-> ¿De dónde sale la demanda? Ver la **sección 15** (ejemplo con aforos
-> reales) o la **sección 16** (cómo estimarla si no tienes aforos).
+### Aforo de campo de 15 minutos (recomendado — sin Excel)
+
+Si vienes de un conteo de campo, **no reduzcas los datos a mano**: usa la
+tarjeta **Aforo de campo (15 min)**, debajo de la Demanda.
+
+1. Pulsa **🖨 Hoja de campo imprimible** para llevar al sitio una planilla
+   con tus grupos, clases (auto/moto/bus/camión) e intervalos.
+2. De vuelta, fija la **hora de inicio** y el **número de intervalos**, y
+   teclea los conteos de cada grupo por clase e intervalo.
+3. **Calcular hora pico**: la app encuentra la ventana de 4×15 min de mayor
+   volumen total, calcula el **PHF** = V/(4·V15máx) y el **PCU por
+   movimiento** desde la composición vehicular (equivalencias: auto 1.0,
+   moto 0.5, bus 2.0, camión 2.0 — las motos bajan el factor).
+4. **Aplicar a la demanda y PHF**: llena la tabla de Demanda y el PHF de un
+   golpe.
+
+> Con menos de 4 intervalos la app expande a hora (×4/n) y lo advierte:
+> úsalo solo como tamizaje y elige un CV alto en el análisis de
+> incertidumbre de la pestaña 02.
+
+> ¿De dónde sale la demanda si no aforaste? Ver la **sección 15** (ejemplo
+> con aforos reales) o la **sección 16** (cómo estimarla sin aforos).
 
 ---
 

@@ -74,7 +74,7 @@ export function DemandTable({ config, onChange }: Props) {
                     <Input
                       size="sm"
                       type="number"
-                      min={1}
+                      min={0.3}
                       max={3}
                       step={0.05}
                       value={d?.pcu_factor ?? 1.0}

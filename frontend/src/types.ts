@@ -199,6 +199,25 @@ export interface CompareControlsResult {
   warnings: string[];
 }
 
+// ---- Aforo de campo (15 min) ----
+
+export interface MovementCounts {
+  auto?: number[];
+  moto?: number[];
+  bus?: number[];
+  camion?: number[];
+}
+
+export interface FieldCountResult {
+  peak_hour_label: string;
+  expanded: boolean;
+  phf: number | null;
+  volumes: Record<string, number>;
+  pcu_factors: Record<string, number>;
+  totals_per_interval: number[];
+  warnings: string[];
+}
+
 // ---- Importación OSM ----
 
 export interface OsmImportResult {
