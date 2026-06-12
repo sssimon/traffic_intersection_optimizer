@@ -75,6 +75,21 @@ export interface MovementAnalysis {
   los: LOS;
 }
 
+export interface AuditStep {
+  concept: string;
+  formula: string;
+  substitution: string;
+  value: number;
+  units: string;
+  source: string;
+}
+
+export interface MovementAudit {
+  lane_group_id: string;
+  phase_id: string;
+  steps: AuditStep[];
+}
+
 export interface IntersectionAnalysis {
   config_name: string;
   signal_plan: SignalPlan;
@@ -83,6 +98,7 @@ export interface IntersectionAnalysis {
   overall_los: LOS;
   overall_v_c: number;
   warnings: string[];
+  audit?: MovementAudit[] | null;
 }
 
 export interface MovementTrace {

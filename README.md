@@ -28,6 +28,10 @@ semaforizada — incluso sin datos históricos.
    volúmenes según la calidad del conteo — P(cada LOS), banda de demora
    p5–p95 y tornado de sensibilidad. Un conteo corto no justifica una
    letra única.
+8. **Modo auditoría**: traza de cálculo por movimiento — cada número con su
+   fórmula, sustitución numérica y edición del manual citada
+   (`/api/analyze?audit=true`). Un revisor verifica con calculadora, sin
+   leer código.
 
 ## Quick start
 
@@ -131,7 +135,7 @@ de hora pico) puede usarse como volumen horario equivalente.
 | GET    | `/api/health`            | Health check                                 |
 | GET    | `/api/sample`            | Configuración de ejemplo                     |
 | POST   | `/api/optimize`          | Plan de tiempos (`?method=webster\|delay_min`) |
-| POST   | `/api/analyze`           | Optimiza (`?method=`) + análisis HCM         |
+| POST   | `/api/analyze`           | Optimiza (`?method=`) + análisis HCM (`?audit=true`: traza) |
 | POST   | `/api/simulate`          | Simulación de colas (N réplicas, banda 5–95) |
 | POST   | `/api/scenarios`         | Escenarios (global/direccional) + estrategia |
 | POST   | `/api/analyze-twsc`      | Análisis no semaforizado con PARE (HCM 19)   |

@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .analysis import analyze
 from .data import sample_intersection
 from .alternatives import compare_controls
+from .audit import build_audit
 from .models import (
     CompareControlsRequest,
     CompareControlsResult,
@@ -87,9 +88,17 @@ def post_analyze(
     method: OptimizeMethod = Query(
         "webster", description="Optimizador: 'webster' o 'delay_min'."
     ),
+    audit: bool = Query(
+        False,
+        description="Modo auditoría: incluye la traza de cálculo por movimiento.",
+    ),
 ) -> IntersectionAnalysis:
     """Optimiza (según método) + analiza con HCM (demora, cola, LOS)."""
-    return analyze(cfg, _plan_for(cfg, method))
+    plan = _plan_for(cfg, method)
+    analysis = analyze(cfg, plan)
+    if audit:
+        analysis.audit = build_audit(cfg, plan)
+    return analysis
 
 
 @app.post("/api/simulate", response_model=SimulationResult)

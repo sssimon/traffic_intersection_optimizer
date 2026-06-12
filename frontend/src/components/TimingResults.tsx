@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { Button, Card } from "neobrutalistcomponents";
-import type { IntersectionAnalysis, IntersectionConfig } from "../types";
+import { analyze } from "../api";
+import type {
+  IntersectionAnalysis,
+  IntersectionConfig,
+  MovementAudit,
+} from "../types";
 import { UncertaintyCard } from "./UncertaintyCard";
 
 type Method = "webster" | "delay_min";
@@ -23,9 +28,29 @@ export function TimingResults({ webster, delayMin, config }: Props) {
   const recommended: Method =
     delayMin.avg_delay_s <= webster.avg_delay_s ? "delay_min" : "webster";
   const [method, setMethod] = useState<Method>(recommended);
+  const [auditData, setAuditData] = useState<MovementAudit[] | null>(null);
+  const [auditLoading, setAuditLoading] = useState(false);
+  const [auditError, setAuditError] = useState<string | null>(null);
   useEffect(() => {
     setMethod(recommended);
   }, [recommended, webster, delayMin]);
+  useEffect(() => {
+    setAuditData(null);
+    setAuditError(null);
+  }, [method, webster, delayMin]);
+
+  const loadAudit = async () => {
+    setAuditLoading(true);
+    setAuditError(null);
+    try {
+      const res = await analyze(config, method, true);
+      setAuditData(res.audit ?? []);
+    } catch (e) {
+      setAuditError(String(e));
+    } finally {
+      setAuditLoading(false);
+    }
+  };
 
   const analysis = method === "webster" ? webster : delayMin;
   const plan = analysis.signal_plan;
@@ -246,6 +271,82 @@ export function TimingResults({ webster, delayMin, config }: Props) {
               ))}
             </div>
           )}
+        </Card.Content>
+      </Card>
+
+      <Card>
+        <Card.Header>
+          <Card.Title>Modo auditoría</Card.Title>
+          <Card.Description>
+            Cada número con su fórmula, sustitución y fuente — verificable
+            contra el manual con una calculadora
+          </Card.Description>
+        </Card.Header>
+        <Card.Content>
+          {!auditData && (
+            <Button
+              variant="secondary"
+              size="sm"
+              loading={auditLoading}
+              onClick={loadAudit}
+            >
+              Generar traza de cálculo ({METHOD_LABEL[method]})
+            </Button>
+          )}
+          {auditError && (
+            <div className="error" style={{ marginTop: 12 }}>
+              {auditError}
+            </div>
+          )}
+          {auditData &&
+            auditData.map((mov) => (
+              <details key={mov.lane_group_id} style={{ marginTop: 10 }}>
+                <summary style={{ cursor: "pointer", fontWeight: 600 }}>
+                  <span className="code">{mov.lane_group_id}</span>
+                  <span
+                    style={{
+                      color: "var(--muted)",
+                      fontSize: 11,
+                      marginLeft: 8,
+                    }}
+                  >
+                    fase {mov.phase_id} · {mov.steps.length} pasos
+                  </span>
+                </summary>
+                <table style={{ marginTop: 8 }}>
+                  <thead>
+                    <tr>
+                      <th>Concepto</th>
+                      <th>Fórmula</th>
+                      <th>Sustitución</th>
+                      <th className="right">Valor</th>
+                      <th>Unidades</th>
+                      <th>Fuente</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mov.steps.map((s, i) => (
+                      <tr key={i}>
+                        <td>{s.concept}</td>
+                        <td>
+                          <span className="code" style={{ fontSize: 11 }}>
+                            {s.formula}
+                          </span>
+                        </td>
+                        <td>
+                          <span className="code" style={{ fontSize: 11 }}>
+                            {s.substitution}
+                          </span>
+                        </td>
+                        <td className="right">{s.value}</td>
+                        <td>{s.units}</td>
+                        <td style={{ fontSize: 11 }}>{s.source}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </details>
+            ))}
         </Card.Content>
       </Card>
 

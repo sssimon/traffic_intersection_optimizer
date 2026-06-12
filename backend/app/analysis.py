@@ -24,7 +24,7 @@ aleatorias (PF2 = 1), intersección aislada (I = 1), T = 0.25 h.
 from __future__ import annotations
 
 import math
-from typing import List
+from typing import List, NamedTuple
 
 from .models import (
     IntersectionAnalysis,
@@ -52,9 +52,25 @@ QUEUE_FB95_P2 = 1.0
 QUEUE_FB95_P3 = 5.0
 
 
-def _back_of_queue_per_lane(
+class BackOfQueueDetail(NamedTuple):
+    """Intermedios auditables del modelo de cola (por carril)."""
+    v_lane: float
+    c_lane: float
+    s_lane: float
+    u: float
+    r: float
+    x: float
+    q1: float
+    k_b: float
+    q2: float
+    q_avg: float
+    f_b95: float
+    q95: float
+
+
+def back_of_queue_detail(
     v: float, capacity: float, s: float, lanes: int, g: float, C: float
-) -> tuple[float, float]:
+) -> BackOfQueueDetail:
     """Cola media y percentil 95 (back of queue) por carril, en vehículos.
 
     `v`, `capacity` y `s` son totales del grupo de carriles (veh/h); se
@@ -82,6 +98,7 @@ def _back_of_queue_per_lane(
 
     # Q2 — término incremental (aleatoriedad + sobresaturación)
     if c_lane <= 0:
+        k_b = 0.0
         q2 = 0.5 * v_lane * T_HOURS
     else:
         k_b = 0.12 * I_FACTOR * (s_lane * g / 3600.0) ** 0.7
@@ -91,15 +108,48 @@ def _back_of_queue_per_lane(
 
     q_avg = q1 + q2
     f_b95 = QUEUE_FB95_P1 + QUEUE_FB95_P2 * math.exp(-q_avg / QUEUE_FB95_P3)
-    return q_avg, f_b95 * q_avg
+    return BackOfQueueDetail(
+        v_lane=v_lane,
+        c_lane=c_lane,
+        s_lane=s_lane,
+        u=u,
+        r=r,
+        x=x,
+        q1=q1,
+        k_b=k_b,
+        q2=q2,
+        q_avg=q_avg,
+        f_b95=f_b95,
+        q95=f_b95 * q_avg,
+    )
 
 
-def movement_performance(v: float, s: float, g: float, C: float) -> tuple[float, float, float]:
-    """Demora de control HCM, capacidad y grado de saturación de un movimiento.
+def _back_of_queue_per_lane(
+    v: float, capacity: float, s: float, lanes: int, g: float, C: float
+) -> tuple[float, float]:
+    """Atajo (Q media, Q95) sobre `back_of_queue_detail`."""
+    d = back_of_queue_detail(v, capacity, s, lanes, g, C)
+    return d.q_avg, d.q95
 
-    Devuelve (d, capacidad, X) con d = d1·PF + d2. Es el núcleo compartido
-    entre el análisis (`analyze`) y el optimizador por minimización de demora
-    (`optimizer_delay`): una sola transcripción de las fórmulas.
+
+class MovementPerformance(NamedTuple):
+    """Resultado completo del modelo de demora, con intermedios auditables."""
+    delay: float
+    capacity: float
+    x_ratio: float
+    d1: float
+    d2: float
+    x_capped: float
+    g_over_c: float
+
+
+def movement_performance_full(v: float, s: float, g: float, C: float) -> MovementPerformance:
+    """Demora de control HCM de un movimiento con todos sus intermedios.
+
+    Núcleo único de las fórmulas d = d1·PF + d2, compartido por el análisis
+    (`analyze`), el optimizador de mínima demora (`optimizer_delay`), el
+    Monte Carlo (`uncertainty`) y el modo auditoría (`audit`): una sola
+    transcripción.
     """
     if C <= 0 or g <= 0:
         capacity = 0.0
@@ -123,7 +173,21 @@ def movement_performance(v: float, s: float, g: float, C: float) -> tuple[float,
     else:
         d2 = ZERO_CAPACITY_DELAY
 
-    return d1 * PF_FACTOR + d2, capacity, X
+    return MovementPerformance(
+        delay=d1 * PF_FACTOR + d2,
+        capacity=capacity,
+        x_ratio=X,
+        d1=d1,
+        d2=d2,
+        x_capped=X_capped,
+        g_over_c=g_over_C,
+    )
+
+
+def movement_performance(v: float, s: float, g: float, C: float) -> tuple[float, float, float]:
+    """Atajo (d, capacidad, X) sobre `movement_performance_full`."""
+    p = movement_performance_full(v, s, g, C)
+    return p.delay, p.capacity, p.x_ratio
 
 
 def _los_from_delay(d: float) -> LOSGrade:

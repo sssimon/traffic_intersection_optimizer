@@ -33,8 +33,15 @@ export type OptimizeMethod = "webster" | "delay_min";
 export const optimize = (cfg: IntersectionConfig, method: OptimizeMethod = "webster") =>
   post<SignalPlan>(`/optimize?method=${method}`, cfg);
 
-export const analyze = (cfg: IntersectionConfig, method: OptimizeMethod = "webster") =>
-  post<IntersectionAnalysis>(`/analyze?method=${method}`, cfg);
+export const analyze = (
+  cfg: IntersectionConfig,
+  method: OptimizeMethod = "webster",
+  audit = false,
+) =>
+  post<IntersectionAnalysis>(
+    `/analyze?method=${method}${audit ? "&audit=true" : ""}`,
+    cfg,
+  );
 
 export const simulate = (cfg: IntersectionConfig, opts: {
   signal_plan?: SignalPlan;

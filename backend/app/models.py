@@ -83,25 +83,46 @@ class SaturationFactors(BaseModel):
         ),
     )
 
-    def chain(self, lanes: int, movement: MovementType, shared: bool) -> float:
-        """Producto de los factores para un grupo de `lanes` carriles."""
+    def breakdown(
+        self, lanes: int, movement: MovementType, shared: bool
+    ) -> list[tuple[str, float]]:
+        """Factores individuales (nombre, valor) — los neutros se omiten.
+
+        Es la única transcripción de las fórmulas: `chain` y el modo
+        auditoría se construyen sobre este desglose.
+        """
         n = max(1, lanes)
-        f = 1.0
+        out: list[tuple[str, float]] = []
         if self.lane_width_m is not None:
-            f *= 1.0 + (self.lane_width_m - 3.66) / 9.14
-        f *= 1.0 - self.grade_pct / 200.0
+            out.append(("fw ancho", 1.0 + (self.lane_width_m - 3.66) / 9.14))
+        if self.grade_pct != 0.0:
+            out.append(("fg pendiente", 1.0 - self.grade_pct / 200.0))
         if self.parking_maneuvers_per_h is not None:
-            f *= max(0.050, (n - 0.1 - 18.0 * self.parking_maneuvers_per_h / 3600.0) / n)
+            out.append((
+                "fp estacionamiento",
+                max(0.050, (n - 0.1 - 18.0 * self.parking_maneuvers_per_h / 3600.0) / n),
+            ))
         if self.bus_stops_per_h > 0:
-            f *= max(0.050, (n - 14.4 * self.bus_stops_per_h / 3600.0) / n)
+            out.append((
+                "fbb buses",
+                max(0.050, (n - 14.4 * self.bus_stops_per_h / 3600.0) / n),
+            ))
         if self.cbd:
-            f *= 0.90
-        f *= self.lane_utilization
+            out.append(("fa CBD", 0.90))
+        if self.lane_utilization != 1.0:
+            out.append(("fLU utilización", self.lane_utilization))
         if not shared:
             if movement == MovementType.LEFT:
-                f *= 0.95
+                out.append(("fLT izq. protegida", 0.95))
             elif movement == MovementType.RIGHT:
-                f *= 0.85
+                out.append(("fRT der. exclusiva", 0.85))
+        return out
+
+    def chain(self, lanes: int, movement: MovementType, shared: bool) -> float:
+        """Producto de los factores para un grupo de `lanes` carriles."""
+        f = 1.0
+        for _, value in self.breakdown(lanes, movement, shared):
+            f *= value
         return f
 
 
@@ -282,6 +303,22 @@ class MovementAnalysis(BaseModel):
     los: LOSGrade
 
 
+class AuditStep(BaseModel):
+    """Un paso verificable: fórmula, sustitución numérica, valor y fuente."""
+    concept: str
+    formula: str
+    substitution: str
+    value: float
+    units: str
+    source: str
+
+
+class MovementAudit(BaseModel):
+    lane_group_id: str
+    phase_id: str
+    steps: List[AuditStep]
+
+
 class IntersectionAnalysis(BaseModel):
     config_name: str
     signal_plan: SignalPlan
@@ -290,6 +327,13 @@ class IntersectionAnalysis(BaseModel):
     overall_los: LOSGrade
     overall_v_c: float
     warnings: List[str] = Field(default_factory=list)
+    audit: Optional[List[MovementAudit]] = Field(
+        None,
+        description=(
+            "Traza de cálculo por movimiento (modo auditoría): cada número "
+            "con su fórmula, sustitución y edición citada."
+        ),
+    )
 
 
 # ---------- Simulación ----------

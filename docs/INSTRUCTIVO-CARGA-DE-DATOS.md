@@ -261,6 +261,10 @@ Checklist rápido:
      probabilidad de cada LOS, la banda de demora p5–p95 y qué volúmenes
      pesan más en el resultado. Un conteo corto no justifica una letra
      única.
+   - **Modo auditoría**: genera la traza de cálculo del plan seleccionado —
+     por cada movimiento, cada número con su fórmula, la sustitución
+     numérica y la fuente del manual (HCM). Pensado para revisión técnica:
+     se verifica con calculadora, sin leer código.
 3. Para ver colas en el tiempo → pestaña **03 · Simulación**: corre N
    réplicas (20 por defecto) y muestra la mediana con banda de percentiles
    5–95 — el rango esperable, no una corrida suelta.
