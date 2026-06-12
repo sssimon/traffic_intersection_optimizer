@@ -107,8 +107,10 @@ de hora pico) puede usarse como volumen horario equivalente.
   durante el verde; N réplicas con semillas consecutivas y percentiles
   5/50/95 (sin periodo de calentamiento: parte con colas vacías).
   Ver `backend/app/simulator.py`.
-- **Aceptación de brechas** — HCM 2010 cap. 19 (PARE en la calle secundaria)
-  para intersecciones no semaforizadas. Ver `backend/app/unsignalized.py`.
+- **Aceptación de brechas** — HCM 2010 cap. 19 (PARE en la calle secundaria;
+  cap. 20 desde la 6.ª ed., valores base idénticos entre ediciones), con
+  impedancia por rangos y ajuste p′ del giro izquierda menor (ec. 17-8/19-48).
+  Ver `backend/app/unsignalized.py`.
 
 ## API
 

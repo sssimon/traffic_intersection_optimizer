@@ -94,7 +94,8 @@ export function UnsignalizedPanel({ config }: Props) {
         <Card.Header>
           <Card.Title>Análisis sin semáforo</Card.Title>
           <Card.Description>
-            Comparación: semáforo vs PARE — HCM cap. 19
+            Comparación: semáforo vs PARE — HCM 2010 cap. 19 (cap. 20 en
+            6.ª/7.ª ed.; valores base idénticos)
           </Card.Description>
         </Card.Header>
         <Card.Content>

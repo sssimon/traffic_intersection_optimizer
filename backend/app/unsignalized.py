@@ -1,14 +1,28 @@
 """Análisis de intersecciones NO semaforizadas.
 
-TWSC (HCM 2010, cap. 19) — calle secundaria con PARE; la principal circula
-libre. Se basa en teoría de aceptación de brechas (gap-acceptance). El nivel
-de servicio no semaforizado usa umbrales distintos a los del semáforo:
+TWSC (HCM 2010, cap. 19; cap. 20 desde la 6.ª edición) — calle secundaria
+con PARE; la principal circula libre. Se basa en teoría de aceptación de
+brechas (gap-acceptance). El nivel de servicio no semaforizado usa umbrales
+distintos a los del semáforo:
 
     A ≤ 10   B ≤ 15   C ≤ 25   D ≤ 35   E ≤ 50   F > 50   (s/veh)
 
+Edición (tarea 1.3): los valores base de brecha crítica (tc) y tiempo de
+seguimiento (tf) para calle principal de 2 carriles son idénticos en
+HCM 2000 (Exhibit 17-5), HCM 2010 (Exhibits 19-10/11) y HCM 6.ª/7.ª ed.
+(Exhibits 20-16/17) — verificado contra el capítulo 17 del HCM 2000.
+
+Impedancia entre rangos (ec. 17-5 a 17-9 ≡ 19-43 a 19-49 del HCM 2010):
+- Rango 3 (directo menor): impedido SOLO por los giros izquierda de la
+  principal — no por los giros derecha menores.
+- Rango 4 (izquierda menor, 4 ramas): p″ = p0(izq. mayores)·p0(directo menor
+  opuesto); el ajuste p′ = 0.65p″ − p″/(p″+3) + 0.6√p″ corrige la
+  dependencia estadística entre colas; luego f = p′·p0(derecha menor
+  opuesta). En 3 ramas la izquierda menor opera como rango 3 (HCM).
+
 Supuestos del módulo (declarados para que sean auditables):
 - Calle principal de 2 carriles, una etapa de cruce (sin almacenamiento en
-  mediana). Brechas críticas y tiempos de seguimiento: valores base HCM.
+  mediana). Sin ajustes de tc/tf por pesados o pendiente (valores base).
 - El flujo conflictivo del giro a la derecha desde la calle secundaria se
   aproxima como el promedio de ambos sentidos de la principal.
 """
@@ -27,12 +41,15 @@ from .models import (
 
 T_HOURS = 0.25  # periodo de análisis
 
-# Brechas críticas (tc) y tiempos de seguimiento (tf) base — HCM cap. 19.
+# Brechas críticas (tc) y tiempos de seguimiento (tf) base para calle
+# principal de DOS carriles — HCM 2000 Ex. 17-5 ≡ HCM 2010 Ex. 19-10/11.
+# (Con principal de 4 carriles serían: derecha menor 6.9 e izquierda
+# menor 7.5; el 7.5 que se usaba antes era el valor de 4 carriles.)
 GAP = {
     "major_left": (4.1, 2.2),
     "minor_right": (6.2, 3.3),
     "minor_through": (6.5, 4.0),
-    "minor_left": (7.5, 3.5),
+    "minor_left": (7.1, 3.5),
 }
 
 
@@ -150,7 +167,7 @@ def analyze_twsc(cfg: IntersectionConfig, major_ids: List[str]) -> TWSCAnalysis:
             continue
         d["cp"] = _potential_capacity(d["vc"], d["tc"], d["tf"])
 
-    # Rango 2: cm = cp.
+    # Rango 2: cm = cp (sin impedancia).
     for d in plan.values():
         if d["rank"] == 2:
             d["cm"] = d["cp"]
@@ -161,25 +178,47 @@ def analyze_twsc(cfg: IntersectionConfig, major_ids: List[str]) -> TWSCAnalysis:
             return 0.0
         return max(0.0, 1.0 - d["volume"] / cm)
 
-    rank2 = [d for d in plan.values() if d["rank"] == 2]
-    imp_r2 = 1.0
-    for d in rank2:
-        imp_r2 *= p0(d)
+    # Rango 3 (directo menor): impedido SOLO por los giros izquierda de la
+    # principal (HCM 2000 ec. 17-6, j = movimientos 1 y 4).
+    p_major_left = 1.0
+    for d in plan.values():
+        if d["rank"] == 2 and d["role"] == "mayor-giro-izq":
+            p_major_left *= p0(d)
 
-    # Rango 3: impedido por rango 2.
     for d in plan.values():
         if d["rank"] == 3:
-            d["cm"] = d["cp"] * imp_r2
+            d["cm"] = d["cp"] * p_major_left
 
-    rank3 = [d for d in plan.values() if d["rank"] == 3]
-    imp_r3 = 1.0
-    for d in rank3:
-        imp_r3 *= p0(d)
-
-    # Rango 4: impedido por rango 2 y 3.
+    # Rango 4 (izquierda menor): p″ = p0(izq. mayores)·p0(directo menor
+    # opuesto); p′ = 0.65p″ − p″/(p″+3) + 0.6√p″ (ec. 17-8) corrige la
+    # dependencia entre colas; f = p′·p0(derecha menor opuesta) (ec. 17-9).
+    # Sin directo menor opuesto (3 ramas) opera como rango 3.
     for d in plan.values():
-        if d["rank"] == 4:
-            d["cm"] = d["cp"] * imp_r2 * imp_r3
+        if d["rank"] != 4:
+            continue
+        a = d["approach"]
+        opp_through = [
+            e for e in plan.values()
+            if e["rank"] == 3 and e["approach"] != a
+        ]
+        opp_right = [
+            e for e in plan.values()
+            if e["rank"] == 2 and e["role"] == "menor"
+            and e["movement"] == MovementType.RIGHT and e["approach"] != a
+        ]
+        p0_opp_right = 1.0
+        for e in opp_right:
+            p0_opp_right *= p0(e)
+
+        if opp_through:
+            p2 = p_major_left
+            for e in opp_through:
+                p2 *= p0(e)
+            p_prime = 0.65 * p2 - p2 / (p2 + 3.0) + 0.6 * math.sqrt(p2)
+            f = p_prime * p0_opp_right
+        else:
+            f = p_major_left * p0_opp_right
+        d["cm"] = d["cp"] * max(0.0, f)
 
     # --- Resultados por movimiento ---
     movements: List[UnsignalizedMovement] = []
