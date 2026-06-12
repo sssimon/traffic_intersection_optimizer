@@ -143,13 +143,15 @@ class MovementPerformance(NamedTuple):
     g_over_c: float
 
 
-def movement_performance_full(v: float, s: float, g: float, C: float) -> MovementPerformance:
+def movement_performance_full(
+    v: float, s: float, g: float, C: float, pf: float = PF_FACTOR
+) -> MovementPerformance:
     """Demora de control HCM de un movimiento con todos sus intermedios.
 
     Núcleo único de las fórmulas d = d1·PF + d2, compartido por el análisis
     (`analyze`), el optimizador de mínima demora (`optimizer_delay`), el
-    Monte Carlo (`uncertainty`) y el modo auditoría (`audit`): una sola
-    transcripción.
+    Monte Carlo (`uncertainty`), el modo auditoría (`audit`) y el corredor
+    (`corridor`, que pasa un PF de progresión real): una sola transcripción.
     """
     if C <= 0 or g <= 0:
         capacity = 0.0
@@ -174,7 +176,7 @@ def movement_performance_full(v: float, s: float, g: float, C: float) -> Movemen
         d2 = ZERO_CAPACITY_DELAY
 
     return MovementPerformance(
-        delay=d1 * PF_FACTOR + d2,
+        delay=d1 * pf + d2,
         capacity=capacity,
         x_ratio=X,
         d1=d1,

@@ -1,5 +1,7 @@
 import type {
   CompareControlsResult,
+  CorridorIntersectionInput,
+  CorridorResult,
   DemandMultiplier,
   FieldCountResult,
   IntersectionAnalysis,
@@ -99,6 +101,18 @@ export const runUncertainty = (
     volume_cv: opts.volumeCv,
     samples: opts.samples ?? 1000,
     method: opts.method ?? "delay_min",
+  });
+
+export const runCorridor = (
+  cycleS: number,
+  intersections: CorridorIntersectionInput[],
+  opts: { offsets?: number[]; optimize?: boolean } = {},
+) =>
+  post<CorridorResult>("/corridor", {
+    cycle_s: cycleS,
+    intersections,
+    offsets_s: opts.offsets ?? [],
+    optimize_offsets: opts.optimize ?? true,
   });
 
 export const processFieldCount = (

@@ -41,6 +41,10 @@ semaforizada — incluso sin datos históricos.
     clase (auto/moto/bus/camión); la app detecta la hora pico (ventana
     móvil), calcula el PHF y el PCU por movimiento (motos < 1.0) y los
     aplica a la demanda — sin Excel.
+11. **Corredor (onda verde)**: ciclo común, offsets optimizados (MAXBAND
+    simplificado), banda verde bidireccional ponderada por volumen,
+    diagrama tiempo-espacio y **PF de progresión real** aplicado al modelo
+    de demora — coordinada vs aislada, cuantificado.
 
 ## Quick start
 
@@ -128,6 +132,10 @@ advertencia) y aplica volúmenes, PHF y PCU sin pasar por Excel.
   truncada en 0, independientes por movimiento; el plan se diseña con el
   aforo medio y se evalúa fijo bajo demanda incierta. Ver
   `backend/app/uncertainty.py`.
+- **Coordinación de corredor** — banda verde por intersección cíclica de
+  verdes desplazados (offsets por descenso coordinado, paso 1 s) y
+  `PF = (1−P)·fPA/(1−g/C)` (HCM 2000 cap. 16) con pelotón uniforme sin
+  dispersión (declarado). Ver `backend/app/corridor.py`.
 - **Simulación de colas de tiempo discreto** — paso fijo (1 s por defecto),
   llegadas Poisson (muestreo exacto por paso), salidas a flujo de saturación
   durante el verde; N réplicas con semillas consecutivas y percentiles
@@ -151,6 +159,7 @@ advertencia) y aplica volúmenes, PHF y PCU sin pasar por Excel.
 | POST   | `/api/analyze-twsc`      | Análisis no semaforizado con PARE (HCM 19)   |
 | POST   | `/api/compare-controls`  | Ranking de alternativas de control           |
 | POST   | `/api/uncertainty`       | Monte Carlo: P(LOS), banda y tornado         |
+| POST   | `/api/corridor`          | Corredor: offsets, banda verde y PF          |
 | POST   | `/api/field-count`       | Aforo 15 min: hora pico, PHF y PCU           |
 | POST   | `/api/osm-import`        | Geometría del cruce desde OSM (Overpass)     |
 | POST/GET | `/api/runs`            | Guardar / listar corridas (SQLite)           |
@@ -174,6 +183,8 @@ Traffic-Intersection-Optimizer/
 │   │   ├── audit.py        # Traza de cálculo verificable
 │   │   ├── storage.py      # Corridas guardadas (SQLite)
 │   │   ├── osm.py          # Importación de geometría (Overpass)
+│   │   ├── corridor.py     # Onda verde: offsets, banda y PF
+│   │   ├── field_count.py  # Aforo de campo de 15 min
 │   │   ├── data.py         # Sample
 │   │   └── main.py         # FastAPI
 │   ├── requirements.txt
@@ -200,7 +211,9 @@ Traffic-Intersection-Optimizer/
 ## Limitaciones conocidas
 
 - No modela peatones ni ciclos vehículo-bicicleta.
-- No modela coordinación entre intersecciones (cada una se trata como aislada).
+- El análisis de una intersección (pestañas 01–05) la trata como aislada;
+  la coordinación vive en la pestaña 06 · Corredor con supuestos
+  declarados (pelotón uniforme sin dispersión, fase arterial única).
 - No incluye control adaptativo en tiempo real — el plan es pretimed con
   posibilidad de re-optimizar al cambiar la demanda.
 - Flujo de saturación: base 1900 veh/h/carril + cadena opcional de factores
@@ -209,7 +222,8 @@ Traffic-Intersection-Optimizer/
 
 ## Próximos pasos sugeridos
 
+- Aforo por video (YOLO + ByteTrack) — paquete opcional `tools/aforo-video`.
 - Integración con SUMO para microsimulación de mayor fidelidad.
 - Control actuado (vehicle-actuated) con sensores virtuales.
-- Coordinación de corredor (onda verde) entre múltiples intersecciones.
+- Dispersión de pelotón (Robertson) en el corredor.
 - Aprendizaje por refuerzo (DQN) para control adaptativo.

@@ -515,6 +515,66 @@ class CompareControlsResult(BaseModel):
     warnings: List[str] = Field(default_factory=list)
 
 
+# ---------- Coordinación de corredor (tarea 4.1) ----------
+
+class CorridorIntersectionInput(BaseModel):
+    """Una intersección del corredor, vista desde la arteria coordinada."""
+    name: str
+    green_s: float = Field(..., ge=5.0, description="Verde efectivo de la fase arterial (s).")
+    distance_to_next_m: float = Field(
+        0.0, ge=0.0, description="Distancia a la siguiente intersección (m); 0 en la última."
+    )
+    speed_to_next_kmh: float = Field(40.0, ge=5.0, le=120.0)
+    vol_out: float = Field(0.0, ge=0.0, description="Volumen arterial de ida (veh/h).")
+    vol_in: float = Field(0.0, ge=0.0, description="Volumen arterial de vuelta (veh/h).")
+    sat_out: float = Field(3400.0, ge=500.0, description="Saturación de ida (veh/h, ≈1700·carriles).")
+    sat_in: float = Field(3400.0, ge=500.0, description="Saturación de vuelta (veh/h).")
+
+
+class CorridorRequest(BaseModel):
+    cycle_s: float = Field(..., ge=40.0, le=180.0, description="Ciclo común del corredor (s).")
+    intersections: List[CorridorIntersectionInput] = Field(..., min_length=2, max_length=8)
+    offsets_s: List[float] = Field(
+        default_factory=list,
+        description="Offsets manuales (s, uno por intersección); vacío = optimizar.",
+    )
+    optimize_offsets: bool = Field(
+        True, description="Optimizar offsets maximizando la banda ponderada por volumen."
+    )
+
+
+class CorridorIntersectionResult(BaseModel):
+    name: str
+    position_m: float
+    offset_s: float
+    green_s: float
+    p_green_out: Optional[float] = Field(None, description="Fracción del pelotón de ida que llega en verde (None = primera, llegadas aleatorias).")
+    p_green_in: Optional[float] = None
+    pf_out: float = Field(..., description="Factor de progresión HCM aplicado a d1 (ida).")
+    pf_in: float
+    delay_out_s: float
+    delay_in_s: float
+    delay_isolated_out_s: float = Field(..., description="Demora con PF = 1 (aislada), para comparar.")
+    delay_isolated_in_s: float
+
+
+class CorridorResult(BaseModel):
+    cycle_s: float
+    offsets_optimized: bool
+    band_out_s: float = Field(..., description="Banda verde de ida (s).")
+    band_in_s: float
+    efficiency_out: float = Field(..., description="Banda/ciclo (ida).")
+    efficiency_in: float
+    band_out_start_s: float = Field(..., description="Inicio de la banda de ida, reloj absoluto en la 1.ª intersección.")
+    band_in_start_s: float = Field(..., description="Inicio de la banda de vuelta, reloj absoluto en la última intersección.")
+    travel_times_s: List[float] = Field(..., description="Tiempo de viaje acumulado desde la 1.ª intersección.")
+    intersections: List[CorridorIntersectionResult]
+    avg_artery_delay_s: float = Field(..., description="Demora arterial media ponderada, coordinada (con PF).")
+    avg_artery_delay_isolated_s: float = Field(..., description="Ídem con PF = 1 (aisladas).")
+    warnings: List[str] = Field(default_factory=list)
+    notes: List[str] = Field(default_factory=list)
+
+
 # ---------- Aforo de campo de 15 minutos (tarea 3.3) ----------
 
 class MovementCounts(BaseModel):

@@ -304,6 +304,13 @@ Checklist rápido:
    (fases configuradas y un esquema por acceso auto-generado) y el PARE
    (HCM cap. 19), y los rankea por demora media con una recomendación (★)
    y sus criterios.
+6. Para coordinar **varias intersecciones sobre una avenida** → pestaña
+   **06 · Corredor**: carga verde arterial, distancias, velocidades y
+   volúmenes por sentido; la app optimiza los **offsets**, dibuja el
+   **diagrama tiempo-espacio** con las bandas verdes de ida y vuelta, y
+   cuantifica la mejora de demora por coordinación (PF de progresión del
+   HCM). Desmarca *Optimizar offsets* para experimentar con offsets
+   manuales.
 
 > Si cambias cualquier dato en Configuración, vuelve a pulsar **Optimizar y
 > analizar** para refrescar los resultados.

@@ -10,10 +10,13 @@ from .analysis import analyze
 from .data import sample_intersection
 from .alternatives import compare_controls
 from .audit import build_audit
+from .corridor import process_corridor
 from .field_count import process_field_count
 from .models import (
     CompareControlsRequest,
     CompareControlsResult,
+    CorridorRequest,
+    CorridorResult,
     FieldCountRequest,
     FieldCountResult,
     IntersectionAnalysis,
@@ -141,6 +144,15 @@ def post_uncertainty(req: UncertaintyRequest) -> UncertaintyResult:
     """Monte Carlo de incertidumbre del aforo: P(LOS), banda de demora y
     tornado de sensibilidad."""
     return run_uncertainty(req)
+
+
+@app.post("/api/corridor", response_model=CorridorResult)
+def post_corridor(req: CorridorRequest) -> CorridorResult:
+    """Coordinación de corredor: offsets, banda verde bidireccional y PF."""
+    try:
+        return process_corridor(req)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 @app.post("/api/field-count", response_model=FieldCountResult)

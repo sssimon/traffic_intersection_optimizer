@@ -199,6 +199,51 @@ export interface CompareControlsResult {
   warnings: string[];
 }
 
+// ---- Corredor ----
+
+export interface CorridorIntersectionInput {
+  name: string;
+  green_s: number;
+  distance_to_next_m: number;
+  speed_to_next_kmh: number;
+  vol_out: number;
+  vol_in: number;
+  sat_out: number;
+  sat_in: number;
+}
+
+export interface CorridorIntersectionResult {
+  name: string;
+  position_m: number;
+  offset_s: number;
+  green_s: number;
+  p_green_out: number | null;
+  p_green_in: number | null;
+  pf_out: number;
+  pf_in: number;
+  delay_out_s: number;
+  delay_in_s: number;
+  delay_isolated_out_s: number;
+  delay_isolated_in_s: number;
+}
+
+export interface CorridorResult {
+  cycle_s: number;
+  offsets_optimized: boolean;
+  band_out_s: number;
+  band_in_s: number;
+  efficiency_out: number;
+  efficiency_in: number;
+  band_out_start_s: number;
+  band_in_start_s: number;
+  travel_times_s: number[];
+  intersections: CorridorIntersectionResult[];
+  avg_artery_delay_s: number;
+  avg_artery_delay_isolated_s: number;
+  warnings: string[];
+  notes: string[];
+}
+
 // ---- Aforo de campo (15 min) ----
 
 export interface MovementCounts {

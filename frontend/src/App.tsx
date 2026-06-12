@@ -5,6 +5,7 @@ import { DemandTable } from "./components/DemandTable";
 import { IntersectionForm, PhaseEditor } from "./components/IntersectionForm";
 import { LocationMap } from "./components/LocationMap";
 import { AlternativesPanel } from "./components/AlternativesPanel";
+import { CorridorPanel } from "./components/CorridorPanel";
 import { FieldCountPanel } from "./components/FieldCountPanel";
 import { RunsPanel } from "./components/RunsPanel";
 import { ScenarioComparison } from "./components/ScenarioComparison";
@@ -12,7 +13,13 @@ import { SimulationPanel } from "./components/SimulationPanel";
 import { TimingResults } from "./components/TimingResults";
 import type { IntersectionAnalysis, IntersectionConfig } from "./types";
 
-type Tab = "config" | "timing" | "simulation" | "scenarios" | "alternatives";
+type Tab =
+  | "config"
+  | "timing"
+  | "simulation"
+  | "scenarios"
+  | "alternatives"
+  | "corridor";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "config", label: "01 · Configuración" },
@@ -20,6 +27,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "simulation", label: "03 · Simulación" },
   { id: "scenarios", label: "04 · Escenarios" },
   { id: "alternatives", label: "05 · Alternativas" },
+  { id: "corridor", label: "06 · Corredor" },
 ];
 
 const EMPTY: IntersectionConfig = {
@@ -188,6 +196,8 @@ export default function App() {
         {tab === "scenarios" && <ScenarioComparison config={config} />}
 
         {tab === "alternatives" && <AlternativesPanel config={config} />}
+
+        {tab === "corridor" && <CorridorPanel />}
       </div>
     </div>
   );
