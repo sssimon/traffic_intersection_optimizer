@@ -61,6 +61,8 @@ App en `http://localhost:5173`. El proxy de Vite reenvía `/api` al backend.
 ### Documentación (`docs/`)
 
 - `INSTRUCTIVO-CARGA-DE-DATOS.md` — guía paso a paso de carga de datos.
+- `validacion.md` — validación cruzada del motor contra valores publicados
+  del HCM (Ejemplo 1 TWSC: fórmulas < 1 %, motor completo < 5 %).
 - `informe-caso-ejemplo.html` — fuente del informe técnico del caso.
 - `ejemplo-aforo-cruce-av-principal.json` — caso de ejemplo importable.
 - `figura-1-flujos.svg` / `figura-2-resultados.svg` / `figura-3-simulacion.svg` —

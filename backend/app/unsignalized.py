@@ -22,9 +22,15 @@ Impedancia entre rangos (ec. 17-5 a 17-9 ≡ 19-43 a 19-49 del HCM 2010):
 
 Supuestos del módulo (declarados para que sean auditables):
 - Calle principal de 2 carriles, una etapa de cruce (sin almacenamiento en
-  mediana). Sin ajustes de tc/tf por pesados o pendiente (valores base).
-- El flujo conflictivo del giro a la derecha desde la calle secundaria se
-  aproxima como el promedio de ambos sentidos de la principal.
+  mediana). Sin ajustes de tc/tf por pesados o pendiente (valores base);
+  los pesados se modelan vía PCU en la demanda. En 3 ramas se aplica el
+  ajuste geométrico t3,LT = −0.7 s a la brecha de la izquierda menor
+  (ec. 17-1), verificado con el Ejemplo 1 del HCM 2000.
+- Flujos conflictivos: aproximación de ambos sentidos para el giro derecha
+  menor; las izquierdas de la principal cuentan DOBLE en el conflictivo de
+  la izquierda menor (Exhibit 17-4: cruzan y luego convergen — verificado
+  con la descomposición 870 = 2·150 + 250 + 20 + 300 del Ejemplo 1).
+- Validación contra valores publicados: ver docs/validacion.md.
 """
 from __future__ import annotations
 
@@ -140,6 +146,10 @@ def analyze_twsc(cfg: IntersectionConfig, major_ids: List[str]) -> TWSCAnalysis:
                                    approach=a.id, movement=lg.movement,
                                    role="mayor-libre")
 
+    # Ajuste geométrico de 3 ramas (HCM 2000 ec. 17-1): t3,LT = 0.7 s se
+    # RESTA de la brecha crítica de la izquierda menor en intersecciones T.
+    is_three_leg = len(cfg.approaches) == 3
+
     for a in minors:
         other_minor = [m for m in minors if m.id != a.id]
         vT_opp = sum(_mvt_volume(cfg, m, MovementType.THROUGH) for m in other_minor)
@@ -155,8 +165,11 @@ def analyze_twsc(cfg: IntersectionConfig, major_ids: List[str]) -> TWSCAnalysis:
                 tc, tf = GAP["minor_through"]
                 rank = 3
             else:  # LEFT
-                vc = VT_maj + 0.5 * VR_maj + VL_maj + vT_opp + vR_opp
+                # Las izquierdas de la principal cuentan doble (Exhibit 17-4).
+                vc = VT_maj + 0.5 * VR_maj + 2.0 * VL_maj + vT_opp + vR_opp
                 tc, tf = GAP["minor_left"]
+                if is_three_leg:
+                    tc -= 0.7
                 rank = 4
             plan[lg.id] = dict(rank=rank, vc=vc, tc=tc, tf=tf, volume=v,
                                approach=a.id, movement=lg.movement, role="menor")

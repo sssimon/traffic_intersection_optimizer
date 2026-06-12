@@ -129,9 +129,10 @@ def test_rank4_impedance_with_p_prime_adjustment():
 
 def test_rank4_without_opposing_minor_behaves_as_rank3():
     # 3 ramas: sin directo menor opuesto, la izquierda menor opera como
-    # rango 3 (HCM). Sin izquierdas mayores: cm = cp.
-    #   vc = 1000, tc=7.1, tf=3.5 -> cp = 223.8 veh/h
+    # rango 3 (HCM) y la brecha lleva el ajuste t3,LT = -0.7 (ec. 17-1).
+    # Sin izquierdas mayores: cm = cp.
+    #   vc = 1000, tc = 7.1 - 0.7 = 6.4, tf = 3.5 -> cp = 271.8 veh/h
     result = analyze_twsc(_twsc_with_minor_left(include_opposing=False),
                           ["E", "W"])
     nl = next(m for m in result.movements if m.lane_group_id == "N-L")
-    assert nl.capacity == pytest.approx(223.8, abs=1.0)
+    assert nl.capacity == pytest.approx(271.8, abs=1.0)
