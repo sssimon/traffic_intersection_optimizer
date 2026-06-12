@@ -10,7 +10,9 @@ semaforizada — incluso sin datos históricos.
 ## ¿Qué hace?
 
 1. **Configuración genérica**: cualquier número de accesos, carriles, fases;
-   ubicación geográfica en un mapa de la ciudad (Leaflet + OpenStreetMap).
+   ubicación en un mapa (Leaflet + OpenStreetMap) con **importación de la
+   geometría del cruce desde OSM** — accesos, carriles, nombres de calles y
+   sentidos con un clic en el pin.
 2. **Optimización de tiempos (dos métodos)**: Webster (1958) y minimización
    directa de la demora HCM — la app calcula ambos planes y resalta el de
    menor demora. Cicl​o y verdes óptimos a partir de la demanda.
@@ -144,6 +146,7 @@ de hora pico) puede usarse como volumen horario equivalente.
 | POST   | `/api/analyze-twsc`      | Análisis no semaforizado con PARE (HCM 19)   |
 | POST   | `/api/compare-controls`  | Ranking de alternativas de control           |
 | POST   | `/api/uncertainty`       | Monte Carlo: P(LOS), banda y tornado         |
+| POST   | `/api/osm-import`        | Geometría del cruce desde OSM (Overpass)     |
 | POST/GET | `/api/runs`            | Guardar / listar corridas (SQLite)           |
 | GET/DELETE | `/api/runs/{id}`     | Cargar / eliminar una corrida                |
 
@@ -164,6 +167,7 @@ Traffic-Intersection-Optimizer/
 │   │   ├── uncertainty.py  # Monte Carlo de incertidumbre
 │   │   ├── audit.py        # Traza de cálculo verificable
 │   │   ├── storage.py      # Corridas guardadas (SQLite)
+│   │   ├── osm.py          # Importación de geometría (Overpass)
 │   │   ├── data.py         # Sample
 │   │   └── main.py         # FastAPI
 │   ├── requirements.txt

@@ -3,6 +3,7 @@ import type {
   DemandMultiplier,
   IntersectionAnalysis,
   IntersectionConfig,
+  OsmImportResult,
   RunDetail,
   RunSummary,
   ScenarioComparison,
@@ -96,6 +97,13 @@ export const runUncertainty = (
     volume_cv: opts.volumeCv,
     samples: opts.samples ?? 1000,
     method: opts.method ?? "delay_min",
+  });
+
+export const importOsm = (latitude: number, longitude: number, radiusM = 60) =>
+  post<OsmImportResult>("/osm-import", {
+    latitude,
+    longitude,
+    radius_m: radiusM,
   });
 
 export const saveRun = (

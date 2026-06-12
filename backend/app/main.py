@@ -15,6 +15,8 @@ from .models import (
     CompareControlsResult,
     IntersectionAnalysis,
     IntersectionConfig,
+    OsmImportRequest,
+    OsmImportResult,
     RunDetail,
     RunSummary,
     SaveRunRequest,
@@ -30,6 +32,7 @@ from .models import (
 )
 from .optimizer import optimize
 from .optimizer_delay import optimize_delay
+from .osm import build_config_from_elements, fetch_overpass
 from .scenarios import compare
 from .simulator import simulate
 from .storage import delete_run, get_run, list_runs, save_run
@@ -135,6 +138,28 @@ def post_uncertainty(req: UncertaintyRequest) -> UncertaintyResult:
     """Monte Carlo de incertidumbre del aforo: P(LOS), banda de demora y
     tornado de sensibilidad."""
     return run_uncertainty(req)
+
+
+@app.post("/api/osm-import", response_model=OsmImportResult)
+def post_osm_import(req: OsmImportRequest) -> OsmImportResult:
+    """Importa la geometría del cruce más cercano al pin desde OpenStreetMap."""
+    try:
+        elements = fetch_overpass(req.latitude, req.longitude, req.radius_m)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=(
+                "No se pudo consultar Overpass/OSM (red o límite de uso). "
+                "Intenta de nuevo en unos segundos."
+            ),
+        ) from exc
+    try:
+        cfg, warnings = build_config_from_elements(
+            elements, req.latitude, req.longitude
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return OsmImportResult(config=cfg, warnings=warnings)
 
 
 @app.post("/api/runs", response_model=RunSummary)

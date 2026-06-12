@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { Card, Input } from "neobrutalistcomponents";
+import { Button, Card, Input } from "neobrutalistcomponents";
+import { importOsm } from "../api";
 import type { IntersectionConfig } from "../types";
 
 interface Props {
@@ -31,6 +32,13 @@ export function LocationMap({ config, onChange }: Props) {
   const mapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.CircleMarker | null>(null);
   const [paste, setPaste] = useState("");
+  const [importing, setImporting] = useState(false);
+  const [importError, setImportError] = useState<string | null>(null);
+  const [importWarnings, setImportWarnings] = useState<string[]>([]);
+
+  // Referencia viva para el handler de clic del mapa (evita closures viejos).
+  const liveRef = useRef({ config, onChange });
+  liveRef.current = { config, onChange };
 
   // Crea / actualiza el mapa Leaflet cuando hay coordenadas válidas.
   useEffect(() => {
@@ -57,6 +65,14 @@ export function LocationMap({ config, onChange }: Props) {
         },
       ).addTo(map);
       map.setView([lat as number, lng as number], 16);
+      map.on("click", (e: L.LeafletMouseEvent) => {
+        const live = liveRef.current;
+        live.onChange({
+          ...live.config,
+          latitude: e.latlng.lat,
+          longitude: e.latlng.lng,
+        });
+      });
       mapRef.current = map;
     } else {
       map.setView([lat as number, lng as number], map.getZoom() || 16);
@@ -107,6 +123,31 @@ export function LocationMap({ config, onChange }: Props) {
   const latStr = lat != null && !isNaN(lat) ? lat : "";
   const lngStr = lng != null && !isNaN(lng) ? lng : "";
 
+  const runImport = async () => {
+    if (!valid) return;
+    if (
+      config.approaches.length > 0 &&
+      !window.confirm(
+        "Importar desde OSM reemplaza la configuración actual (accesos, " +
+          "fases y demanda). ¿Continuar?",
+      )
+    ) {
+      return;
+    }
+    setImporting(true);
+    setImportError(null);
+    setImportWarnings([]);
+    try {
+      const res = await importOsm(lat as number, lng as number);
+      onChange(res.config);
+      setImportWarnings(res.warnings);
+    } catch (e) {
+      setImportError(String(e));
+    } finally {
+      setImporting(false);
+    }
+  };
+
   return (
     <Card>
       <Card.Header>
@@ -155,7 +196,7 @@ export function LocationMap({ config, onChange }: Props) {
             >
               <span style={{ fontSize: 12, color: "var(--muted)" }}>
                 Coordenadas: {(lat as number).toFixed(5)},{" "}
-                {(lng as number).toFixed(5)}
+                {(lng as number).toFixed(5)} · clic en el mapa mueve el pin
               </span>
               <a
                 href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=17/${lat}/${lng}`}
@@ -166,6 +207,30 @@ export function LocationMap({ config, onChange }: Props) {
                 Abrir en OpenStreetMap →
               </a>
             </div>
+            <div className="row" style={{ marginTop: 12 }}>
+              <Button
+                variant="secondary"
+                size="sm"
+                loading={importing}
+                onClick={runImport}
+              >
+                Importar geometría desde OSM
+              </Button>
+              <span style={{ fontSize: 11, color: "var(--muted)" }}>
+                Detecta el cruce más cercano al pin: accesos, carriles y
+                nombres de calles. Luego agrega giros y demanda.
+              </span>
+            </div>
+            {importError && (
+              <div className="error" style={{ marginTop: 8 }}>
+                {importError}
+              </div>
+            )}
+            {importWarnings.map((w, i) => (
+              <div key={i} className="note" style={{ marginTop: 6 }}>
+                {w}
+              </div>
+            ))}
           </>
         ) : (
           <div className="map-placeholder">

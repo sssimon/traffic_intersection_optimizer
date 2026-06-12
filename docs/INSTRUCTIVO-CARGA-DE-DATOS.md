@@ -97,7 +97,15 @@ plano de la ciudad:
    clic derecho sobre el punto → las coordenadas aparecen arriba del menú,
    cópialas y pégalas.
 2. Con coordenadas válidas aparece un **mapa** con un marcador sobre la
-   intersección, y un enlace para abrirla en OpenStreetMap.
+   intersección (un clic en el mapa mueve el pin), y un enlace para abrirla
+   en OpenStreetMap.
+3. **Importar geometría desde OSM** (opcional, recomendado para empezar):
+   con el pin sobre el cruce, el botón consulta OpenStreetMap y pre-llena
+   los **accesos** con su rumbo (N/S/E/W…), **nombre de calle**, **número
+   de carriles** y **sentidos** (los brazos de solo salida se excluyen),
+   más unas fases iniciales emparejando brazos opuestos. La demanda queda
+   en 0 y los giros no se generan: agrégalos tú y verifica los carriles
+   (la calidad depende del mapeo OSM de tu zona).
 
 > La ubicación es opcional para el cálculo, pero recomendable: documenta el
 > sitio y se incluye al **Exportar JSON** y en el informe del caso.

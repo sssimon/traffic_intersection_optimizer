@@ -512,6 +512,24 @@ class CompareControlsResult(BaseModel):
     warnings: List[str] = Field(default_factory=list)
 
 
+# ---------- Importación desde OpenStreetMap (tarea 3.1) ----------
+
+class OsmImportRequest(BaseModel):
+    latitude: float = Field(..., ge=-90.0, le=90.0)
+    longitude: float = Field(..., ge=-180.0, le=180.0)
+    radius_m: int = Field(
+        60, ge=20, le=150,
+        description="Radio de búsqueda del cruce alrededor del pin (m).",
+    )
+
+
+class OsmImportResult(BaseModel):
+    config: IntersectionConfig = Field(
+        ..., description="Configuración inicial: accesos, carriles, fases; demanda en 0."
+    )
+    warnings: List[str] = Field(default_factory=list)
+
+
 # ---------- Persistencia de corridas (tarea 2.5) ----------
 
 class SaveRunRequest(BaseModel):

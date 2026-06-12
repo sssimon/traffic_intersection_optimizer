@@ -199,6 +199,13 @@ export interface CompareControlsResult {
   warnings: string[];
 }
 
+// ---- Importación OSM ----
+
+export interface OsmImportResult {
+  config: IntersectionConfig;
+  warnings: string[];
+}
+
 // ---- Corridas guardadas ----
 
 export interface RunSummary {
