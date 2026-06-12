@@ -182,3 +182,27 @@ export interface CompareControlsResult {
   rationale: string[];
   warnings: string[];
 }
+
+// ---- Incertidumbre Monte Carlo ----
+
+export interface MovementSensitivity {
+  lane_group_id: string;
+  correlation: number;
+  cv: number;
+}
+
+export interface UncertaintyResult {
+  samples: number;
+  volume_cv: number;
+  method: string;
+  signal_plan: SignalPlan;
+  base_delay_s: number;
+  delay_mean_s: number;
+  delay_p05_s: number;
+  delay_p50_s: number;
+  delay_p95_s: number;
+  los_probability: Record<string, number>;
+  prob_oversaturated: number;
+  sensitivity: MovementSensitivity[];
+  notes: string[];
+}

@@ -7,6 +7,7 @@ import type {
   SignalPlan,
   SimulationResult,
   TWSCAnalysis,
+  UncertaintyResult,
 } from "./types";
 
 const BASE = "/api";
@@ -75,4 +76,15 @@ export const compareControls = (
   post<CompareControlsResult>("/compare-controls", {
     config: cfg,
     major_approach_ids: majorApproachIds,
+  });
+
+export const runUncertainty = (
+  cfg: IntersectionConfig,
+  opts: { volumeCv: number; samples?: number; method?: OptimizeMethod },
+) =>
+  post<UncertaintyResult>("/uncertainty", {
+    config: cfg,
+    volume_cv: opts.volumeCv,
+    samples: opts.samples ?? 1000,
+    method: opts.method ?? "delay_min",
   });

@@ -468,3 +468,66 @@ class CompareControlsResult(BaseModel):
     warnings: List[str] = Field(default_factory=list)
 
 
+# ---------- Incertidumbre Monte Carlo (tarea 2.3) ----------
+
+class UncertaintyRequest(BaseModel):
+    config: IntersectionConfig
+    volume_cv: float = Field(
+        0.10,
+        ge=0.0,
+        le=0.5,
+        description=(
+            "Coeficiente de variación de los volúmenes. Guía según la "
+            "calidad del aforo: ≈0.15 conteo de 15 min expandido, ≈0.10 "
+            "conteo de 1 h, ≈0.05 aforo de varios días."
+        ),
+    )
+    movement_cv: dict[str, float] = Field(
+        default_factory=dict,
+        description="CV por grupo de carriles (prevalece sobre el global).",
+    )
+    samples: int = Field(1000, ge=100, le=20000)
+    seed: int = 42
+    method: Literal["webster", "delay_min"] = Field(
+        "delay_min", description="Optimizador del plan (diseñado con el aforo medio)."
+    )
+
+    @field_validator("movement_cv")
+    @classmethod
+    def cv_in_range(cls, v: dict[str, float]) -> dict[str, float]:
+        for key, cv in v.items():
+            if not 0.0 <= cv <= 0.5:
+                raise ValueError(f"CV fuera de rango [0, 0.5] para '{key}': {cv}")
+        return v
+
+
+class MovementSensitivity(BaseModel):
+    lane_group_id: str
+    correlation: float = Field(
+        ..., description="Correlación de Pearson entre el volumen muestreado y la demora media."
+    )
+    cv: float
+
+
+class UncertaintyResult(BaseModel):
+    samples: int
+    volume_cv: float
+    method: str
+    signal_plan: SignalPlan = Field(..., description="Plan fijo diseñado con el aforo medio.")
+    base_delay_s: float = Field(..., description="Demora con el aforo medio (la estimación puntual clásica).")
+    delay_mean_s: float
+    delay_p05_s: float
+    delay_p50_s: float
+    delay_p95_s: float
+    los_probability: dict[str, float] = Field(
+        ..., description="P(LOS) de la intersección sobre las muestras (A..F, suma 1)."
+    )
+    prob_oversaturated: float = Field(
+        ..., description="P(X máx > 1): probabilidad de sobresaturación del movimiento crítico."
+    )
+    sensitivity: List[MovementSensitivity] = Field(
+        ..., description="Tornado: movimientos ordenados por |correlación| descendente."
+    )
+    notes: List[str] = Field(default_factory=list)
+
+

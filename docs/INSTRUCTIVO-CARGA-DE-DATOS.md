@@ -256,6 +256,11 @@ Checklist rápido:
    - Ciclo y verde por fase del plan seleccionado.
    - Demora media, nivel de servicio (LOS A–F) y relación v/c.
    - Tabla HCM por movimiento (capacidad, cola, demora).
+   - **Incertidumbre del aforo (Monte Carlo)**: elige la calidad del conteo
+     (15 min / 1 h / varios días) y pulsa *Calcular P(LOS)* — obtienes la
+     probabilidad de cada LOS, la banda de demora p5–p95 y qué volúmenes
+     pesan más en el resultado. Un conteo corto no justifica una letra
+     única.
 3. Para ver colas en el tiempo → pestaña **03 · Simulación**: corre N
    réplicas (20 por defecto) y muestra la mediana con banda de percentiles
    5–95 — el rango esperable, no una corrida suelta.

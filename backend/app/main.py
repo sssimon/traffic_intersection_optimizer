@@ -21,11 +21,14 @@ from .models import (
     SimulationResult,
     TWSCAnalysis,
     TWSCRequest,
+    UncertaintyRequest,
+    UncertaintyResult,
 )
 from .optimizer import optimize
 from .optimizer_delay import optimize_delay
 from .scenarios import compare
 from .simulator import simulate
+from .uncertainty import run_uncertainty
 from .unsignalized import analyze_twsc
 
 OptimizeMethod = Literal["webster", "delay_min"]
@@ -112,3 +115,10 @@ def post_compare_controls(req: CompareControlsRequest) -> CompareControlsResult:
     """Explorador de alternativas: rankea semáforo (fases configuradas y por
     acceso) vs PARE con la misma demanda."""
     return compare_controls(req)
+
+
+@app.post("/api/uncertainty", response_model=UncertaintyResult)
+def post_uncertainty(req: UncertaintyRequest) -> UncertaintyResult:
+    """Monte Carlo de incertidumbre del aforo: P(LOS), banda de demora y
+    tornado de sensibilidad."""
+    return run_uncertainty(req)

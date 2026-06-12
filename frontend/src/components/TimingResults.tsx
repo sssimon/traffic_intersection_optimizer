@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button, Card } from "neobrutalistcomponents";
 import type { IntersectionAnalysis, IntersectionConfig } from "../types";
+import { UncertaintyCard } from "./UncertaintyCard";
 
 type Method = "webster" | "delay_min";
 
@@ -247,6 +248,8 @@ export function TimingResults({ webster, delayMin, config }: Props) {
           )}
         </Card.Content>
       </Card>
+
+      <UncertaintyCard config={config} method={method} />
     </>
   );
 }

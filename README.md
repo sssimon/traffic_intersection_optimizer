@@ -24,6 +24,10 @@ semaforizada — incluso sin datos históricos.
    y rankea semáforo (fases configuradas y fases por acceso auto-generadas)
    vs PARE en secundaria (HCM cap. 19) — responde *qué control conviene*,
    con recomendación y criterios de aplicabilidad.
+7. **Incertidumbre del aforo (Monte Carlo)**: 1 000 muestras sobre los
+   volúmenes según la calidad del conteo — P(cada LOS), banda de demora
+   p5–p95 y tornado de sensibilidad. Un conteo corto no justifica una
+   letra única.
 
 ## Quick start
 
@@ -106,6 +110,10 @@ de hora pico) puede usarse como volumen horario equivalente.
   `fw · fg · fp · fbb · fa · fLU` + giro protegido (0.95 izq / 0.85 der en
   carril exclusivo). Pesados vía `pcu_factor` en la demanda (≡ fHV). Ver
   `SaturationFactors` en `backend/app/models.py`.
+- **Monte Carlo de incertidumbre** — volúmenes ~ Normal(media, CV·media)
+  truncada en 0, independientes por movimiento; el plan se diseña con el
+  aforo medio y se evalúa fijo bajo demanda incierta. Ver
+  `backend/app/uncertainty.py`.
 - **Simulación de colas de tiempo discreto** — paso fijo (1 s por defecto),
   llegadas Poisson (muestreo exacto por paso), salidas a flujo de saturación
   durante el verde; N réplicas con semillas consecutivas y percentiles
@@ -128,6 +136,7 @@ de hora pico) puede usarse como volumen horario equivalente.
 | POST   | `/api/scenarios`         | Escenarios (global/direccional) + estrategia |
 | POST   | `/api/analyze-twsc`      | Análisis no semaforizado con PARE (HCM 19)   |
 | POST   | `/api/compare-controls`  | Ranking de alternativas de control           |
+| POST   | `/api/uncertainty`       | Monte Carlo: P(LOS), banda y tornado         |
 
 ## Estructura
 
