@@ -11,7 +11,7 @@ semáforo. Todas las cantidades están en unidades coherentes:
 from __future__ import annotations
 
 from enum import Enum
-from typing import List, Optional
+from typing import List, Literal, Optional
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -246,19 +246,50 @@ class SimulationResult(BaseModel):
 # ---------- Escenarios ----------
 
 class DemandMultiplier(BaseModel):
+    """Escenario de demanda: factor global + ajustes direccionales (M8).
+
+    El factor efectivo de cada grupo de carriles es el más específico que lo
+    cubra: movement_factors[grupo] > approach_factors[acceso] > factor.
+    """
     name: str
-    factor: float = Field(..., ge=0.1, le=3.0)
+    factor: float = Field(1.0, ge=0.1, le=3.0, description="Factor global.")
+    approach_factors: dict[str, float] = Field(
+        default_factory=dict,
+        description="Factor por acceso (approach_id → factor); prevalece sobre el global.",
+    )
+    movement_factors: dict[str, float] = Field(
+        default_factory=dict,
+        description="Factor por grupo de carriles (lane_group_id → factor); prevalece sobre todos.",
+    )
+
+    @field_validator("approach_factors", "movement_factors")
+    @classmethod
+    def factors_in_range(cls, v: dict[str, float]) -> dict[str, float]:
+        for key, f in v.items():
+            if not 0.1 <= f <= 3.0:
+                raise ValueError(
+                    f"Factor fuera de rango [0.1, 3.0] para '{key}': {f}"
+                )
+        return v
 
 
 class ScenarioRequest(BaseModel):
     config: IntersectionConfig
     multipliers: List[DemandMultiplier]
     use_optimized_timing: bool = True
+    method: Literal["webster", "delay_min"] = Field(
+        "webster",
+        description="Optimizador usado para el plan de cada escenario.",
+    )
 
 
 class ScenarioResult(BaseModel):
     name: str
-    factor: float
+    factor: float = Field(..., description="Factor global del escenario.")
+    directional: bool = Field(
+        False, description="True si el escenario tiene ajustes por acceso/movimiento."
+    )
+    label: str = Field("", description="Resumen legible de los factores aplicados.")
     analysis: IntersectionAnalysis
 
 
@@ -266,6 +297,7 @@ class ScenarioComparison(BaseModel):
     scenarios: List[ScenarioResult]
     recommended_strategy: str
     rationale: List[str]
+    warnings: List[str] = Field(default_factory=list)
 
 
 # ---------- Análisis no semaforizado (HCM cap. 19) ----------

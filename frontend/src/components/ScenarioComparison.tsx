@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Button, Card, Input } from "neobrutalistcomponents";
-import { runScenarios } from "../api";
+import { runScenarios, type OptimizeMethod } from "../api";
 import type {
+  DemandMultiplier,
   IntersectionConfig,
   ScenarioComparison as Comparison,
 } from "../types";
@@ -13,20 +14,25 @@ interface Props {
 interface Row {
   name: string;
   factor: number;
+  // Texto crudo por acceso; "" = hereda el factor global.
+  approach: Record<string, string>;
 }
 
 const DEFAULTS: Row[] = [
-  { name: "Valle (60%)", factor: 0.6 },
-  { name: "Actual", factor: 1.0 },
-  { name: "+15% (crecimiento)", factor: 1.15 },
-  { name: "Hora pico extrema", factor: 1.3 },
+  { name: "Valle (60%)", factor: 0.6, approach: {} },
+  { name: "Actual", factor: 1.0, approach: {} },
+  { name: "+15% (crecimiento)", factor: 1.15, approach: {} },
+  { name: "Hora pico extrema", factor: 1.3, approach: {} },
 ];
 
 export function ScenarioComparison({ config }: Props) {
   const [rows, setRows] = useState<Row[]>(DEFAULTS);
+  const [method, setMethod] = useState<OptimizeMethod>("delay_min");
   const [comparison, setComparison] = useState<Comparison | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const approachIds = config.approaches.map((a) => a.id);
 
   const updateRow = (i: number, r: Row) => {
     const copy = [...rows];
@@ -34,11 +40,31 @@ export function ScenarioComparison({ config }: Props) {
     setRows(copy);
   };
 
+  const toPayload = (): DemandMultiplier[] =>
+    rows.map((r) => {
+      const approach_factors: Record<string, number> = {};
+      for (const id of approachIds) {
+        const raw = (r.approach[id] ?? "").trim();
+        if (raw === "") continue;
+        const f = parseFloat(raw);
+        if (!Number.isNaN(f)) {
+          approach_factors[id] = Math.max(0.1, Math.min(3, f));
+        }
+      }
+      return {
+        name: r.name,
+        factor: r.factor,
+        ...(Object.keys(approach_factors).length > 0
+          ? { approach_factors }
+          : {}),
+      };
+    });
+
   const run = async () => {
     setLoading(true);
     setError(null);
     try {
-      const r = await runScenarios(config, rows);
+      const r = await runScenarios(config, toPayload(), method);
       setComparison(r);
     } catch (e) {
       setError(String(e));
@@ -53,15 +79,25 @@ export function ScenarioComparison({ config }: Props) {
         <Card.Header>
           <Card.Title>Comparación de escenarios</Card.Title>
           <Card.Description>
-            Multiplicadores de demanda · reoptimización por escenario
+            Factor global y ajustes por acceso · reoptimización por escenario
           </Card.Description>
         </Card.Header>
         <Card.Content>
+          <p className="desc" style={{ marginTop: 0 }}>
+            El factor por acceso prevalece sobre el global (déjalo vacío para
+            heredar). Útil para crecimiento direccional: un desarrollo nuevo
+            carga un solo acceso, no toda la intersección.
+          </p>
           <table>
             <thead>
               <tr>
                 <th>Escenario</th>
-                <th>Factor</th>
+                <th>Factor global</th>
+                {approachIds.map((id) => (
+                  <th key={id} className="right">
+                    <span className="code">{id}</span> ×
+                  </th>
+                ))}
                 <th></th>
               </tr>
             </thead>
@@ -75,7 +111,7 @@ export function ScenarioComparison({ config }: Props) {
                       onChange={(e) =>
                         updateRow(i, { ...r, name: e.target.value })
                       }
-                      style={{ width: 240 }}
+                      style={{ width: 180 }}
                     />
                   </td>
                   <td>
@@ -92,9 +128,32 @@ export function ScenarioComparison({ config }: Props) {
                           factor: parseFloat(e.target.value) || 1,
                         })
                       }
-                      style={{ width: 100 }}
+                      style={{ width: 90 }}
                     />
                   </td>
+                  {approachIds.map((id) => (
+                    <td key={id}>
+                      <Input
+                        size="sm"
+                        type="number"
+                        step={0.05}
+                        min={0.1}
+                        max={3}
+                        placeholder="—"
+                        value={r.approach[id] ?? ""}
+                        onChange={(e) =>
+                          updateRow(i, {
+                            ...r,
+                            approach: {
+                              ...r.approach,
+                              [id]: e.target.value,
+                            },
+                          })
+                        }
+                        style={{ width: 80 }}
+                      />
+                    </td>
+                  ))}
                   <td>
                     <Button
                       variant="ghost"
@@ -109,7 +168,7 @@ export function ScenarioComparison({ config }: Props) {
             </tbody>
           </table>
 
-          <div className="row" style={{ marginTop: 16 }}>
+          <div className="row" style={{ marginTop: 16, alignItems: "flex-end" }}>
             <Button
               variant="secondary"
               size="sm"
@@ -119,20 +178,33 @@ export function ScenarioComparison({ config }: Props) {
                   {
                     name: `Escenario ${rows.length + 1}`,
                     factor: 1.0,
+                    approach: {},
                   },
                 ])
               }
             >
               + Escenario
             </Button>
-            <Button
-              variant="primary"
-              size="sm"
-              loading={loading}
-              onClick={run}
-            >
-              Comparar escenarios
-            </Button>
+            <label className="field">
+              Optimizador
+              <select
+                value={method}
+                onChange={(e) => setMethod(e.target.value as OptimizeMethod)}
+              >
+                <option value="delay_min">Mínima demora HCM (recomendado)</option>
+                <option value="webster">Webster (1958)</option>
+              </select>
+            </label>
+            <div style={{ marginLeft: "auto" }}>
+              <Button
+                variant="primary"
+                size="sm"
+                loading={loading}
+                onClick={run}
+              >
+                Comparar escenarios
+              </Button>
+            </div>
           </div>
 
           {error && (
@@ -157,7 +229,7 @@ export function ScenarioComparison({ config }: Props) {
                 <thead>
                   <tr>
                     <th>Escenario</th>
-                    <th className="right">Factor</th>
+                    <th>Demanda</th>
                     <th className="right">Ciclo (s)</th>
                     <th className="right">Demora media</th>
                     <th className="right">v/c máx</th>
@@ -168,7 +240,9 @@ export function ScenarioComparison({ config }: Props) {
                   {comparison.scenarios.map((s) => (
                     <tr key={s.name}>
                       <td>{s.name}</td>
-                      <td className="right">{s.factor.toFixed(2)}×</td>
+                      <td style={{ fontSize: 11, color: "var(--muted, #555)" }}>
+                        {s.label || `global ×${s.factor.toFixed(2)}`}
+                      </td>
                       <td className="right">
                         {s.analysis.signal_plan.cycle_length.toFixed(0)}
                       </td>
@@ -199,6 +273,11 @@ export function ScenarioComparison({ config }: Props) {
                   ))}
                 </tbody>
               </table>
+              {comparison.warnings.map((w, i) => (
+                <div key={i} className="warning" style={{ marginTop: 8 }}>
+                  {w}
+                </div>
+              ))}
             </Card.Content>
           </Card>
 

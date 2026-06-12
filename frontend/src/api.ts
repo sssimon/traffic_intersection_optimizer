@@ -1,4 +1,5 @@
 import type {
+  DemandMultiplier,
   IntersectionAnalysis,
   IntersectionConfig,
   ScenarioComparison,
@@ -50,12 +51,14 @@ export const simulate = (cfg: IntersectionConfig, opts: {
 
 export const runScenarios = (
   cfg: IntersectionConfig,
-  multipliers: { name: string; factor: number }[],
+  multipliers: DemandMultiplier[],
+  method: OptimizeMethod = "delay_min",
 ) =>
   post<ScenarioComparison>("/scenarios", {
     config: cfg,
     multipliers,
     use_optimized_timing: true,
+    method,
   });
 
 export const analyzeTwsc = (cfg: IntersectionConfig, majorApproachIds: string[]) =>

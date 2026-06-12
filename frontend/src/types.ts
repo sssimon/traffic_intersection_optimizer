@@ -106,11 +106,15 @@ export interface SimulationResult {
 export interface DemandMultiplier {
   name: string;
   factor: number;
+  approach_factors?: Record<string, number>;
+  movement_factors?: Record<string, number>;
 }
 
 export interface ScenarioResult {
   name: string;
   factor: number;
+  directional: boolean;
+  label: string;
   analysis: IntersectionAnalysis;
 }
 
@@ -118,6 +122,7 @@ export interface ScenarioComparison {
   scenarios: ScenarioResult[];
   recommended_strategy: string;
   rationale: string[];
+  warnings: string[];
 }
 
 // ---- Análisis no semaforizado ----

@@ -18,7 +18,8 @@ semaforizada — incluso sin datos históricos.
    queue, HCM 2000 ap. G), LOS A–F.
 4. **Simulación de colas**: llegadas Poisson + descarga a saturación, con N
    réplicas y banda de percentiles 5–95 de la cola en el tiempo.
-5. **Escenarios**: compara crecimiento, hora pico, eventos — recomienda estrategia.
+5. **Escenarios**: compara crecimiento global o direccional (factores por
+   acceso/movimiento) — recomienda estrategia.
 6. **Análisis sin semáforo**: PARE en calle secundaria (HCM cap. 19) por
    aceptación de brechas; compara semáforo vs PARE.
 
@@ -114,7 +115,7 @@ de hora pico) puede usarse como volumen horario equivalente.
 | POST   | `/api/optimize`          | Plan de tiempos (`?method=webster\|delay_min`) |
 | POST   | `/api/analyze`           | Optimiza (`?method=`) + análisis HCM         |
 | POST   | `/api/simulate`          | Simulación de colas (N réplicas, banda 5–95) |
-| POST   | `/api/scenarios`         | Comparación multi-escenario + recomendación  |
+| POST   | `/api/scenarios`         | Escenarios (global/direccional) + estrategia |
 | POST   | `/api/analyze-twsc`      | Análisis no semaforizado con PARE (HCM 19)   |
 
 ## Estructura

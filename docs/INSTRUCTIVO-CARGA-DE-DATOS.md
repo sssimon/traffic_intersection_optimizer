@@ -254,7 +254,8 @@ Checklist rápido:
 3. Para ver colas en el tiempo → pestaña **03 · Simulación**: corre N
    réplicas (20 por defecto) y muestra la mediana con banda de percentiles
    5–95 — el rango esperable, no una corrida suelta.
-4. Para comparar escenarios de demanda → pestaña **04 · Escenarios**.
+4. Para comparar escenarios de demanda → pestaña **04 · Escenarios**
+   (factor global o ajustes por acceso, para crecimiento direccional).
 5. Para evaluar la intersección **sin semáforo** → pestaña **05 · Sin
    semáforo**: marca qué accesos son la calle principal (sin PARE) y pulsa
    **Analizar y comparar**. Obtienes una comparación entre semáforo y PARE
@@ -487,10 +488,17 @@ servicio, más el plan semafórico calculado:
 
 | Escenario | Factor | Ciclo | Demora | v/c máx | LOS |
 |---|--:|--:|--:|--:|:--:|
-| Valle mediodía | 0.65× | 61 s | 28 s | 0.74 | **C** |
-| Hora pico AM (aforo) | 1.00× | 120 s | 58 s | 0.94 | **E** |
-| Proyección +10 % (3 años) | 1.10× | 120 s | 75 s | 1.03 | **E** |
-| Proyección +25 % (horizonte) | 1.25× | 120 s | 119 s | 1.18 | **F** |
+| Valle mediodía | 0.65× | 60 s | 28 s | 0.76 | **C** |
+| Hora pico AM (aforo) | 1.00× | 96 s | 55 s | 1.04 | **D** |
+| Proyección +10 % (3 años) | 1.10× | 115 s | 72 s | 1.16 | **E** |
+| Proyección +25 % (horizonte) | 1.25× | 120 s | 110 s | 1.44 | **F** |
+
+> Valores con el optimizador de **mínima demora HCM** (el predeterminado de
+> la pestaña). Este plan puede aceptar v/c > 1 en el movimiento crítico
+> cuando el ciclo corto reduce la demora total del periodo; con el
+> optimizador Webster los ciclos son más largos y las demoras mayores.
+> La pestaña también admite **factores por acceso** (crecimiento
+> direccional): déjalos vacíos para heredar el factor global.
 
 **Estrategia recomendada:** gestión de demanda + control adaptativo en red.
 
@@ -502,8 +510,9 @@ servicio, más el plan semafórico calculado:
   sus fases reciben poco verde. Primer punto a atacar.
 - El eje **E-W es el crítico**; el plan Webster ya le asigna el verde más
   largo (P3 = 44,7 s).
-- Con apenas **+10 % de tránsito se sobresatura** (v/c 1.03): Webster solo no
-  alcanza — hace falta control adaptativo y gestión de demanda.
+- Con **+10 % de tránsito** la demora sube a ~72 s (LOS E) y con **+25 %**
+  la intersección colapsa (LOS F, 110 s): la optimización de tiempos sola
+  no alcanza — hace falta control adaptativo y gestión de demanda.
 
 ---
 
