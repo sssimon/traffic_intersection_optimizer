@@ -37,6 +37,7 @@ export const simulate = (cfg: IntersectionConfig, opts: {
   signal_plan?: SignalPlan;
   duration_s?: number;
   seed?: number;
+  replications?: number;
 }) =>
   post<SimulationResult>("/simulate", {
     config: cfg,
@@ -44,6 +45,7 @@ export const simulate = (cfg: IntersectionConfig, opts: {
     duration_s: opts.duration_s ?? 900,
     seed: opts.seed ?? 42,
     time_step_s: 1.0,
+    replications: opts.replications ?? 20,
   });
 
 export const runScenarios = (

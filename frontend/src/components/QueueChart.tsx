@@ -1,7 +1,15 @@
 import { useMemo } from "react";
 
+export interface BandSeries {
+  label: string;
+  color: string;
+  median: number[];
+  low: number[];
+  high: number[];
+}
+
 interface Props {
-  series: { label: string; color: string; values: number[] }[];
+  series: BandSeries[];
   timeAxis: number[];
   height?: number;
 }
@@ -19,10 +27,10 @@ const COLORS = [
 ];
 
 export function QueueChart({ series, timeAxis, height = 300 }: Props) {
-  const { width, padding, maxY, points } = useMemo(() => {
+  const { width, padding, maxY, paths } = useMemo(() => {
     const width = 800;
     const padding = { l: 48, r: 16, t: 12, b: 32 };
-    const allValues = series.flatMap((s) => s.values);
+    const allValues = series.flatMap((s) => [...s.high, ...s.median]);
     const maxY = Math.max(1, ...allValues);
     const xs = timeAxis;
     const maxX = xs[xs.length - 1] ?? 1;
@@ -32,18 +40,35 @@ export function QueueChart({ series, timeAxis, height = 300 }: Props) {
     const py = (y: number) =>
       height - padding.b - (y / maxY) * (height - padding.t - padding.b);
 
-    const points = series.map((s) => ({
+    const line = (values: number[]) =>
+      values.length === 0
+        ? ""
+        : values
+            .map((v, i) => `${i === 0 ? "M" : "L"}${px(xs[i] ?? i)},${py(v)}`)
+            .join(" ");
+
+    // Banda p05–p95: contorno superior hacia adelante + inferior en reversa.
+    const band = (low: number[], high: number[]) => {
+      if (high.length === 0 || low.length !== high.length) return "";
+      const fwd = high
+        .map((v, i) => `${i === 0 ? "M" : "L"}${px(xs[i] ?? i)},${py(v)}`)
+        .join(" ");
+      const back = [...low]
+        .map((v, i) => ({ v, i }))
+        .reverse()
+        .map(({ v, i }) => `L${px(xs[i] ?? i)},${py(v)}`)
+        .join(" ");
+      return `${fwd} ${back} Z`;
+    };
+
+    const paths = series.map((s) => ({
       label: s.label,
       color: s.color,
-      d:
-        s.values.length === 0
-          ? ""
-          : s.values
-              .map((v, i) => `${i === 0 ? "M" : "L"}${px(xs[i] ?? i)},${py(v)}`)
-              .join(" "),
+      median: line(s.median),
+      band: band(s.low, s.high),
     }));
 
-    return { width, padding, maxY, points };
+    return { width, padding, maxY, paths };
   }, [series, timeAxis, height]);
 
   const ticks = 5;
@@ -121,10 +146,22 @@ export function QueueChart({ series, timeAxis, height = 300 }: Props) {
             </text>
           );
         })}
-        {points.map((p) => (
+        {/* bandas p05–p95 debajo de las medianas */}
+        {paths.map((p) =>
+          p.band ? (
+            <path
+              key={`band-${p.label}`}
+              d={p.band}
+              fill={p.color}
+              fillOpacity={0.13}
+              stroke="none"
+            />
+          ) : null,
+        )}
+        {paths.map((p) => (
           <path
             key={p.label}
-            d={p.d}
+            d={p.median}
             stroke={p.color}
             strokeWidth="1.5"
             fill="none"
@@ -155,6 +192,9 @@ export function QueueChart({ series, timeAxis, height = 300 }: Props) {
             {s.label}
           </span>
         ))}
+        <span style={{ color: "var(--muted, #777)", letterSpacing: "0.06em" }}>
+          línea: mediana · banda: percentil 5–95 entre réplicas
+        </span>
       </div>
     </div>
   );

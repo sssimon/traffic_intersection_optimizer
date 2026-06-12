@@ -34,10 +34,21 @@ def test_sample_analysis_snapshot():
 
 
 def test_sample_simulation_snapshot():
-    # Determinista con la semilla por defecto (42).
+    # Determinista con la semilla por defecto (42) y UNA réplica: ancla la
+    # corrida única para detectar cambios en el muestreo o en la descarga.
     # Actualizado al implementar M2b (muestreo Poisson real con numpy):
     # el valor 1320 correspondía a la aproximación de Bernoulli. La media
     # teórica es Σv/PHF × 900/3600 ≈ 1337; 1328 está dentro de ±1σ (≈37).
-    result = simulate(SimulationRequest(config=sample_intersection()))
+    result = simulate(SimulationRequest(config=sample_intersection(),
+                                        replications=1))
     assert result.total_arrived == 1328
     assert result.total_served <= result.total_arrived
+
+
+def test_sample_simulation_replicated_mean_near_theory():
+    # Con 20 réplicas, la media de llegadas debe acercarse a la teórica
+    # (Σv/PHF × T = 1337 veh en 900 s; error estándar de la media ≈ 8).
+    result = simulate(SimulationRequest(config=sample_intersection(),
+                                        replications=20))
+    assert abs(result.total_arrived - 1337.0) <= 30.0
+    assert result.replications == 20

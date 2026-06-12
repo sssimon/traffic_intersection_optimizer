@@ -204,27 +204,43 @@ class SimulationRequest(BaseModel):
     config: IntersectionConfig
     signal_plan: Optional[SignalPlan] = None
     duration_s: int = Field(900, ge=60, le=7200, description="Duración (s).")
-    seed: int = 42
+    seed: int = Field(42, description="Semilla base; la réplica i usa seed + i.")
     time_step_s: float = Field(1.0, ge=0.25, le=2.0)
+    replications: int = Field(
+        20,
+        ge=1,
+        le=100,
+        description="Número de réplicas con semillas consecutivas (M6).",
+    )
 
 
 class MovementTrace(BaseModel):
+    """Métricas de un grupo de carriles agregadas entre réplicas."""
     lane_group_id: str
-    queue_over_time: List[float]
-    served_total: int
-    arrived_total: int
-    avg_wait_s: float
-    max_queue: float
+    queue_p05: List[float] = Field(..., description="Cola por paso, percentil 5 entre réplicas.")
+    queue_p50: List[float] = Field(..., description="Cola por paso, mediana entre réplicas.")
+    queue_p95: List[float] = Field(..., description="Cola por paso, percentil 95 entre réplicas.")
+    arrived_total: float = Field(..., description="Llegadas totales (media entre réplicas).")
+    served_total: float = Field(..., description="Vehículos servidos (media entre réplicas).")
+    avg_wait_s: float = Field(..., description="Espera media por vehículo (media entre réplicas).")
+    wait_p05: float = Field(..., description="Espera media, percentil 5 entre réplicas.")
+    wait_p95: float = Field(..., description="Espera media, percentil 95 entre réplicas.")
+    max_queue: float = Field(..., description="Cola máxima (media entre réplicas).")
+    max_queue_p95: float = Field(..., description="Cola máxima, percentil 95 entre réplicas.")
 
 
 class SimulationResult(BaseModel):
     duration_s: int
+    replications: int
     time_axis_s: List[float]
     movements: List[MovementTrace]
-    avg_wait_all_s: float
-    max_queue_all: float
-    total_served: int
-    total_arrived: int
+    avg_wait_all_s: float = Field(..., description="Espera media global (media entre réplicas).")
+    avg_wait_all_p05: float
+    avg_wait_all_p95: float
+    max_queue_all: float = Field(..., description="Cola máxima global (media entre réplicas).")
+    max_queue_all_p95: float
+    total_served: float = Field(..., description="Media entre réplicas.")
+    total_arrived: float = Field(..., description="Media entre réplicas.")
 
 
 # ---------- Escenarios ----------

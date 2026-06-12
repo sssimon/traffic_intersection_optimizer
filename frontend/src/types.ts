@@ -77,19 +77,28 @@ export interface IntersectionAnalysis {
 
 export interface MovementTrace {
   lane_group_id: string;
-  queue_over_time: number[];
+  queue_p05: number[];
+  queue_p50: number[];
+  queue_p95: number[];
   served_total: number;
   arrived_total: number;
   avg_wait_s: number;
+  wait_p05: number;
+  wait_p95: number;
   max_queue: number;
+  max_queue_p95: number;
 }
 
 export interface SimulationResult {
   duration_s: number;
+  replications: number;
   time_axis_s: number[];
   movements: MovementTrace[];
   avg_wait_all_s: number;
+  avg_wait_all_p05: number;
+  avg_wait_all_p95: number;
   max_queue_all: number;
+  max_queue_all_p95: number;
   total_served: number;
   total_arrived: number;
 }

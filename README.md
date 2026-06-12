@@ -16,7 +16,8 @@ semaforizada — incluso sin datos históricos.
    menor demora. Cicl​o y verdes óptimos a partir de la demanda.
 3. **Análisis HCM 2010**: demora, capacidad, cola al percentil 95 (back of
    queue, HCM 2000 ap. G), LOS A–F.
-4. **Simulación de colas**: llegadas aleatorias + descarga a saturación, traza de colas en el tiempo.
+4. **Simulación de colas**: llegadas Poisson + descarga a saturación, con N
+   réplicas y banda de percentiles 5–95 de la cola en el tiempo.
 5. **Escenarios**: compara crecimiento, hora pico, eventos — recomienda estrategia.
 6. **Análisis sin semáforo**: PARE en calle secundaria (HCM cap. 19) por
    aceptación de brechas; compara semáforo vs PARE.
@@ -98,7 +99,9 @@ de hora pico) puede usarse como volumen horario equivalente.
   `backend/app/analysis.py`.
 - **Simulación de colas de tiempo discreto** — paso fijo (1 s por defecto),
   llegadas Poisson (muestreo exacto por paso), salidas a flujo de saturación
-  durante el verde. Ver `backend/app/simulator.py`.
+  durante el verde; N réplicas con semillas consecutivas y percentiles
+  5/50/95 (sin periodo de calentamiento: parte con colas vacías).
+  Ver `backend/app/simulator.py`.
 - **Aceptación de brechas** — HCM 2010 cap. 19 (PARE en la calle secundaria)
   para intersecciones no semaforizadas. Ver `backend/app/unsignalized.py`.
 
@@ -110,7 +113,7 @@ de hora pico) puede usarse como volumen horario equivalente.
 | GET    | `/api/sample`            | Configuración de ejemplo                     |
 | POST   | `/api/optimize`          | Plan de tiempos (`?method=webster\|delay_min`) |
 | POST   | `/api/analyze`           | Optimiza (`?method=`) + análisis HCM         |
-| POST   | `/api/simulate`          | Simulación de colas (tiempo discreto)        |
+| POST   | `/api/simulate`          | Simulación de colas (N réplicas, banda 5–95) |
 | POST   | `/api/scenarios`         | Comparación multi-escenario + recomendación  |
 | POST   | `/api/analyze-twsc`      | Análisis no semaforizado con PARE (HCM 19)   |
 

@@ -1,4 +1,4 @@
-"""Simulación de colas en tiempo discreto (paso fijo).
+"""Simulación de colas en tiempo discreto (paso fijo) con réplicas.
 
 No es una microsimulación espacial: cada grupo de carriles se modela como una
 cola vertical, sin seguimiento vehicular ni cambio de carril.
@@ -14,15 +14,20 @@ Modelo:
   s/3600 (veh/s). Fuera del verde no hay salidas (amarillo + rojo).
 - Estado del semáforo: se reproduce el plan ciclo a ciclo.
 
-Métricas:
-- Cola promedio y máxima por grupo a lo largo del tiempo.
-- Tiempo de espera promedio por vehículo servido.
-- Llegadas vs servidos (vehículos que quedan en cola al final).
+Réplicas (M6): una corrida estocástica es una muestra, no una estimación. Se
+corren `replications` réplicas con semillas consecutivas (seed, seed+1, …) y
+se reporta la banda de percentiles 5/50/95 de la cola punto a punto, además
+de percentiles de las métricas agregadas. Con replications=1 el resultado es
+la corrida única de esa semilla (los tres percentiles coinciden).
+
+Limitación declarada: sin periodo de calentamiento — cada réplica parte con
+colas vacías (inicio del periodo pico), lo que subestima la cola de los
+primeros minutos.
 """
 from __future__ import annotations
 
 from collections import deque
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 import numpy as np
 
@@ -79,105 +84,138 @@ def _phase_state_at(t: float, schedule: List[tuple[str, str, float]]) -> tuple[s
     return schedule[-1][0], schedule[-1][1]
 
 
+def _run_once(
+    group_ids: List[str],
+    rates: Dict[str, Tuple[float, float, str | None]],
+    states: List[Tuple[str, str]],
+    dt: float,
+    seed: int,
+) -> dict:
+    """Una réplica: historial de cola, llegadas, servidos y esperas por grupo."""
+    rng = np.random.default_rng(seed)
+    n_steps = len(states)
+
+    queues: Dict[str, deque[float]] = {g: deque() for g in group_ids}
+    arrivals: Dict[str, int] = {g: 0 for g in group_ids}
+    served: Dict[str, int] = {g: 0 for g in group_ids}
+    wait_sum: Dict[str, float] = {g: 0.0 for g in group_ids}
+    credit: Dict[str, float] = {g: 0.0 for g in group_ids}
+    hist: Dict[str, np.ndarray] = {
+        g: np.zeros(n_steps, dtype=np.float32) for g in group_ids
+    }
+
+    # Pre-muestreo: llegadas por paso ~ Poisson(λ·dt), en el orden de los
+    # grupos (mismo orden de consumo del RNG que la corrida única original).
+    draws = {g: rng.poisson(rates[g][0] * dt, n_steps) for g in group_ids}
+
+    for step in range(n_steps):
+        t = step * dt
+        active_phase, state = states[step]
+
+        for g in group_ids:
+            arr_rate, sat_rate, phase_id = rates[g]
+            n_arr = int(draws[g][step])
+            for _ in range(n_arr):
+                queues[g].append(t)
+            arrivals[g] += n_arr
+
+            # Salidas si la fase está en verde para este grupo; el crédito
+            # acumulado se conserva fuera del verde.
+            if phase_id == active_phase and state == "green":
+                credit[g] += sat_rate * dt
+                while credit[g] >= 1.0 and queues[g]:
+                    arrival_time = queues[g].popleft()
+                    wait_sum[g] += t - arrival_time
+                    served[g] += 1
+                    credit[g] -= 1.0
+
+            hist[g][step] = len(queues[g])
+
+    return {"hist": hist, "arrivals": arrivals, "served": served, "wait_sum": wait_sum}
+
+
 def simulate(req: SimulationRequest) -> SimulationResult:
-    rng = np.random.default_rng(req.seed)
     cfg = req.config
     plan = req.signal_plan or optimize(cfg)
     schedule = _build_phase_schedule(cfg, plan)
 
     dt = req.time_step_s
     n_steps = int(req.duration_s / dt)
+    time_axis = [i * dt for i in range(n_steps)]
+    # El plan es fijo: el estado semafórico por paso se calcula una sola vez
+    # y se comparte entre réplicas.
+    states = [_phase_state_at(i * dt, schedule) for i in range(n_steps)]
 
-    # Estado por grupo
-    queues: Dict[str, deque[float]] = {}
-    arrivals: Dict[str, int] = {}
-    served: Dict[str, int] = {}
-    wait_sum: Dict[str, float] = {}
-    queue_history: Dict[str, List[float]] = {}
-    departure_credit: Dict[str, float] = {}
-    rates: Dict[str, tuple[float, float, str | None]] = {}  # (arr_rate, sat_rate, phase)
-
+    group_ids: List[str] = []
+    rates: Dict[str, Tuple[float, float, str | None]] = {}
     for ap in cfg.approaches:
         for lg in ap.lane_groups:
-            queues[lg.id] = deque()
-            arrivals[lg.id] = 0
-            served[lg.id] = 0
-            wait_sum[lg.id] = 0.0
-            queue_history[lg.id] = []
-            departure_credit[lg.id] = 0.0
-            arr_rate = cfg.demand_for(lg.id) / 3600.0  # veh/s
-            sat_rate = lg.saturation_flow / 3600.0      # veh/s
-            rates[lg.id] = (arr_rate, sat_rate, _phase_id_for(cfg, lg.id))
+            group_ids.append(lg.id)
+            rates[lg.id] = (
+                cfg.demand_for(lg.id) / 3600.0,   # veh/s
+                lg.saturation_flow / 3600.0,       # veh/s
+                _phase_id_for(cfg, lg.id),
+            )
 
-    # Pre-muestreo: llegadas por paso ~ Poisson(λ·dt) para cada grupo.
-    arrival_draws: Dict[str, np.ndarray] = {
-        lg_id: rng.poisson(arr_rate * dt, n_steps)
-        for lg_id, (arr_rate, _, _) in rates.items()
-    }
-
-    time_axis: List[float] = []
-
-    for step in range(n_steps):
-        t = step * dt
-        time_axis.append(t)
-        active_phase, state = _phase_state_at(t, schedule)
-
-        for lg_id, (arr_rate, sat_rate, phase_id) in rates.items():
-            # Llegadas Poisson en el intervalo dt (pre-muestreadas)
-            n_arr = int(arrival_draws[lg_id][step])
-            for _ in range(n_arr):
-                queues[lg_id].append(t)
-                arrivals[lg_id] += 1
-
-            # Salidas si la fase está en verde para este grupo
-            if phase_id == active_phase and state == "green":
-                departure_credit[lg_id] += sat_rate * dt
-                while departure_credit[lg_id] >= 1.0 and queues[lg_id]:
-                    arrival_time = queues[lg_id].popleft()
-                    wait_sum[lg_id] += t - arrival_time
-                    served[lg_id] += 1
-                    departure_credit[lg_id] -= 1.0
-            else:
-                # se mantiene el crédito acumulado del verde anterior
-                pass
-
-            queue_history[lg_id].append(len(queues[lg_id]))
+    reps = [
+        _run_once(group_ids, rates, states, dt, req.seed + r)
+        for r in range(req.replications)
+    ]
+    n_reps = len(reps)
 
     traces: List[MovementTrace] = []
-    total_served = 0
-    total_arrived = 0
-    max_q_all = 0.0
-    wait_num = 0.0
-    wait_den = 0
+    rep_arrived = np.zeros(n_reps)
+    rep_served = np.zeros(n_reps)
+    rep_wait_num = np.zeros(n_reps)
+    rep_max_queue = np.zeros(n_reps)
 
-    for lg_id in queues:
-        q_hist = queue_history[lg_id]
-        max_q = max(q_hist) if q_hist else 0.0
-        avg_wait = wait_sum[lg_id] / served[lg_id] if served[lg_id] > 0 else 0.0
-        traces.append(
-            MovementTrace(
-                lane_group_id=lg_id,
-                queue_over_time=q_hist,
-                served_total=served[lg_id],
-                arrived_total=arrivals[lg_id],
-                avg_wait_s=round(avg_wait, 2),
-                max_queue=max_q,
-            )
-        )
-        total_served += served[lg_id]
-        total_arrived += arrivals[lg_id]
-        max_q_all = max(max_q_all, max_q)
-        wait_num += wait_sum[lg_id]
-        wait_den += served[lg_id]
+    for g in group_ids:
+        qstack = np.stack([rep["hist"][g] for rep in reps])  # (réplicas, pasos)
+        if n_steps > 0:
+            p05, p50, p95 = np.percentile(qstack, [5.0, 50.0, 95.0], axis=0)
+            maxqs = qstack.max(axis=1)
+        else:
+            p05 = p50 = p95 = np.zeros(0)
+            maxqs = np.zeros(n_reps)
 
-    avg_wait_all = wait_num / wait_den if wait_den > 0 else 0.0
+        waits = np.array([
+            rep["wait_sum"][g] / rep["served"][g] if rep["served"][g] > 0 else 0.0
+            for rep in reps
+        ])
+        arr = np.array([rep["arrivals"][g] for rep in reps], dtype=float)
+        srv = np.array([rep["served"][g] for rep in reps], dtype=float)
+
+        traces.append(MovementTrace(
+            lane_group_id=g,
+            queue_p05=[round(float(x), 2) for x in p05],
+            queue_p50=[round(float(x), 2) for x in p50],
+            queue_p95=[round(float(x), 2) for x in p95],
+            arrived_total=round(float(arr.mean()), 1),
+            served_total=round(float(srv.mean()), 1),
+            avg_wait_s=round(float(waits.mean()), 2),
+            wait_p05=round(float(np.percentile(waits, 5.0)), 2),
+            wait_p95=round(float(np.percentile(waits, 95.0)), 2),
+            max_queue=round(float(maxqs.mean()), 1),
+            max_queue_p95=round(float(np.percentile(maxqs, 95.0)), 1),
+        ))
+
+        rep_arrived += arr
+        rep_served += srv
+        rep_wait_num += np.array([rep["wait_sum"][g] for rep in reps])
+        rep_max_queue = np.maximum(rep_max_queue, maxqs)
+
+    rep_avg_wait = np.where(rep_served > 0, rep_wait_num / np.maximum(rep_served, 1.0), 0.0)
 
     return SimulationResult(
         duration_s=req.duration_s,
+        replications=n_reps,
         time_axis_s=time_axis,
         movements=traces,
-        avg_wait_all_s=round(avg_wait_all, 2),
-        max_queue_all=max_q_all,
-        total_served=total_served,
-        total_arrived=total_arrived,
+        avg_wait_all_s=round(float(rep_avg_wait.mean()), 2),
+        avg_wait_all_p05=round(float(np.percentile(rep_avg_wait, 5.0)), 2),
+        avg_wait_all_p95=round(float(np.percentile(rep_avg_wait, 95.0)), 2),
+        max_queue_all=round(float(rep_max_queue.mean()), 1),
+        max_queue_all_p95=round(float(np.percentile(rep_max_queue, 95.0)), 1),
+        total_served=round(float(rep_served.mean()), 1),
+        total_arrived=round(float(rep_arrived.mean()), 1),
     )

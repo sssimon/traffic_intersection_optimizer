@@ -11,6 +11,7 @@ interface Props {
 export function SimulationPanel({ config }: Props) {
   const [duration, setDuration] = useState(900);
   const [seed, setSeed] = useState(42);
+  const [reps, setReps] = useState(20);
   const [result, setResult] = useState<SimulationResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -20,7 +21,11 @@ export function SimulationPanel({ config }: Props) {
     setLoading(true);
     setError(null);
     try {
-      const r = await simulate(config, { duration_s: duration, seed });
+      const r = await simulate(config, {
+        duration_s: duration,
+        seed,
+        replications: reps,
+      });
       setResult(r);
       const top = [...r.movements]
         .sort((a, b) => b.max_queue - a.max_queue)
@@ -48,7 +53,9 @@ export function SimulationPanel({ config }: Props) {
         .map((m, i) => ({
           label: m.lane_group_id,
           color: colorFor(i),
-          values: decimated(m.queue_over_time),
+          median: decimated(m.queue_p50),
+          low: decimated(m.queue_p05),
+          high: decimated(m.queue_p95),
         }))
     : [];
 
@@ -59,7 +66,8 @@ export function SimulationPanel({ config }: Props) {
       <Card.Header>
         <Card.Title>Simulación de colas</Card.Title>
         <Card.Description>
-          Llegadas Poisson · descarga a flujo de saturación durante el verde
+          Llegadas Poisson · N réplicas con banda percentil 5–95 · descarga a
+          flujo de saturación durante el verde
         </Card.Description>
       </Card.Header>
       <Card.Content>
@@ -83,6 +91,18 @@ export function SimulationPanel({ config }: Props) {
             onChange={(e) => setSeed(parseInt(e.target.value) || 0)}
             style={{ width: 100 }}
           />
+          <Input
+            label="Réplicas"
+            size="sm"
+            type="number"
+            min={1}
+            max={100}
+            value={reps}
+            onChange={(e) =>
+              setReps(Math.max(1, Math.min(100, parseInt(e.target.value) || 20)))
+            }
+            style={{ width: 100 }}
+          />
           <div style={{ alignSelf: "flex-end", marginLeft: "auto" }}>
             <Button variant="primary" size="sm" loading={loading} onClick={run}>
               Ejecutar simulación
@@ -97,12 +117,14 @@ export function SimulationPanel({ config }: Props) {
             <div className="kpi-grid" style={{ marginBottom: 16 }}>
               <div className="kpi">
                 <span className="label">Llegados</span>
-                <span className="value">{result.total_arrived}</span>
-                <span className="unit">vehículos</span>
+                <span className="value">{result.total_arrived.toFixed(0)}</span>
+                <span className="unit">
+                  veh · media de {result.replications} réplicas
+                </span>
               </div>
               <div className="kpi">
                 <span className="label">Servidos</span>
-                <span className="value">{result.total_served}</span>
+                <span className="value">{result.total_served.toFixed(0)}</span>
                 <span className="unit">
                   {result.total_arrived > 0
                     ? `${((result.total_served / result.total_arrived) * 100).toFixed(1)}%`
@@ -112,12 +134,17 @@ export function SimulationPanel({ config }: Props) {
               <div className="kpi">
                 <span className="label">Espera media</span>
                 <span className="value">{result.avg_wait_all_s.toFixed(1)}</span>
-                <span className="unit">s / veh</span>
+                <span className="unit">
+                  s/veh · p5–p95: {result.avg_wait_all_p05.toFixed(0)}–
+                  {result.avg_wait_all_p95.toFixed(0)}
+                </span>
               </div>
               <div className="kpi">
                 <span className="label">Cola máxima</span>
                 <span className="value">{result.max_queue_all.toFixed(0)}</span>
-                <span className="unit">veh</span>
+                <span className="unit">
+                  veh · p95: {result.max_queue_all_p95.toFixed(0)}
+                </span>
               </div>
             </div>
 

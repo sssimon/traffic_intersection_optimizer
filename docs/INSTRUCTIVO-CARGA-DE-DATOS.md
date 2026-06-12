@@ -251,7 +251,9 @@ Checklist rápido:
    - Ciclo y verde por fase del plan seleccionado.
    - Demora media, nivel de servicio (LOS A–F) y relación v/c.
    - Tabla HCM por movimiento (capacidad, cola, demora).
-3. Para ver colas en el tiempo → pestaña **03 · Simulación**.
+3. Para ver colas en el tiempo → pestaña **03 · Simulación**: corre N
+   réplicas (20 por defecto) y muestra la mediana con banda de percentiles
+   5–95 — el rango esperable, no una corrida suelta.
 4. Para comparar escenarios de demanda → pestaña **04 · Escenarios**.
 5. Para evaluar la intersección **sin semáforo** → pestaña **05 · Sin
    semáforo**: marca qué accesos son la calle principal (sin PARE) y pulsa
