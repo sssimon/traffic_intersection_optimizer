@@ -55,6 +55,11 @@ semaforizada — incluso sin datos históricos.
     microsimulada lado a lado. Degradación elegante si SUMO no está (solo
     exporta los archivos). En el caso de ejemplo no saturado ambos métodos
     coinciden en < 1 %.
+14. **Informe profesional de 1 clic**: el botón «Generar informe» produce un
+    informe técnico completo en español (HTML autocontenido, listo para
+    imprimir a PDF) con portada, resumen ejecutivo, análisis HCM, **P(LOS)
+    probabilístico** y **anexo de auditoría** (cada número con su fórmula y
+    edición citada) — los dos pilares que ningún software comercial integra.
 
 ## Quick start
 
@@ -90,6 +95,8 @@ App en `http://localhost:5173`. El proxy de Vite reenvía `/api` al backend.
 3. Pulsa **Optimizar y analizar** — verás ciclo, verdes, demora y LOS.
 4. Ve a **Simulación** para ver la evolución de colas con datos sintéticos.
 5. Ve a **Escenarios** para comparar futuros y obtener una recomendación.
+6. Pulsa **Generar informe** para abrir el informe técnico completo (HCM +
+   P(LOS) + auditoría) y guardarlo como PDF desde el navegador.
 
 ### Documentación (`docs/`)
 
@@ -174,6 +181,7 @@ advertencia) y aplica volúmenes, PHF y PCU sin pasar por Excel.
 | POST   | `/api/field-count`       | Aforo 15 min: hora pico, PHF y PCU           |
 | POST   | `/api/osm-import`        | Geometría del cruce desde OSM (Overpass)     |
 | POST   | `/api/sumo-export`       | Exporta a SUMO + compara analítico vs microsim |
+| POST   | `/api/report`            | Informe HTML de 1 clic (HCM + P(LOS) + auditoría) |
 | POST/GET | `/api/runs`            | Guardar / listar corridas (SQLite)           |
 | GET/DELETE | `/api/runs/{id}`     | Cargar / eliminar una corrida                |
 

@@ -816,3 +816,29 @@ class SumoExportResult(BaseModel):
     notes: List[str] = Field(default_factory=list)
 
 
+# ---------- Informe profesional de 1 clic (tarea 5.1) ----------
+
+class ReportRequest(BaseModel):
+    config: IntersectionConfig
+    method: Literal["webster", "delay_min"] = Field(
+        "delay_min", description="Optimizador con el que se diseña el plan del informe."
+    )
+    volume_cv: float = Field(
+        0.10, ge=0.0, le=0.5,
+        description="CV de los volúmenes para el análisis de incertidumbre P(LOS).",
+    )
+    samples: int = Field(2000, ge=100, le=20000)
+    include_uncertainty: bool = Field(
+        True, description="Incluir la sección de incertidumbre P(LOS)."
+    )
+    include_audit: bool = Field(
+        True, description="Incluir el anexo de auditoría (traza de cálculo)."
+    )
+    author: Optional[str] = Field(
+        None, description="Quién firma el informe (opcional, para la portada)."
+    )
+    study_date: Optional[str] = Field(
+        None, description="Fecha del estudio/aforo (texto libre, opcional)."
+    )
+
+

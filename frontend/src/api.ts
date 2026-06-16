@@ -116,6 +116,26 @@ export const runCorridor = (
     optimize_offsets: opts.optimize ?? true,
   });
 
+export async function generateReport(
+  cfg: IntersectionConfig,
+  opts: { method?: OptimizeMethod; volumeCv?: number; samples?: number } = {},
+): Promise<string> {
+  const r = await fetch(`${BASE}/report`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      config: cfg,
+      method: opts.method ?? "delay_min",
+      volume_cv: opts.volumeCv ?? 0.1,
+      samples: opts.samples ?? 2000,
+      include_uncertainty: true,
+      include_audit: true,
+    }),
+  });
+  if (!r.ok) throw new Error(`report: ${r.status} ${await r.text()}`);
+  return r.text();
+}
+
 export const sumoExport = (
   cfg: IntersectionConfig,
   opts: {

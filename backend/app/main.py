@@ -5,6 +5,7 @@ from typing import Literal
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 
 from .analysis import analyze
 from .data import sample_intersection
@@ -23,6 +24,7 @@ from .models import (
     IntersectionConfig,
     OsmImportRequest,
     OsmImportResult,
+    ReportRequest,
     RunDetail,
     RunSummary,
     SaveRunRequest,
@@ -41,6 +43,7 @@ from .models import (
 from .optimizer import optimize
 from .optimizer_delay import optimize_delay
 from .osm import build_config_from_elements, fetch_overpass
+from .reports import build_report_html
 from .scenarios import compare
 from .simulator import simulate
 from .storage import delete_run, get_run, list_runs, save_run
@@ -173,6 +176,26 @@ def post_sumo_export(req: SumoExportRequest) -> SumoExportResult:
     para comparar la demora analítica (HCM) con la microsimulada."""
     try:
         return process_sumo_export(req)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.post("/api/report", response_class=HTMLResponse)
+def post_report(req: ReportRequest) -> HTMLResponse:
+    """Informe técnico profesional de 1 clic (HTML autocontenido, listo para
+    imprimir a PDF): análisis HCM + P(LOS) + anexo de auditoría."""
+    try:
+        html = build_report_html(
+            req.config,
+            method=req.method,
+            volume_cv=req.volume_cv,
+            samples=req.samples,
+            include_uncertainty=req.include_uncertainty,
+            include_audit=req.include_audit,
+            author=req.author,
+            study_date=req.study_date,
+        )
+        return HTMLResponse(content=html)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 

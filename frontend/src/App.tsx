@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "neobrutalistcomponents";
-import { analyze, fetchSample } from "./api";
+import { analyze, fetchSample, generateReport } from "./api";
 import { DemandTable } from "./components/DemandTable";
 import { IntersectionForm, PhaseEditor } from "./components/IntersectionForm";
 import { LocationMap } from "./components/LocationMap";
@@ -51,6 +51,7 @@ export default function App() {
   const [config, setConfig] = useState<IntersectionConfig>(EMPTY);
   const [analyses, setAnalyses] = useState<Analyses | null>(null);
   const [loading, setLoading] = useState(false);
+  const [reportLoading, setReportLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const loadSample = async () => {
@@ -66,6 +67,26 @@ export default function App() {
   useEffect(() => {
     loadSample().catch(() => {});
   }, []);
+
+  const makeReport = async () => {
+    setReportLoading(true);
+    setError(null);
+    try {
+      const reportHtml = await generateReport(config);
+      const blob = new Blob([reportHtml], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      const win = window.open(url, "_blank");
+      if (!win)
+        setError(
+          "El navegador bloqueó la ventana del informe; permite las ventanas emergentes.",
+        );
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    } catch (e) {
+      setError(String(e));
+    } finally {
+      setReportLoading(false);
+    }
+  };
 
   const runAnalysis = async () => {
     setLoading(true);
@@ -143,6 +164,14 @@ export default function App() {
               }
             />
           </label>
+          <Button
+            variant="secondary"
+            size="sm"
+            loading={reportLoading}
+            onClick={makeReport}
+          >
+            Generar informe
+          </Button>
           <Button
             variant="primary"
             size="sm"

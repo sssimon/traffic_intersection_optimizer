@@ -3,8 +3,12 @@
 
 Produce:
   INSTRUCTIVO-CARGA-DE-DATOS.pdf  <-  INSTRUCTIVO-CARGA-DE-DATOS.md
-  INFORME-CRUCE-AV-PRINCIPAL.pdf  <-  informe-caso-ejemplo.html
+  INFORME-CRUCE-AV-PRINCIPAL.pdf  <-  informe-caso-ejemplo.html (narrativo)
+  INFORME-GENERADO-EJEMPLO.pdf    <-  informe-generado-ejemplo.html (1 clic, tarea 5.1)
   INVESTIGACION-COMPARATIVA.pdf   <-  investigacion-comparativa.md
+
+El informe «generado» se produce con `python regen-informe-generado.py` (que
+llama al motor); aquí solo se imprime a PDF el HTML resultante.
 
 Requisitos:
   - Python 3
@@ -68,6 +72,7 @@ TARGETS = {
     "instructivo": ("INSTRUCTIVO-CARGA-DE-DATOS.md", "INSTRUCTIVO-CARGA-DE-DATOS.pdf"),
     "investigacion": ("investigacion-comparativa.md", "INVESTIGACION-COMPARATIVA.pdf"),
     "informe": ("informe-caso-ejemplo.html", "INFORME-CRUCE-AV-PRINCIPAL.pdf"),
+    "informe-generado": ("informe-generado-ejemplo.html", "INFORME-GENERADO-EJEMPLO.pdf"),
 }
 
 # Claves cuya fuente es Markdown (se convierte a HTML antes de imprimir).
@@ -146,12 +151,13 @@ def build_markdown(browser: str, key: str) -> bool:
         tmp.unlink(missing_ok=True)
 
 
-def build_informe(browser: str) -> bool:
-    src = DOCS / TARGETS["informe"][0]
+def build_html_target(browser: str, key: str) -> bool:
+    """Imprime a PDF un target cuya fuente ya es HTML."""
+    src = DOCS / TARGETS[key][0]
     if not src.exists():
         print(f"  ERROR: no se encuentra {src.name}")
         return False
-    return html_to_pdf(browser, src, DOCS / TARGETS["informe"][1])
+    return html_to_pdf(browser, src, DOCS / TARGETS[key][1])
 
 
 def main() -> int:
@@ -174,7 +180,7 @@ def main() -> int:
             continue
         pdf = DOCS / TARGETS[key][1]
         print(f"Generando {pdf.name} ...")
-        res = build_markdown(browser, key) if key in MARKDOWN_KEYS else build_informe(browser)
+        res = build_markdown(browser, key) if key in MARKDOWN_KEYS else build_html_target(browser, key)
         if res:
             print(f"  OK  ({pdf.stat().st_size / 1024:.0f} KB)")
         else:
