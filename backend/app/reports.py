@@ -376,6 +376,34 @@ def _hcm_analysis(an: IntersectionAnalysis) -> str:
     )
 
 
+def _pedestrians_block(an: IntersectionAnalysis) -> str:
+    if not an.pedestrians:
+        return ""
+    rows = []
+    for p in an.pedestrians:
+        ok = "sí" if p.sufficient_green else "<strong>no</strong>"
+        rows.append(
+            f"<tr><td><code>{_esc(p.crossing_id)}</code> {_esc(p.name)}</td>"
+            f"<td>{_esc(p.phase_id)}</td><td class=\"r\">{_es(p.length_m)}</td>"
+            f'<td class="r">{_es(p.effective_walk_s)}</td>'
+            f'<td class="r">{_es(p.min_required_s)}</td>'
+            f'<td class="r">{_es(p.avg_delay_s)}</td>'
+            f'<td class="c">{_badge(p.los.value)}</td>'
+            f'<td class="c">{ok}</td></tr>'
+        )
+    return (
+        "<h2>Análisis peatonal (M10)</h2>"
+        "<p>Demora peatonal por cruce (HCM, llegadas aleatorias: "
+        "<code>dp = 0.5·C·(1 − gp/C)²</code>) y verificación del mínimo seguro "
+        "MUTCD (Walk + L/Sp). LOS por demora peatonal.</p>"
+        '<table><thead><tr><th>Cruce</th><th>Fase</th><th class="r">Long. (m)</th>'
+        '<th class="r">Verde gp (s)</th><th class="r">Mín. MUTCD (s)</th>'
+        '<th class="r">Demora (s)</th><th class="c">LOS</th>'
+        '<th class="c">¿Verde suf.?</th></tr></thead>'
+        f"<tbody>{''.join(rows)}</tbody></table>"
+    )
+
+
 def _uncertainty(cfg: IntersectionConfig, an: IntersectionAnalysis,
                  method: str, volume_cv: float, samples: int) -> str:
     res = run_uncertainty(UncertaintyRequest(
@@ -578,7 +606,7 @@ def build_report_html(
         _methodology(),
         _signal_plan(cfg, plan, method),
         _demand(cfg),
-        _hcm_analysis(an),
+        _hcm_analysis(an) + _pedestrians_block(an),
     ]
     if include_uncertainty:
         try:

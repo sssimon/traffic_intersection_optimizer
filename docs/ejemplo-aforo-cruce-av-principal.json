@@ -52,5 +52,9 @@
     { "lane_group_id": "E-L", "volume": 248, "pcu_factor": 1.08 },
     { "lane_group_id": "W-T", "volume": 1066, "pcu_factor": 1.11 },
     { "lane_group_id": "W-L", "volume": 222, "pcu_factor": 1.07 }
+  ],
+  "crossings": [
+    { "id": "X-N", "name": "Cruce acceso Norte", "length_m": 14, "phase_id": "P3", "walk_speed_ms": 1.2, "walk_interval_s": 7 },
+    { "id": "X-E", "name": "Cruce acceso Este", "length_m": 11, "phase_id": "P1", "walk_speed_ms": 1.2, "walk_interval_s": 7 }
   ]
 }

@@ -42,11 +42,22 @@ export interface Demand {
   pcu_factor: number;
 }
 
+export interface Crossing {
+  id: string;
+  name: string;
+  length_m: number;
+  phase_id: string;
+  walk_speed_ms: number;
+  walk_interval_s: number;
+  ped_volume_per_h: number;
+}
+
 export interface IntersectionConfig {
   name: string;
   approaches: Approach[];
   phases: Phase[];
   demand: Demand[];
+  crossings?: Crossing[];
   peak_hour_factor: number;
   latitude?: number | null;
   longitude?: number | null;
@@ -90,6 +101,19 @@ export interface MovementAudit {
   steps: AuditStep[];
 }
 
+export interface PedestrianAnalysis {
+  crossing_id: string;
+  name: string;
+  phase_id: string;
+  length_m: number;
+  effective_walk_s: number;
+  clearance_s: number;
+  min_required_s: number;
+  avg_delay_s: number;
+  los: LOS;
+  sufficient_green: boolean;
+}
+
 export interface IntersectionAnalysis {
   config_name: string;
   signal_plan: SignalPlan;
@@ -97,6 +121,7 @@ export interface IntersectionAnalysis {
   avg_delay_s: number;
   overall_los: LOS;
   overall_v_c: number;
+  pedestrians?: PedestrianAnalysis[];
   warnings: string[];
   audit?: MovementAudit[] | null;
 }

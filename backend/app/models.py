@@ -219,12 +219,43 @@ class Demand(BaseModel):
         return self.volume * self.pcu_factor
 
 
+class Crossing(BaseModel):
+    """Cruce peatonal asociado a una fase del semáforo (M10, tarea 5.3).
+
+    Los peatones reciben el intervalo Walk durante una fase (normalmente la
+    paralela al sentido que cruzan, o una fase peatonal exclusiva). El tiempo
+    mínimo seguro es el Walk de MUTCD más el despeje peatonal L/Sp; la demora
+    peatonal sale del modelo HCM de llegadas aleatorias.
+    """
+    id: str = Field(..., description="Identificador único del cruce, ej: 'X-N'.")
+    name: str
+    length_m: float = Field(
+        ..., gt=0.0, le=60.0, description="Longitud del cruce (m): ancho de la calzada que se cruza."
+    )
+    phase_id: str = Field(
+        ..., description="Fase durante la cual los peatones reciben Walk."
+    )
+    walk_speed_ms: float = Field(
+        1.2, ge=0.8, le=1.8, description="Velocidad peatonal de cruce (HCM: 1.2 m/s)."
+    )
+    walk_interval_s: float = Field(
+        7.0, ge=4.0, le=15.0, description="Intervalo Walk mínimo (MUTCD: 7 s)."
+    )
+    ped_volume_per_h: float = Field(
+        0.0, ge=0.0, description="Volumen peatonal por hora (informativo)."
+    )
+
+
 class IntersectionConfig(BaseModel):
     """Configuración completa de una intersección."""
     name: str
     approaches: List[Approach]
     phases: List[Phase]
     demand: List[Demand]
+    crossings: List[Crossing] = Field(
+        default_factory=list,
+        description="Cruces peatonales (opcional, M10). Vacío = sin análisis peatonal.",
+    )
     peak_hour_factor: float = Field(
         0.92,
         ge=0.7,
@@ -322,6 +353,26 @@ class MovementAudit(BaseModel):
     steps: List[AuditStep]
 
 
+class PedestrianAnalysis(BaseModel):
+    """Resultado peatonal por cruce (M10): demora y LOS junto al vehicular."""
+    crossing_id: str
+    name: str
+    phase_id: str
+    length_m: float
+    effective_walk_s: float = Field(
+        ..., description="Tiempo disponible para cruzar (verde de la fase, gp)."
+    )
+    clearance_s: float = Field(..., description="Despeje peatonal L/Sp (FDW).")
+    min_required_s: float = Field(
+        ..., description="Mínimo seguro: Walk + L/Sp (MUTCD)."
+    )
+    avg_delay_s: float = Field(..., description="Demora peatonal media: 0.5·C·(1 − gp/C)².")
+    los: LOSGrade
+    sufficient_green: bool = Field(
+        ..., description="True si el verde de la fase cubre el mínimo MUTCD."
+    )
+
+
 class IntersectionAnalysis(BaseModel):
     config_name: str
     signal_plan: SignalPlan
@@ -329,6 +380,10 @@ class IntersectionAnalysis(BaseModel):
     avg_delay_s: float
     overall_los: LOSGrade
     overall_v_c: float
+    pedestrians: List[PedestrianAnalysis] = Field(
+        default_factory=list,
+        description="Análisis peatonal por cruce (vacío si no hay cruces definidos).",
+    )
     warnings: List[str] = Field(default_factory=list)
     audit: Optional[List[MovementAudit]] = Field(
         None,

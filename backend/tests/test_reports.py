@@ -76,3 +76,10 @@ def test_report_reflects_actual_numbers():
     # El nombre de la intersección y al menos un grupo aparecen.
     assert cfg.name in html
     assert "N-T" in html
+
+
+def test_report_includes_pedestrian_section_when_crossings():
+    # El ejemplo trae cruces (M10): el informe debe traer la sección peatonal.
+    html = build_report_html(sample_intersection(), samples=300)
+    assert "Análisis peatonal (M10)" in html
+    assert "X-N" in html and "X-E" in html

@@ -33,6 +33,7 @@ from .models import (
     MovementAnalysis,
     SignalPlan,
 )
+from .pedestrians import analyze_pedestrians
 
 
 T_HOURS = 0.25   # periodo de análisis (15 min, HCM)
@@ -270,6 +271,9 @@ def analyze(cfg: IntersectionConfig, plan: SignalPlan) -> IntersectionAnalysis:
     if avg_delay > 80:
         warnings.append("Demora promedio en LOS F — la intersección está colapsada.")
 
+    pedestrians, ped_warnings = analyze_pedestrians(cfg, plan)
+    warnings.extend(ped_warnings)
+
     return IntersectionAnalysis(
         config_name=cfg.name,
         signal_plan=plan,
@@ -277,5 +281,6 @@ def analyze(cfg: IntersectionConfig, plan: SignalPlan) -> IntersectionAnalysis:
         avg_delay_s=round(avg_delay, 1),
         overall_los=overall_los,
         overall_v_c=round(max_vc, 3),
+        pedestrians=pedestrians,
         warnings=warnings,
     )

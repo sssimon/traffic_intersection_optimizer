@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from .models import (
     Approach,
+    Crossing,
     Demand,
     IntersectionConfig,
     LaneGroup,
@@ -75,10 +76,19 @@ def sample_intersection() -> IntersectionConfig:
         Demand(lane_group_id="W-L", volume=210),
     ]
 
+    # Cruces peatonales (M10): cruzar un brazo se hace durante el verde del eje
+    # transversal. El brazo Norte (4 carriles ≈ 14 m) se cruza en la fase E-W
+    # (P3); el brazo Este (3 carriles ≈ 11 m) en la fase N-S (P1).
+    crossings = [
+        Crossing(id="X-N", name="Cruce acceso Norte", length_m=14.0, phase_id="P3"),
+        Crossing(id="X-E", name="Cruce acceso Este", length_m=11.0, phase_id="P1"),
+    ]
+
     return IntersectionConfig(
         name="Intersección ejemplo (4×4 con giros izquierda)",
         approaches=approaches,
         phases=phases,
         demand=demand,
+        crossings=crossings,
         peak_hour_factor=0.92,
     )

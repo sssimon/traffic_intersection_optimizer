@@ -66,6 +66,10 @@ semaforizada — incluso sin datos históricos.
     una fase peatonal exclusiva»); la propuesta se valida con el esquema y el
     usuario decide si aplicarla. Requiere `ANTHROPIC_API_KEY` en el entorno del
     backend; sin ella el copiloto se desactiva y el resto funciona igual.
+16. **Peatones (M10)**: cruces peatonales por fase con **demora y LOS peatonal**
+    (HCM, `dp = 0.5·C·(1 − gp/C)²`) reportados junto al vehicular, y
+    verificación del **verde mínimo seguro** (MUTCD: Walk + despeje L/Sp). Avisa
+    cuando una fase es demasiado corta para cruzar con seguridad.
 
 ## Quick start
 
@@ -182,7 +186,7 @@ advertencia) y aplica volúmenes, PHF y PCU sin pasar por Excel.
 | GET    | `/api/health`            | Health check                                 |
 | GET    | `/api/sample`            | Configuración de ejemplo                     |
 | POST   | `/api/optimize`          | Plan de tiempos (`?method=webster\|delay_min`) |
-| POST   | `/api/analyze`           | Optimiza (`?method=`) + análisis HCM (`?audit=true`: traza) |
+| POST   | `/api/analyze`           | Optimiza (`?method=`) + análisis HCM + LOS peatonal (`?audit=true`: traza) |
 | POST   | `/api/simulate`          | Simulación de colas (N réplicas, banda 5–95) |
 | POST   | `/api/scenarios`         | Escenarios (global/direccional) + estrategia |
 | POST   | `/api/analyze-twsc`      | Análisis no semaforizado con PARE (HCM 19)   |
@@ -244,7 +248,9 @@ Traffic-Intersection-Optimizer/
 
 ## Limitaciones conocidas
 
-- No modela peatones ni ciclos vehículo-bicicleta.
+- Peatones: se modela la **demora y el LOS peatonal por cruce** (basado en
+  demora) y el verde mínimo seguro MUTCD. No se modela el LOS peatonal
+  perceptual multifactor del HCM 2010 ni los ciclistas.
 - El análisis de una intersección (pestañas 01–05) la trata como aislada;
   la coordinación vive en la pestaña 06 · Corredor con supuestos
   declarados (pelotón uniforme sin dispersión, fase arterial única).

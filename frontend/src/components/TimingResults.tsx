@@ -274,6 +274,65 @@ export function TimingResults({ webster, delayMin, config }: Props) {
         </Card.Content>
       </Card>
 
+      {analysis.pedestrians && analysis.pedestrians.length > 0 && (
+        <Card>
+          <Card.Header>
+            <Card.Title>Peatones (M10)</Card.Title>
+            <Card.Description>
+              Demora peatonal por cruce (HCM: dp = 0.5·C·(1 − gp/C)²) y verde
+              mínimo seguro MUTCD (Walk + L/Sp) · LOS peatonal junto al vehicular
+            </Card.Description>
+          </Card.Header>
+          <Card.Content>
+            <table>
+              <thead>
+                <tr>
+                  <th>Cruce</th>
+                  <th>Fase</th>
+                  <th className="right">Long. (m)</th>
+                  <th className="right">Verde gp (s)</th>
+                  <th className="right">Mín. MUTCD (s)</th>
+                  <th className="right">Demora (s)</th>
+                  <th>LOS</th>
+                  <th>Verde suf.</th>
+                </tr>
+              </thead>
+              <tbody>
+                {analysis.pedestrians.map((p) => (
+                  <tr key={p.crossing_id}>
+                    <td>
+                      <span className="code">{p.crossing_id}</span> {p.name}
+                    </td>
+                    <td>{p.phase_id}</td>
+                    <td className="right">{p.length_m.toFixed(0)}</td>
+                    <td className="right">{p.effective_walk_s.toFixed(0)}</td>
+                    <td className="right">{p.min_required_s.toFixed(0)}</td>
+                    <td className="right">{p.avg_delay_s.toFixed(0)}</td>
+                    <td>
+                      <span className={`los-badge los-${p.los}`}>{p.los}</span>
+                    </td>
+                    <td
+                      style={{
+                        color: p.sufficient_green ? undefined : "var(--oxblood)",
+                        fontWeight: p.sufficient_green ? undefined : 600,
+                      }}
+                    >
+                      {p.sufficient_green ? "sí" : "no"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p className="desc" style={{ marginBottom: 0, marginTop: 8 }}>
+              «Verde suf.» compara el verde de la fase con el mínimo seguro de
+              MUTCD (Walk 7 s + despeje L/Sp a 1,2 m/s). «no» = la fase es
+              demasiado corta para cruzar con seguridad; amplía el verde o usa
+              una fase peatonal exclusiva.
+            </p>
+          </Card.Content>
+        </Card>
+      )}
+
       <Card>
         <Card.Header>
           <Card.Title>Modo auditoría</Card.Title>

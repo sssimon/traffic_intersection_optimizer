@@ -7,6 +7,7 @@ import { LocationMap } from "./components/LocationMap";
 import { AlternativesPanel } from "./components/AlternativesPanel";
 import { CopilotPanel } from "./components/CopilotPanel";
 import { CorridorPanel } from "./components/CorridorPanel";
+import { CrossingsEditor } from "./components/CrossingsEditor";
 import { FieldCountPanel } from "./components/FieldCountPanel";
 import { RunsPanel } from "./components/RunsPanel";
 import { ScenarioComparison } from "./components/ScenarioComparison";
@@ -207,6 +208,7 @@ export default function App() {
             <IntersectionForm config={config} onChange={setConfig} />
             <PhaseEditor config={config} onChange={setConfig} />
             <DemandTable config={config} onChange={setConfig} />
+            <CrossingsEditor config={config} onChange={setConfig} />
             <FieldCountPanel config={config} onChange={setConfig} />
             <RunsPanel config={config} onChange={setConfig} />
           </>
