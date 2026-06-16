@@ -311,3 +311,38 @@ export interface UncertaintyResult {
   sensitivity: MovementSensitivity[];
   notes: string[];
 }
+
+// ---- Puente SUMO (tarea 4.2) ----
+
+export interface SumoFile {
+  name: string;
+  content: string;
+}
+
+export interface SumoMicrosimResult {
+  replications: number;
+  measured_vehicles: number;
+  delay_mean_s: number;
+  delay_p05_s: number;
+  delay_p50_s: number;
+  delay_p95_s: number;
+  mean_waiting_s: number;
+  overall_los: LOS;
+  teleports: number;
+}
+
+export interface SumoAnalyticSummary {
+  avg_delay_s: number;
+  overall_los: LOS;
+  overall_v_c: number;
+}
+
+export interface SumoExportResult {
+  sumo_available: boolean;
+  files: SumoFile[];
+  analytic: SumoAnalyticSummary;
+  microsim: SumoMicrosimResult | null;
+  delta_delay_s: number | null;
+  warnings: string[];
+  notes: string[];
+}

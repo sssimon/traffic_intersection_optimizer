@@ -13,6 +13,7 @@ import type {
   ScenarioComparison,
   SignalPlan,
   SimulationResult,
+  SumoExportResult,
   TWSCAnalysis,
   UncertaintyResult,
 } from "./types";
@@ -113,6 +114,25 @@ export const runCorridor = (
     intersections,
     offsets_s: opts.offsets ?? [],
     optimize_offsets: opts.optimize ?? true,
+  });
+
+export const sumoExport = (
+  cfg: IntersectionConfig,
+  opts: {
+    method?: OptimizeMethod;
+    replications?: number;
+    durationS?: number;
+    warmupS?: number;
+    runMicrosim?: boolean;
+  } = {},
+) =>
+  post<SumoExportResult>("/sumo-export", {
+    config: cfg,
+    method: opts.method ?? "delay_min",
+    replications: opts.replications ?? 5,
+    duration_s: opts.durationS ?? 600,
+    warmup_s: opts.warmupS ?? 120,
+    run_microsim: opts.runMicrosim ?? true,
   });
 
 export const processFieldCount = (

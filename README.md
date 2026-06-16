@@ -49,6 +49,12 @@ semaforizada — incluso sin datos históricos.
     backend): YOLO + ByteTrack sobre video fijo → matriz de giros (OD) por
     clase con PCU, video anotado para verificación manual y volcado directo
     a la configuración (`--config --map`).
+13. **Validación con SUMO** (opcional): exporta la intersección a un modelo
+    SUMO completo (red, rutas, semáforo) y, si SUMO está instalado, corre
+    réplicas headless para comparar la demora analítica (HCM) con la
+    microsimulada lado a lado. Degradación elegante si SUMO no está (solo
+    exporta los archivos). En el caso de ejemplo no saturado ambos métodos
+    coinciden en < 1 %.
 
 ## Quick start
 
@@ -89,7 +95,8 @@ App en `http://localhost:5173`. El proxy de Vite reenvía `/api` al backend.
 
 - `INSTRUCTIVO-CARGA-DE-DATOS.md` — guía paso a paso de carga de datos.
 - `validacion.md` — validación cruzada del motor contra valores publicados
-  del HCM (Ejemplo 1 TWSC: fórmulas < 1 %, motor completo < 5 %).
+  del HCM (Ejemplo 1 TWSC: fórmulas < 1 %, motor completo < 5 %) y contra
+  microsimulación SUMO (semaforizado no saturado < 1 %).
 - `informe-caso-ejemplo.html` — fuente del informe técnico del caso.
 - `ejemplo-aforo-cruce-av-principal.json` — caso de ejemplo importable.
 - `figura-1-flujos.svg` / `figura-2-resultados.svg` / `figura-3-simulacion.svg` —
@@ -166,6 +173,7 @@ advertencia) y aplica volúmenes, PHF y PCU sin pasar por Excel.
 | POST   | `/api/corridor`          | Corredor: offsets, banda verde y PF          |
 | POST   | `/api/field-count`       | Aforo 15 min: hora pico, PHF y PCU           |
 | POST   | `/api/osm-import`        | Geometría del cruce desde OSM (Overpass)     |
+| POST   | `/api/sumo-export`       | Exporta a SUMO + compara analítico vs microsim |
 | POST/GET | `/api/runs`            | Guardar / listar corridas (SQLite)           |
 | GET/DELETE | `/api/runs/{id}`     | Cargar / eliminar una corrida                |
 
@@ -226,7 +234,6 @@ Traffic-Intersection-Optimizer/
 
 ## Próximos pasos sugeridos
 
-- Integración con SUMO para microsimulación de mayor fidelidad.
 - Control actuado (vehicle-actuated) con sensores virtuales.
 - Dispersión de pelotón (Robertson) en el corredor.
 - Aprendizaje por refuerzo (DQN) para control adaptativo.

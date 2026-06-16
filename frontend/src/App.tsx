@@ -10,6 +10,7 @@ import { FieldCountPanel } from "./components/FieldCountPanel";
 import { RunsPanel } from "./components/RunsPanel";
 import { ScenarioComparison } from "./components/ScenarioComparison";
 import { SimulationPanel } from "./components/SimulationPanel";
+import { SumoPanel } from "./components/SumoPanel";
 import { TimingResults } from "./components/TimingResults";
 import type { IntersectionAnalysis, IntersectionConfig } from "./types";
 
@@ -19,7 +20,8 @@ type Tab =
   | "simulation"
   | "scenarios"
   | "alternatives"
-  | "corridor";
+  | "corridor"
+  | "sumo";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "config", label: "01 · Configuración" },
@@ -28,6 +30,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "scenarios", label: "04 · Escenarios" },
   { id: "alternatives", label: "05 · Alternativas" },
   { id: "corridor", label: "06 · Corredor" },
+  { id: "sumo", label: "07 · Validación SUMO" },
 ];
 
 const EMPTY: IntersectionConfig = {
@@ -198,6 +201,8 @@ export default function App() {
         {tab === "alternatives" && <AlternativesPanel config={config} />}
 
         {tab === "corridor" && <CorridorPanel />}
+
+        {tab === "sumo" && <SumoPanel config={config} />}
       </div>
     </div>
   );

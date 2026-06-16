@@ -12,7 +12,8 @@ Fecha: 2026-06-12 · Suite de respaldo: `backend/tests/test_validation_hcm.py`
 | V1 | TWSC — fórmulas (capacidad potencial, impedancia, demora) | HCM 2000 cap. 17, Example Problem 1 (worksheets publicados) | **< 1 %** en los 4 valores publicados |
 | V2 | TWSC — motor completo sobre el Ejemplo 1 | Ídem | **< 5 %** en capacidad y demora por movimiento |
 | V3 | Cola (back of queue Q1+Q2, fB95) | Nota técnica de Akçelik sobre el modelo HCM 2000 (ap. G), ejemplo resuelto | Ecuaciones reproducidas en la transcripción (Q1 = 12.95 ✓, Q2 = 6.94 ✓) |
-| V4 | Demora semaforizada (d1·PF + d2) | Derivación a mano de las ecuaciones HCM (tests de regresión) | Exacta a la fórmula; **pendiente** contraste con caso publicado del cap. 16/HCS |
+| V4 | Demora semaforizada (d1·PF + d2) | Derivación a mano de las ecuaciones HCM (tests de regresión) | Exacta a la fórmula; contraste con caso publicado del cap. 16/HCS sigue pendiente, pero ahora hay **validación cruzada con microsimulación** (V5) |
+| V5 | Demora semaforizada — motor completo | Microsimulación SUMO (método independiente) sobre el caso de ejemplo | **−0.2 s** (24.1 vs 23.9 s) en régimen no saturado; mismo LOS |
 
 ## 2. V1 — Fórmulas TWSC contra valores publicados (Ejemplo 1, HCM 2000)
 
@@ -83,14 +84,56 @@ Q1 = 12.95 veh ✓ y Q2 = 6.94 veh ✓ con las ecuaciones completas (con cola
 inicial). El motor implementa el caso sin cola inicial (QbL = 0), cuyo
 término Q1 coincide con el publicado para los mismos insumos.
 
-## 6. Brechas conocidas y siguiente paso de validación
+## 6. V5 — Validación cruzada con microsimulación (SUMO)
 
-- **Semaforizado end-to-end (V4):** falta reproducir un Example Problem
-  del cap. 16/18 o contrastar contra HCS con licencia. Los componentes
-  (d1, d2, factores de saturación, Webster) están verificados por
-  derivación a mano en la suite, pero no contra un caso publicado completo
-  (los ejemplos del manual usan giros permitidos y PF por coordinación,
-  fuera del alcance actual del motor).
+**Tarea 4.2 del plan estratégico.** Respaldo: `backend/tests/test_sumo_bridge.py`
+(la prueba end-to-end se ejecuta si SUMO está instalado) y módulo
+`backend/app/sumo_bridge.py`.
+
+La demora semaforizada no tenía un caso publicado del cap. 16 contra el cual
+contrastarse (V4). El puente SUMO cubre ese hueco con un **método
+independiente**: exporta la intersección a un modelo SUMO completo (red,
+rutas, semáforo) y corre réplicas headless; la demora del motor analítico
+HCM se compara contra el `timeLoss` microsimulado. Que dos formalismos tan
+distintos (estado estable de colas vs auto-seguimiento de Krauss vehículo a
+vehículo) coincidan es evidencia fuerte de que el motor es correcto.
+
+Caso de ejemplo (4×4, plan de mínima demora, 5 réplicas, 600 s + 120 s de
+calentamiento):
+
+| Régimen | v/c | Analítico (HCM) | Microsim. (SUMO) | Desv. | LOS |
+|---|--:|--:|--:|--:|:--:|
+| No saturado (demanda ×0.55) | 0.68 | 24.1 s | 23.9 s | **−0.2 s** | C = C |
+| Sobresaturado (demanda nominal) | 1.04 | 52.5 s | 42.1 s | −10.4 s | D = D |
+
+En régimen no saturado —donde el modelo HCM de demora es válido— la
+coincidencia es casi exacta (< 1 %). En sobresaturación los dos métodos
+divergen más (la demora HCM con T = 15 min y la microsimulación tienen
+supuestos distintos sobre el crecimiento y la propagación de cola), pero
+siguen dando el mismo LOS; la herramienta lo declara con avisos
+(teletransportes = gridlock) en vez de ocultarlo. Esa divergencia honesta es
+en sí un resultado útil: marca cuándo conviene una microsimulación.
+
+**Hallazgo de implementación:** `netconvert` reasigna el orden de los enlaces
+del semáforo (no respeta el `linkIndex` impuesto). La primera versión, con la
+cadena de estados desalineada, daba green a los movimientos equivocados y un
+gridlock falso (microsim ≈ +200 s incluso sin saturación). La validación
+cruzada lo detectó; la versión final lee el orden real del `.net.xml`
+generado (doble pasada de netconvert) y por eso coincide.
+
+**Límites declarados:** geometría sintética en estrella con giros inferidos
+por rumbo; la saturación emerge del modelo de Krauss (no se impone el `s`
+analítico); giros permitidos en conflicto no se modelan aparte.
+
+## 7. Brechas conocidas y siguiente paso de validación
+
+- **Semaforizado contra caso publicado (V4):** falta reproducir un Example
+  Problem del cap. 16/18 o contrastar contra HCS con licencia. Los
+  componentes (d1, d2, factores de saturación, Webster) están verificados
+  por derivación a mano en la suite y ahora por **validación cruzada con
+  SUMO (V5)**, pero aún no contra un caso publicado completo (los ejemplos
+  del manual usan giros permitidos y PF por coordinación, fuera del alcance
+  actual del motor).
 - **Derecha menor:** la aproximación de ambos sentidos introduce ±5 % en
   vc según la asimetría direccional (±1 % en capacidad en el Ejemplo 1).
 - **Carril menor compartido (cSH)** y **ajustes tc/tf por pesados y
@@ -104,3 +147,6 @@ término Q1 coincide con el publicado para los mismos insumos.
   idénticos en HCM 2010 (cap. 19) y HCM 6.ª/7.ª ed. (cap. 20).
 - Akçelik & Associates, *HCM 2000 Back of Queue Model for Signalised
   Intersections* (nota técnica, sidrasolutions.com).
+- Eclipse SUMO (Simulation of Urban MObility) 1.23, German Aerospace Center
+  (DLR), https://sumo.dlr.de — usado en V5 como microsimulador de referencia
+  (modelo de auto-seguimiento de Krauss).

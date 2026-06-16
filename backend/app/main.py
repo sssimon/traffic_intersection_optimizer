@@ -31,6 +31,8 @@ from .models import (
     SignalPlan,
     SimulationRequest,
     SimulationResult,
+    SumoExportRequest,
+    SumoExportResult,
     TWSCAnalysis,
     TWSCRequest,
     UncertaintyRequest,
@@ -42,6 +44,7 @@ from .osm import build_config_from_elements, fetch_overpass
 from .scenarios import compare
 from .simulator import simulate
 from .storage import delete_run, get_run, list_runs, save_run
+from .sumo_bridge import process_sumo_export
 from .uncertainty import run_uncertainty
 from .unsignalized import analyze_twsc
 
@@ -160,6 +163,16 @@ def post_field_count(req: FieldCountRequest) -> FieldCountResult:
     """Procesa el aforo de 15 min: hora pico, PHF y PCU por movimiento."""
     try:
         return process_field_count(req)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.post("/api/sumo-export", response_model=SumoExportResult)
+def post_sumo_export(req: SumoExportRequest) -> SumoExportResult:
+    """Exporta el modelo a SUMO y, si está instalado, corre réplicas headless
+    para comparar la demora analítica (HCM) con la microsimulada."""
+    try:
+        return process_sumo_export(req)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 

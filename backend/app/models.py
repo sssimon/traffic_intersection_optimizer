@@ -736,3 +736,83 @@ class UncertaintyResult(BaseModel):
     notes: List[str] = Field(default_factory=list)
 
 
+# ---------- Puente SUMO opcional (tarea 4.2) ----------
+
+class SumoExportRequest(BaseModel):
+    config: IntersectionConfig
+    signal_plan: Optional[SignalPlan] = Field(
+        None, description="Plan a exportar; None = se optimiza con `method`."
+    )
+    method: Literal["webster", "delay_min"] = Field(
+        "delay_min", description="Optimizador si no se entrega un signal_plan."
+    )
+    duration_s: int = Field(
+        600, ge=120, le=3600, description="Periodo medido por réplica (s)."
+    )
+    warmup_s: int = Field(
+        120, ge=0, le=1800, description="Calentamiento descartado antes de medir (s)."
+    )
+    replications: int = Field(
+        5, ge=1, le=20, description="Réplicas SUMO con semillas consecutivas."
+    )
+    seed: int = 42
+    run_microsim: bool = Field(
+        True, description="Correr SUMO si está disponible; False = solo exportar archivos."
+    )
+    driving_side: Literal["right", "left"] = Field(
+        "right", description="Mano de circulación para inferir giros (Venezuela: derecha)."
+    )
+
+
+class SumoFile(BaseModel):
+    """Un archivo del modelo SUMO, devuelto como texto para descargar."""
+    name: str
+    content: str
+
+
+class SumoMicrosimResult(BaseModel):
+    replications: int
+    measured_vehicles: float = Field(
+        ..., description="Vehículos medidos tras el calentamiento (media entre réplicas)."
+    )
+    delay_mean_s: float = Field(
+        ..., description="timeLoss medio (s/veh): demora microsimulada."
+    )
+    delay_p05_s: float
+    delay_p50_s: float
+    delay_p95_s: float
+    mean_waiting_s: float = Field(
+        ..., description="Tiempo detenido medio (s/veh)."
+    )
+    overall_los: LOSGrade
+    teleports: float = Field(
+        ...,
+        description=(
+            "Teletransportes medios por réplica; >0 indica gridlock y demora "
+            "microsimulada subestimada."
+        ),
+    )
+
+
+class SumoAnalyticSummary(BaseModel):
+    avg_delay_s: float
+    overall_los: LOSGrade
+    overall_v_c: float
+
+
+class SumoExportResult(BaseModel):
+    sumo_available: bool = Field(
+        ..., description="True si netconvert y sumo se encontraron (PATH o SUMO_HOME)."
+    )
+    files: List[SumoFile] = Field(
+        ..., description="Archivos del modelo SUMO (descargables aunque SUMO no esté)."
+    )
+    analytic: SumoAnalyticSummary
+    microsim: Optional[SumoMicrosimResult] = None
+    delta_delay_s: Optional[float] = Field(
+        None, description="Demora microsimulada − analítica (s/veh)."
+    )
+    warnings: List[str] = Field(default_factory=list)
+    notes: List[str] = Field(default_factory=list)
+
+
