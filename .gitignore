@@ -30,3 +30,9 @@ build/
 data/runs/
 *.sqlite
 .dev-port
+_tmp_frames/
+
+# Aforo por video (pesos del modelo y salidas pesadas)
+*.pt
+tools/aforo-video/*.mp4
+tools/aforo-video/runs/

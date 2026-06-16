@@ -45,6 +45,10 @@ semaforizada — incluso sin datos históricos.
     simplificado), banda verde bidireccional ponderada por volumen,
     diagrama tiempo-espacio y **PF de progresión real** aplicado al modelo
     de demora — coordinada vs aislada, cuantificado.
+12. **Aforo por video** (paquete opcional `tools/aforo-video/`, no infla el
+    backend): YOLO + ByteTrack sobre video fijo → matriz de giros (OD) por
+    clase con PCU, video anotado para verificación manual y volcado directo
+    a la configuración (`--config --map`).
 
 ## Quick start
 
@@ -222,7 +226,6 @@ Traffic-Intersection-Optimizer/
 
 ## Próximos pasos sugeridos
 
-- Aforo por video (YOLO + ByteTrack) — paquete opcional `tools/aforo-video`.
 - Integración con SUMO para microsimulación de mayor fidelidad.
 - Control actuado (vehicle-actuated) con sensores virtuales.
 - Dispersión de pelotón (Robertson) en el corredor.

@@ -1,0 +1,9 @@
+{
+  "comentario": "Zonas para el video 180386-864121573_tiny.mp4 (1280x720): aérea nocturna, arteria W-E diagonal cruzada por calle N-S. Brazos largos hacia el centro; la zona E cubre también la banda y 310-430 del borde derecho (carriles de la arteria).",
+  "zonas": [
+    { "nombre": "W", "poligono": [[0, 330], [430, 380], [440, 560], [0, 690]] },
+    { "nombre": "E", "poligono": [[880, 40], [1280, 10], [1280, 430], [900, 420]] },
+    { "nombre": "N", "poligono": [[440, 0], [800, 0], [760, 200], [450, 190]] },
+    { "nombre": "S", "poligono": [[660, 520], [1140, 490], [1190, 720], [680, 720]] }
+  ]
+}

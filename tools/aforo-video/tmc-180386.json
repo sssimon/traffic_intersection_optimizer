@@ -1,0 +1,53 @@
+{
+  "duration_s": 31.6,
+  "expansion_factor": 113.87,
+  "movements": [
+    {
+      "from": "E",
+      "to": "S",
+      "auto": 6,
+      "moto": 0,
+      "bus": 0,
+      "camion": 0,
+      "total": 6,
+      "veh_h": 683.2,
+      "pcu_factor": 1.0
+    },
+    {
+      "from": "W",
+      "to": "E",
+      "auto": 3,
+      "moto": 0,
+      "bus": 0,
+      "camion": 0,
+      "total": 3,
+      "veh_h": 341.6,
+      "pcu_factor": 1.0
+    },
+    {
+      "from": "W",
+      "to": "S",
+      "auto": 1,
+      "moto": 0,
+      "bus": 0,
+      "camion": 0,
+      "total": 1,
+      "veh_h": 113.9,
+      "pcu_factor": 1.0
+    }
+  ],
+  "total_counted": 10,
+  "discarded": {
+    "cortos": 17,
+    "inmoviles": 24,
+    "sin_od": 64
+  },
+  "warnings": [
+    "Expansión simple a veh/h: con clips cortos esto es una MUESTRA, no un aforo (el criterio formal pide ≥ 15 min). Úsese con CV alto en el análisis de incertidumbre."
+  ],
+  "video": "180386-864121573_tiny.mp4",
+  "fps": 59.94,
+  "stride": 2,
+  "tracks_detectados": 175,
+  "tracks_cosidos": 115
+}

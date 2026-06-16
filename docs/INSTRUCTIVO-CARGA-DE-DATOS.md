@@ -581,9 +581,14 @@ servicio, más el plan semafórico calculado:
 El sistema **funciona con estimaciones**. Opciones, de más a menos precisa:
 
 1. **Conteo manual corto.** Párate en la intersección en hora pico y cuenta
-   vehículos por movimiento durante **15 minutos**. Multiplica por 4 para
-   obtener veh/h. Es la opción más confiable y barata.
-2. **Video.** Graba 15–30 min con un celular y cuenta después con calma.
+   vehículos por movimiento durante **15 minutos** — y captúralos en la
+   tarjeta **Aforo de campo (15 min)**, que expande, calcula PHF/PCU y
+   llena la demanda sola.
+2. **Video.** Graba 15–30 min con un celular fijo (trípode) o dron
+   estático. Puedes contar a mano con calma, o usar el **aforo automático
+   por video** (`tools/aforo-video/`): YOLO + seguimiento → matriz de giros
+   por clase con video anotado para verificar. Requiere instalar sus
+   dependencias aparte (ver su README).
 3. **Estimación por observación.** Clasifica cada movimiento como bajo
    (~300 veh/h), medio (~700), alto (~1100) o saturado (~1500+).
 4. **Escenarios.** Carga una estimación y usa la pestaña **04 · Escenarios**
