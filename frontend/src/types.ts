@@ -346,3 +346,24 @@ export interface SumoExportResult {
   warnings: string[];
   notes: string[];
 }
+
+// ---- Copiloto LLM (tarea 5.2) ----
+
+export interface CopilotStatus {
+  available: boolean;
+  model: string | null;
+  note: string;
+}
+
+export interface CopilotExplainResult {
+  answer: string;
+  model: string;
+  warnings: string[];
+}
+
+export interface CopilotEditResult {
+  config: IntersectionConfig;
+  summary: string;
+  model: string;
+  warnings: string[];
+}

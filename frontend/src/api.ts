@@ -10,6 +10,9 @@ import type {
   OsmImportResult,
   RunDetail,
   RunSummary,
+  CopilotEditResult,
+  CopilotExplainResult,
+  CopilotStatus,
   ScenarioComparison,
   SignalPlan,
   SimulationResult,
@@ -115,6 +118,26 @@ export const runCorridor = (
     offsets_s: opts.offsets ?? [],
     optimize_offsets: opts.optimize ?? true,
   });
+
+export async function copilotStatus(): Promise<CopilotStatus> {
+  const r = await fetch(`${BASE}/copilot/status`);
+  if (!r.ok) throw new Error(`copilot status: ${r.status}`);
+  return r.json();
+}
+
+export const copilotExplain = (
+  cfg: IntersectionConfig,
+  question: string,
+  method: OptimizeMethod = "delay_min",
+) =>
+  post<CopilotExplainResult>("/copilot/explain", {
+    config: cfg,
+    question,
+    method,
+  });
+
+export const copilotEdit = (cfg: IntersectionConfig, instruction: string) =>
+  post<CopilotEditResult>("/copilot/edit", { config: cfg, instruction });
 
 export async function generateReport(
   cfg: IntersectionConfig,

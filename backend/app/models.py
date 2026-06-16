@@ -842,3 +842,42 @@ class ReportRequest(BaseModel):
     )
 
 
+# ---------- Copiloto LLM opcional (tarea 5.2) ----------
+
+class CopilotStatus(BaseModel):
+    available: bool = Field(
+        ..., description="True si hay ANTHROPIC_API_KEY en el entorno del backend."
+    )
+    model: Optional[str] = Field(None, description="Modelo que usará el copiloto.")
+    note: str
+
+
+class CopilotExplainRequest(BaseModel):
+    config: IntersectionConfig
+    question: str = Field(..., min_length=1, max_length=2000)
+    method: Literal["webster", "delay_min"] = "delay_min"
+
+
+class CopilotExplainResult(BaseModel):
+    answer: str = Field(..., description="Respuesta en español (markdown).")
+    model: str
+    warnings: List[str] = Field(default_factory=list)
+
+
+class CopilotEditRequest(BaseModel):
+    config: IntersectionConfig
+    instruction: str = Field(
+        ..., min_length=1, max_length=2000,
+        description="Instrucción en lenguaje natural (p. ej. 'sube 20% la demanda del Este').",
+    )
+
+
+class CopilotEditResult(BaseModel):
+    config: IntersectionConfig = Field(
+        ..., description="Configuración propuesta, ya validada con el esquema."
+    )
+    summary: str = Field(..., description="Resumen en español de lo que cambió.")
+    model: str
+    warnings: List[str] = Field(default_factory=list)
+
+

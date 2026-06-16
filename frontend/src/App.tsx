@@ -5,6 +5,7 @@ import { DemandTable } from "./components/DemandTable";
 import { IntersectionForm, PhaseEditor } from "./components/IntersectionForm";
 import { LocationMap } from "./components/LocationMap";
 import { AlternativesPanel } from "./components/AlternativesPanel";
+import { CopilotPanel } from "./components/CopilotPanel";
 import { CorridorPanel } from "./components/CorridorPanel";
 import { FieldCountPanel } from "./components/FieldCountPanel";
 import { RunsPanel } from "./components/RunsPanel";
@@ -21,7 +22,8 @@ type Tab =
   | "scenarios"
   | "alternatives"
   | "corridor"
-  | "sumo";
+  | "sumo"
+  | "copilot";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "config", label: "01 · Configuración" },
@@ -31,6 +33,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "alternatives", label: "05 · Alternativas" },
   { id: "corridor", label: "06 · Corredor" },
   { id: "sumo", label: "07 · Validación SUMO" },
+  { id: "copilot", label: "08 · Copiloto" },
 ];
 
 const EMPTY: IntersectionConfig = {
@@ -232,6 +235,10 @@ export default function App() {
         {tab === "corridor" && <CorridorPanel />}
 
         {tab === "sumo" && <SumoPanel config={config} />}
+
+        {tab === "copilot" && (
+          <CopilotPanel config={config} onChange={setConfig} />
+        )}
       </div>
     </div>
   );

@@ -60,6 +60,12 @@ semaforizada — incluso sin datos históricos.
     imprimir a PDF) con portada, resumen ejecutivo, análisis HCM, **P(LOS)
     probabilístico** y **anexo de auditoría** (cada número con su fórmula y
     edición citada) — los dos pilares que ningún software comercial integra.
+15. **Copiloto (IA)** (opcional, pestaña 08): explica los resultados en
+    lenguaje natural (anclado en los números reales del motor) y **edita la
+    configuración por instrucción** («sube 20 % la demanda del Este», «agrega
+    una fase peatonal exclusiva»); la propuesta se valida con el esquema y el
+    usuario decide si aplicarla. Requiere `ANTHROPIC_API_KEY` en el entorno del
+    backend; sin ella el copiloto se desactiva y el resto funciona igual.
 
 ## Quick start
 
@@ -77,6 +83,11 @@ python run.py
 El backend escanea puertos en `[8765, 8800]` y elige el primero libre. Lo escribe
 en `.dev-port` (raíz del repo) y el proxy de Vite lo lee al arrancar. Para forzar
 un puerto: `BACKEND_PORT=8770 python run.py`. Docs interactivas en `/docs`.
+
+**Copiloto (opcional):** para activar la pestaña 08, exporta tu clave antes de
+arrancar el backend: `ANTHROPIC_API_KEY=sk-... python run.py` (modelo por
+defecto `claude-sonnet-4-6`, configurable con `COPILOT_MODEL`). No instala
+dependencias nuevas: la API se llama por `urllib` de la librería estándar.
 
 ### Frontend
 
@@ -182,6 +193,9 @@ advertencia) y aplica volúmenes, PHF y PCU sin pasar por Excel.
 | POST   | `/api/osm-import`        | Geometría del cruce desde OSM (Overpass)     |
 | POST   | `/api/sumo-export`       | Exporta a SUMO + compara analítico vs microsim |
 | POST   | `/api/report`            | Informe HTML de 1 clic (HCM + P(LOS) + auditoría) |
+| GET    | `/api/copilot/status`    | Disponibilidad del copiloto LLM (opcional)   |
+| POST   | `/api/copilot/explain`   | Explica el análisis en lenguaje natural      |
+| POST   | `/api/copilot/edit`      | Edita la configuración por instrucción       |
 | POST/GET | `/api/runs`            | Guardar / listar corridas (SQLite)           |
 | GET/DELETE | `/api/runs/{id}`     | Cargar / eliminar una corrida                |
 

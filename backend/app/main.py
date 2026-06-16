@@ -11,11 +11,17 @@ from .analysis import analyze
 from .data import sample_intersection
 from .alternatives import compare_controls
 from .audit import build_audit
+from .copilot import copilot_status, edit_config, explain_analysis
 from .corridor import process_corridor
 from .field_count import process_field_count
 from .models import (
     CompareControlsRequest,
     CompareControlsResult,
+    CopilotEditRequest,
+    CopilotEditResult,
+    CopilotExplainRequest,
+    CopilotExplainResult,
+    CopilotStatus,
     CorridorRequest,
     CorridorResult,
     FieldCountRequest,
@@ -198,6 +204,31 @@ def post_report(req: ReportRequest) -> HTMLResponse:
         return HTMLResponse(content=html)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.get("/api/copilot/status", response_model=CopilotStatus)
+def get_copilot_status() -> CopilotStatus:
+    """Disponibilidad del copiloto LLM (opcional, requiere ANTHROPIC_API_KEY)."""
+    return copilot_status()
+
+
+@app.post("/api/copilot/explain", response_model=CopilotExplainResult)
+def post_copilot_explain(req: CopilotExplainRequest) -> CopilotExplainResult:
+    """Explica el análisis en lenguaje natural, anclado en los números del motor."""
+    try:
+        return explain_analysis(req)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@app.post("/api/copilot/edit", response_model=CopilotEditResult)
+def post_copilot_edit(req: CopilotEditRequest) -> CopilotEditResult:
+    """Edita la configuración por lenguaje natural; el resultado se valida con
+    el esquema antes de devolverse (el usuario decide si aplicarlo)."""
+    try:
+        return edit_config(req)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @app.post("/api/osm-import", response_model=OsmImportResult)
