@@ -76,9 +76,9 @@ img { max-width:88%; height:auto; display:block; margin:10px auto 4px;
     <tr><td>Fecha del aforo</td><td>Jueves 30 de abril de 2026</td></tr>
     <tr><td>Periodo observado</td><td>07:00 – 09:00 h · intervalos de 15 min</td></tr>
     <tr><td>Hora pico identificada</td><td>07:30 – 08:30 h</td></tr>
-    <tr><td>Métodos aplicados</td><td>Webster (1958) · HCM 2010 cap. 18 · simulación de colas</td></tr>
+    <tr><td>Métodos aplicados</td><td>Webster (1958) · HCM 2010 cap. 18 · cola percentil 95 (ap. G) · simulación de colas (20 réplicas) · LOS peatonal (M10)</td></tr>
     <tr><td>Herramienta</td><td>Traffic Intersection Optimizer v0.1</td></tr>
-    <tr><td>Fecha del informe</td><td>20 de mayo de 2026</td></tr>
+    <tr><td>Fecha del informe</td><td>16 de junio de 2026</td></tr>
   </table>
   <div class="foot">Documento generado a partir del caso de ejemplo cargado en el sistema
   (archivo <code>ejemplo-aforo-cruce-av-principal.json</code>). Cifras calculadas por el
@@ -274,24 +274,45 @@ el límite de su asignación.</p>
 <table>
   <thead><tr><th>Grupo</th><th>Fase</th><th class="r">Demanda dis.</th>
   <th class="r">Capacidad</th><th class="r">v/c</th><th class="r">Demora (s)</th>
-  <th class="r">Cola est. (veh)</th><th class="c">LOS</th></tr></thead>
+  <th class="r">Cola 95 % (veh/carril)</th><th class="c">LOS</th></tr></thead>
   <tbody>
-    <tr><td><code>N-T</code></td><td>P1</td><td class="r">820</td><td class="r">874</td><td class="r">0,94</td><td class="r">64</td><td class="r">53,7</td><td class="c"><span class="badge E">E</span></td></tr>
-    <tr><td><code>N-L</code></td><td>P2</td><td class="r">188</td><td class="r">200</td><td class="r">0,94</td><td class="r">103</td><td class="r">12,4</td><td class="c"><span class="badge F">F</span></td></tr>
-    <tr><td><code>S-T</code></td><td>P1</td><td class="r">774</td><td class="r">874</td><td class="r">0,89</td><td class="r">58</td><td class="r">49,9</td><td class="c"><span class="badge E">E</span></td></tr>
-    <tr><td><code>S-L</code></td><td>P2</td><td class="r">167</td><td class="r">200</td><td class="r">0,84</td><td class="r">85</td><td class="r">10,9</td><td class="c"><span class="badge F">F</span></td></tr>
-    <tr><td><code>E-T</code></td><td>P3</td><td class="r">1 326</td><td class="r">1 416</td><td class="r">0,94</td><td class="r">49</td><td class="r">85,2</td><td class="c"><span class="badge D">D</span></td></tr>
-    <tr><td><code>E-L</code></td><td>P4</td><td class="r">282</td><td class="r">301</td><td class="r">0,94</td><td class="r">88</td><td class="r">18,6</td><td class="c"><span class="badge F">F</span></td></tr>
-    <tr><td><code>W-T</code></td><td>P3</td><td class="r">1 246</td><td class="r">1 416</td><td class="r">0,88</td><td class="r">43</td><td class="r">77,5</td><td class="c"><span class="badge D">D</span></td></tr>
-    <tr><td><code>W-L</code></td><td>P4</td><td class="r">250</td><td class="r">301</td><td class="r">0,83</td><td class="r">72</td><td class="r">16,2</td><td class="c"><span class="badge E">E</span></td></tr>
+    <tr><td><code>N-T</code></td><td>P1</td><td class="r">820</td><td class="r">874</td><td class="r">0,94</td><td class="r">64</td><td class="r">29,7</td><td class="c"><span class="badge E">E</span></td></tr>
+    <tr><td><code>N-L</code></td><td>P2</td><td class="r">188</td><td class="r">200</td><td class="r">0,94</td><td class="r">103</td><td class="r">15,6</td><td class="c"><span class="badge F">F</span></td></tr>
+    <tr><td><code>S-T</code></td><td>P1</td><td class="r">774</td><td class="r">874</td><td class="r">0,89</td><td class="r">58</td><td class="r">26,7</td><td class="c"><span class="badge E">E</span></td></tr>
+    <tr><td><code>S-L</code></td><td>P2</td><td class="r">167</td><td class="r">200</td><td class="r">0,84</td><td class="r">85</td><td class="r">13,1</td><td class="c"><span class="badge F">F</span></td></tr>
+    <tr><td><code>E-T</code></td><td>P3</td><td class="r">1 326</td><td class="r">1 416</td><td class="r">0,94</td><td class="r">49</td><td class="r">45,6</td><td class="c"><span class="badge D">D</span></td></tr>
+    <tr><td><code>E-L</code></td><td>P4</td><td class="r">282</td><td class="r">301</td><td class="r">0,94</td><td class="r">88</td><td class="r">21,6</td><td class="c"><span class="badge F">F</span></td></tr>
+    <tr><td><code>W-T</code></td><td>P3</td><td class="r">1 246</td><td class="r">1 416</td><td class="r">0,88</td><td class="r">43</td><td class="r">39,7</td><td class="c"><span class="badge D">D</span></td></tr>
+    <tr><td><code>W-L</code></td><td>P4</td><td class="r">250</td><td class="r">301</td><td class="r">0,83</td><td class="r">72</td><td class="r">17,8</td><td class="c"><span class="badge E">E</span></td></tr>
   </tbody>
 </table>
 <p><strong>Resultado global:</strong> demora media de 57,9 s/veh, nivel de servicio
 <span class="badge E">E</span> y saturación máxima v/c = 0,94. La columna
-«Demanda dis.» corresponde a la demanda de diseño <code>conteo × PCU ÷ PHF</code>.</p>
+«Demanda dis.» corresponde a la demanda de diseño <code>conteo × PCU ÷ PHF</code>;
+la «Cola 95 %» es el back of queue al percentil 95 <em>por carril</em>
+(HCM 2000 cap. 16 ap. G, factor de percentil sobre Q1 + Q2).</p>
 <div class="box">Los tres movimientos en nivel de servicio <strong>F</strong> (N-L, S-L y
 E-L) son giros a la izquierda con demoras de 85 a 103 s/veh. Constituyen el cuello
 de botella operativo de la intersección.</div>
+
+<h2>Nivel de servicio peatonal (M10)</h2>
+<p>Demora peatonal por cruce con el plan de Webster (HCM, llegadas aleatorias:
+<code>dp = 0,5·C·(1 − gp/C)²</code>) y verificación del verde mínimo seguro
+(MUTCD: Walk 7 s + despeje L/Sp a 1,2 m/s). El despeje no condiciona la operación:
+ambos cruces tienen verde suficiente.</p>
+<table>
+  <thead><tr><th>Cruce</th><th>Fase</th><th class="r">Longitud (m)</th>
+  <th class="r">Verde disp. (s)</th><th class="r">Mínimo MUTCD (s)</th>
+  <th class="r">Demora (s)</th><th class="c">LOS</th><th class="c">Verde suf.</th></tr></thead>
+  <tbody>
+    <tr><td><code>X-N</code> Cruce acceso Norte</td><td>P3</td><td class="r">14</td><td class="r">44,7</td><td class="r">18,7</td><td class="r">23,6</td><td class="c"><span class="badge C">C</span></td><td class="c">sí</td></tr>
+    <tr><td><code>X-E</code> Cruce acceso Este</td><td>P1</td><td class="r">11</td><td class="r">27,6</td><td class="r">16,2</td><td class="r">35,6</td><td class="c"><span class="badge D">D</span></td><td class="c">sí</td></tr>
+  </tbody>
+</table>
+<p>Los peatones que cruzan el brazo Norte (en la fase E-W, con 44,7 s de verde)
+operan en <span class="badge C">C</span>; los del brazo Este (fase N-S, 27,6 s)
+en <span class="badge D">D</span>, por el menor verde disponible. Una fase peatonal
+exclusiva reduciría la demora a cambio de capacidad vehicular.</p>
 
 <!-- ============ 9. FIGURA RESULTADOS ============ -->
 <h1>9. Resultados del análisis</h1>
@@ -300,37 +321,38 @@ de botella operativo de la intersección.</div>
 
 <!-- ============ 10. SIMULACIÓN ============ -->
 <h1>10. Simulación de colas</h1>
-<p>Simulación de 900 s (15 min) con llegadas aleatorias y semilla 42. De
-1&nbsp;235 vehículos generados se sirvieron 1&nbsp;208 (97,8 %); las colas son
+<p>Simulación de 900 s (15 min) con llegadas de Poisson, promediada sobre
+<strong>20 réplicas</strong> (semillas 42–61) con banda de confianza. Llegan en
+promedio 1&nbsp;273 vehículos y se sirven 1&nbsp;235 (97,0 %); las colas son
 extensas pero todavía se disipan dentro del periodo analizado.</p>
 <div class="kpis">
-  <div class="kpi"><div class="l">Vehículos llegados</div><div class="v">1 235</div><div class="u">en 15 min</div></div>
-  <div class="kpi"><div class="l">Servidos</div><div class="v">97,8 %</div><div class="u">1 208 veh</div></div>
-  <div class="kpi"><div class="l">Espera media</div><div class="v">31,8</div><div class="u">s / veh</div></div>
-  <div class="kpi"><div class="l">Cola máxima</div><div class="v">35</div><div class="u">vehículos</div></div>
+  <div class="kpi"><div class="l">Vehículos llegados</div><div class="v">1 273</div><div class="u">media de 20 réplicas</div></div>
+  <div class="kpi"><div class="l">Servidos</div><div class="v">97,0 %</div><div class="u">1 235 veh</div></div>
+  <div class="kpi"><div class="l">Espera media</div><div class="v">35,5</div><div class="u">s / veh (p05–p95: 32–40)</div></div>
+  <div class="kpi"><div class="l">Cola máxima</div><div class="v">37</div><div class="u">veh (p95: 47)</div></div>
 </div>
 <table>
   <thead><tr><th>Grupo</th><th class="r">Llegados</th><th class="r">Servidos</th>
   <th class="r">Espera media (s)</th><th class="r">Cola máxima (veh)</th></tr></thead>
   <tbody>
-    <tr><td><code>E-T</code></td><td class="r">322</td><td class="r">322</td><td class="r">26,5</td><td class="r">35</td></tr>
-    <tr><td><code>W-T</code></td><td class="r">301</td><td class="r">301</td><td class="r">25,2</td><td class="r">30</td></tr>
-    <tr><td><code>S-T</code></td><td class="r">196</td><td class="r">188</td><td class="r">31,1</td><td class="r">25</td></tr>
-    <tr><td><code>N-T</code></td><td class="r">206</td><td class="r">199</td><td class="r">34,1</td><td class="r">24</td></tr>
-    <tr><td><code>E-L</code></td><td class="r">64</td><td class="r">61</td><td class="r">48,5</td><td class="r">10</td></tr>
-    <tr><td><code>W-L</code></td><td class="r">59</td><td class="r">53</td><td class="r">40,5</td><td class="r">9</td></tr>
-    <tr><td><code>N-L</code></td><td class="r">47</td><td class="r">46</td><td class="r">55,7</td><td class="r">8</td></tr>
-    <tr><td><code>S-L</code></td><td class="r">40</td><td class="r">38</td><td class="r">51,1</td><td class="r">8</td></tr>
+    <tr><td><code>E-T</code></td><td class="r">336</td><td class="r">331</td><td class="r">31,2</td><td class="r">36</td></tr>
+    <tr><td><code>W-T</code></td><td class="r">313</td><td class="r">312</td><td class="r">26,9</td><td class="r">33</td></tr>
+    <tr><td><code>S-T</code></td><td class="r">195</td><td class="r">188</td><td class="r">34,8</td><td class="r">25</td></tr>
+    <tr><td><code>N-T</code></td><td class="r">203</td><td class="r">195</td><td class="r">34,2</td><td class="r">27</td></tr>
+    <tr><td><code>E-L</code></td><td class="r">72</td><td class="r">64</td><td class="r">63,1</td><td class="r">13</td></tr>
+    <tr><td><code>W-L</code></td><td class="r">64</td><td class="r">58</td><td class="r">51,8</td><td class="r">11</td></tr>
+    <tr><td><code>N-L</code></td><td class="r">49</td><td class="r">47</td><td class="r">54,6</td><td class="r">10</td></tr>
+    <tr><td><code>S-L</code></td><td class="r">42</td><td class="r">40</td><td class="r">48,2</td><td class="r">8</td></tr>
   </tbody>
 </table>
 <img src="figura-3-simulacion.svg" alt="Figura 3 - Evolución de las colas">
 <p class="caption">Figura 3 — Evolución de la cola en los movimientos directos durante la simulación</p>
 <p>El patrón en diente de sierra refleja el ciclo del semáforo: la cola crece
 durante el rojo y se descarga durante el verde. En los movimientos directos del
-eje Este–Oeste las colas alcanzan de 30 a 35 vehículos antes de cada descarga;
-las del eje Norte–Sur se mantienen entre 24 y 25. Los giros a la izquierda (no
-graficados) no superan los 10 vehículos, pero con esperas unitarias más altas
-(50–56 s), confirmando el diagnóstico del análisis HCM: la mayor demora la
+eje Este–Oeste las colas alcanzan de 33 a 36 vehículos antes de cada descarga;
+las del eje Norte–Sur se mantienen entre 25 y 27. Los giros a la izquierda (no
+graficados) no superan los 13 vehículos, pero con esperas unitarias más altas
+(48–63 s), confirmando el diagnóstico del análisis HCM: la mayor demora la
 sufren los giros, mientras que las colas más largas se forman en los directos.</p>
 
 <!-- ============ 11. ESCENARIOS ============ -->
@@ -341,7 +363,7 @@ evaluar la sensibilidad de la intersección al crecimiento del tránsito.</p>
   <thead><tr><th>Escenario</th><th class="r">Factor</th><th class="r">Ciclo</th>
   <th class="r">Demora media</th><th class="r">v/c máx</th><th class="c">LOS</th></tr></thead>
   <tbody>
-    <tr><td>Valle (mediodía)</td><td class="r">0,65×</td><td class="r">61 s</td><td class="r">28 s</td><td class="r">0,74</td><td class="c"><span class="badge C">C</span></td></tr>
+    <tr><td>Valle (mediodía)</td><td class="r">0,65×</td><td class="r">61 s</td><td class="r">26 s</td><td class="r">0,71</td><td class="c"><span class="badge C">C</span></td></tr>
     <tr><td>Hora pico AM (aforo actual)</td><td class="r">1,00×</td><td class="r">120 s</td><td class="r">58 s</td><td class="r">0,94</td><td class="c"><span class="badge E">E</span></td></tr>
     <tr><td>Proyección +10 % (3 años)</td><td class="r">1,10×</td><td class="r">120 s</td><td class="r">75 s</td><td class="r">1,03</td><td class="c"><span class="badge E">E</span></td></tr>
     <tr><td>Proyección +25 % (horizonte)</td><td class="r">1,25×</td><td class="r">120 s</td><td class="r">119 s</td><td class="r">1,18</td><td class="c"><span class="badge F">F</span></td></tr>
